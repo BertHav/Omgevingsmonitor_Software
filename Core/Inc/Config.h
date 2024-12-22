@@ -15,7 +15,7 @@
 #define VocRawConfigAddr EEPromStartAddr + (IdSize * 3)
 #define VocIndexConfigAddr EEPromStartAddr + (IdSize * 4)
 #define dBaConfigAddr EEPromStartAddr + (IdSize * 5)
-#define dBcConfigAddr EEPromStartAddr + (IdSize * 6)
+#define dBAConfigAddr EEPromStartAddr + (IdSize * 6)
 #define PM2ConfigAddr EEPromStartAddr + (IdSize * 7)
 #define PM10ConfigAddr EEPromStartAddr + (IdSize * 8)
 #define BatVoltConfigAddr EEPromStartAddr + (IdSize * 9)

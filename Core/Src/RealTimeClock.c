@@ -2,6 +2,7 @@
 #include "RealTimeClock.h"
 #include "sen5x.h"
 #include "main.h"
+#include "microphone.h"
 #include "ESP.h"
 #include "sgp40.h"
 #include <string.h>

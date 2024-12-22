@@ -27,29 +27,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00026420  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00034ae6  00000000  00000000  00026448  2**0
+ 12 .debug_info   00034acb  00000000  00000000  00026448  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00009823  00000000  00000000  0005af2e  2**0
+ 13 .debug_abbrev 000097fb  00000000  00000000  0005af13  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00002b18  00000000  00000000  00064758  2**3
+ 14 .debug_aranges 00002b18  00000000  00000000  00064710  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00001fdf  00000000  00000000  00067270  2**0
+ 15 .debug_rnglists 00001fdf  00000000  00000000  00067228  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000232e7  00000000  00000000  0006924f  2**0
+ 16 .debug_macro  000232f9  00000000  00000000  00069207  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000433bf  00000000  00000000  0008c536  2**0
+ 17 .debug_line   000433cf  00000000  00000000  0008c500  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000a0568  00000000  00000000  000cf8f5  2**0
+ 18 .debug_str    000a0568  00000000  00000000  000cf8cf  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      000000b1  00000000  00000000  0016fe5d  2**0
+ 19 .comment      000000b1  00000000  00000000  0016fe37  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000ae78  00000000  00000000  0016ff10  2**2
+ 20 .debug_frame  0000ae78  00000000  00000000  0016fee8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000006d  00000000  00000000  0017ad88  2**0
+ 21 .debug_line_str 0000006d  00000000  00000000  0017ad60  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_loc    0000257c  00000000  00000000  0017adf5  2**0
+ 22 .debug_loc    0000257c  00000000  00000000  0017adcd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 23 .debug_ranges 00000088  00000000  00000000  0017d371  2**0
+ 23 .debug_ranges 00000088  00000000  00000000  0017d349  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -7352,7 +7352,7 @@ void setMic(float dB){
  8003936:	b082      	sub	sp, #8
  8003938:	af00      	add	r7, sp, #0
  800393a:	6078      	str	r0, [r7, #4]
-  dBC = dB;
+  dBA = dB;
  800393c:	4b03      	ldr	r3, [pc, #12]	@ (800394c <setMic+0x18>)
  800393e:	687a      	ldr	r2, [r7, #4]
  8003940:	601a      	str	r2, [r3, #0]
@@ -7829,7 +7829,7 @@ uint16_t CreateMessage(bool onBeurs){
  8003c64:	220c      	movs	r2, #12
  8003c66:	0019      	movs	r1, r3
  8003c68:	f7ff fd46 	bl	80036f8 <ReadUint8ArrayEEprom>
-  ReadUint8ArrayEEprom(dBcConfigAddr, soundConfig, IdSize);
+  ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
  8003c6c:	4be3      	ldr	r3, [pc, #908]	@ (8003ffc <CreateMessage+0x3b4>)
  8003c6e:	48e4      	ldr	r0, [pc, #912]	@ (8004000 <CreateMessage+0x3b8>)
  8003c70:	220c      	movs	r2, #12
@@ -8000,7 +8000,7 @@ uint16_t CreateMessage(bool onBeurs){
  8003da8:	0011      	movs	r1, r2
  8003daa:	0018      	movs	r0, r3
  8003dac:	f7ff ff28 	bl	8003c00 <uint8ArrayToString>
-  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, dBC);
+  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, dBA);
  8003db0:	19bb      	adds	r3, r7, r6
  8003db2:	881a      	ldrh	r2, [r3, #0]
  8003db4:	4ba0      	ldr	r3, [pc, #640]	@ (8004038 <CreateMessage+0x3f0>)
@@ -12793,7 +12793,7 @@ void ProcessCmd(Receive_MSG msg)
  8005e5a:	f7fd fc31 	bl	80036c0 <WriteUint8ArrayEepromSafe>
         break;
  8005e5e:	e069      	b.n	8005f34 <ProcessCmd+0x19c>
-            WriteUint8ArrayEepromSafe(dBcConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+            WriteUint8ArrayEepromSafe(dBAConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
  8005e60:	2118      	movs	r1, #24
  8005e62:	187b      	adds	r3, r7, r1
  8005e64:	785b      	ldrb	r3, [r3, #1]

@@ -101,7 +101,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 #define SRC_VERSION "2.92 BH"
-#define CURRENT_WEEK "24w51-6"  // -x is daynumber of week i.e. monday = 1
+#define CURRENT_WEEK "24w51-7"  // -x is daynumber of week i.e. monday = 1
 #define LED_BLINK_INTERVAL 1000
 void SetTestDone();
 void SystemClock_Config(void);

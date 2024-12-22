@@ -50,7 +50,7 @@ float Humidity = 0.0;
 float batteryCharge = 0.0;
 float solarCharge = 0.0;
 uint16_t VOCIndex = 0;
-static float dBC = 0.0;
+static float dBA = 0.0;
 float airPM2 = 0.0;
 float airPM10 = 0.0;
 static char message[1024];
@@ -141,7 +141,7 @@ void setMeasurement(float temp, float humid, uint16_t voc){
   VOCIndex = voc;
 }
 void setMic(float dB){
-  dBC = dB;
+  dBA = dB;
 }
 
 void setPMs(uint16_t PM2, uint16_t PM10) {
@@ -264,7 +264,7 @@ uint16_t CreateMessage(bool onBeurs){
   static uint8_t nameConfig[CustomNameMaxLength];
   ReadUint8ArrayEEprom(TempConfigAddr, tempConfig, IdSize);
   ReadUint8ArrayEEprom(HumidConfigAddr, humidConfig, IdSize);
-  ReadUint8ArrayEEprom(dBcConfigAddr, soundConfig, IdSize);
+  ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
   ReadUint8ArrayEEprom(VocIndexConfigAddr, vocConfig, IdSize);
   ReadUint8ArrayEEprom(BatVoltConfigAddr, batteryConfig, IdSize);
   ReadUint8ArrayEEprom(SolVoltConfigAddr, solarConfig, IdSize);
@@ -294,7 +294,7 @@ uint16_t CreateMessage(bool onBeurs){
   index = strlen(message);
 
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, dBC);
+  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, dBA);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, vocConfig);
@@ -339,7 +339,7 @@ uint16_t CreateMessage(bool onBeurs){
     index = strlen(message);
 
 
-    sprintf(&message[index], "{\"Sound\":%.2f},", dBC);
+    sprintf(&message[index], "{\"Sound\":%.2f},", dBA);
     index = strlen(message);
 
 
