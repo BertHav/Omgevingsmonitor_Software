@@ -35,6 +35,16 @@
 typedef bool (*I2CReadCb)(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 typedef bool (*I2CWriteCB)(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 
+typedef enum {
+    SGP_STATE_INIT,
+    SGP_STATE_START_MEASUREMENTS,
+    SGP_STATE_WAIT_FOR_COMPLETION,
+    SGP_STATE_PROCESS_RESULTS,
+    SGP_STATE_WAIT_FOR_READY,
+    SGP_STATE_OFF,
+    SGP_STATE_WAIT
+} SGP40State;
+
 void forceVOCstart(void);
 void SGP_Init(I2CReadCb readFunction, I2CWriteCB writeFunction);
 void SGP_StartMeasurement(void);
@@ -43,5 +53,6 @@ bool SGP_DeviceConnected(void);
 bool SGP_SelfTest(void);
 void SGP_SoftReset(void);
 void SGP_GetHT(float* temperature, float* humidity);
-
+SGP40State SGP_Upkeep(void);
+void setSGP40TimeStamp(uint32_t ticks);
 #endif /* INC_SGP40_H_ */

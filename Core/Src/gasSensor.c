@@ -15,6 +15,7 @@
 #include "stm32l0xx_it.h"
 #include "utils.h"
 
+/*
 void Gas_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   SGP_Init(readFunction, writeFunction);
 }
@@ -30,4 +31,4 @@ bool Gas_GetMeasurementValues(int32_t* vocIndex) {
 bool Gas_DeviceConnected(void) {
   return SGP_DeviceConnected();
 }
-
+*/

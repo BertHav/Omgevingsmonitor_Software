@@ -34,8 +34,11 @@ float dBAmax = 0.0;
 uint8_t counter = 0;
 uint8_t denominator = 1;
 bool samplebufferfilled = false;
+static uint32_t MicStamp;
 //bool averageReached = false;
 //float sample[NUMBER_OF_SAMPLES];
+
+SoundData_t soundData = {0};
 
 void ResetDBACalculator(void) {
   counter = 0;
@@ -122,4 +125,75 @@ bool MIC_TestMeasurementDone(void) {
     return Check;
   }
   return false;
+}
+
+MicrophoneState Mic_Upkeep(){
+  static MicrophoneState MicState = MIC_STATE_INIT;
+  switch(MicState){
+
+  case MIC_STATE_INIT:
+    //reset if necesarry
+    if (!enableMicrophone(true))
+      {
+        errorHandler(__func__, __LINE__, __FILE__);
+      }
+  MicState = MIC_STATE_START_MEASUREMENT;
+    break;
+
+  case MIC_STATE_START_MEASUREMENT:
+    if (micSettlingComplete() || DataReady) {
+      if (!startSPLcalculation())
+      {
+        errorHandler(__func__, __LINE__, __FILE__);
+      }
+      MicState = MIC_STATE_WAIT_FOR_COMPLETION;
+    }
+    break;
+
+  case MIC_STATE_WAIT_FOR_COMPLETION:
+    if (getSoundData(&soundData, true, true)) {
+      clearMaximumAmplitude();
+//      print("SPL_dBA: %u.%u peak_amp_mPa: %u.%02u   \r\n", soundData.SPL_dBA_int,
+//             soundData.SPL_dBA_fr_1dp, soundData.peak_amp_mPa_int,
+//             soundData.peak_amp_mPa_fr_2dp);
+      char dBbuffer[8];
+
+      sprintf(dBbuffer, "%u.%1u", soundData.SPL_dBA_int, soundData.SPL_dBA_fr_1dp);
+      sprintf(mPabuffer, "%u.%02u", soundData.peak_amp_mPa_int, soundData.peak_amp_mPa_fr_2dp);
+      dBValue = atof(dBbuffer);
+      dBValue = ((int)(dBValue * 100 + .5) / 100.0);
+
+      MIC_Print();
+      if (!startSPLcalculation()) {
+        errorHandler(__func__, __LINE__, __FILE__);
+      }
+      if (!enableMicrophone(false))
+        {
+          errorHandler(__func__, __LINE__, __FILE__);
+        }
+
+      MicStamp = HAL_GetTick() + 755;  // about every second
+      MicState = MIC_STATE_WAIT;
+      ResetMICIndicator();
+    }
+    break;
+
+  case MIC_STATE_WAIT:
+    if(TimestampIsReached(MicStamp)){
+      if (!enableMicrophone(true))
+        {
+          errorHandler(__func__, __LINE__, __FILE__);
+        }
+      MicState = MIC_STATE_START_MEASUREMENT;
+      SetMICIndicator();
+    }
+    break;
+
+  default:
+    Debug("Unexpected occurrence happened");
+    MicState = MIC_STATE_INIT;
+    break;
+  }
+
+  return MicState;
 }

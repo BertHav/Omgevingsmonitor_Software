@@ -11,7 +11,11 @@
 #include "EEprom.h"
 #include "Config.h"
 #include "PowerUtils.h"
+#ifdef PUBLIC
+#include "cred_pub.h"
+#else
 #include "cred.h"
+#endif
 #include "RealTimeClock.h"
 #include "sen5x.h"
 #include <stdint.h>
@@ -135,9 +139,11 @@ void ESP_GetHT(float temp, float humid){
   Temperature = temp;
   Humidity = humid;
 }
-void setMeasurement(float temp, float humid, uint16_t voc){
+void setHIDS(float temp, float humid){
   Temperature = temp;
   Humidity = humid;
+}
+void setVOC(uint16_t voc){
   VOCIndex = voc;
 }
 void setMic(float dB){
@@ -868,6 +874,8 @@ bool AT_Send(AT_Commands state){
     Debug("Set the interval to timesync");
     ATCommandSend = CIPSNTPINTV();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
+    break;
+  case AT_END:
     break;
   }
 

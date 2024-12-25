@@ -7,8 +7,8 @@
 
 #include "gadget.h"
 //static uint32_t LastWakeupTime = 0;
-MeasurementState MeasurementStatus;
-MicrophoneState MicrophoneStatus;
+//MeasurementState MeasurementStatus;
+//MicrophoneState MicrophoneStatus;
 
 //static bool ShouldSleep(void){
 //  uint32_t awakeTime = TimerGetCurrentTime() - LastWakeupTime;
@@ -16,14 +16,14 @@ MicrophoneState MicrophoneStatus;
 //  if(awakeTime < MINIMUM_AWAKE_TIME_SECONDS * 1000) return false;
 //  return true;
 //}
-
+/*
 static EnabledMeasurements SensorSetTest = {
     .HT_measurementEnabled = true,
     .VOC_measurementEnabled = true,
     .PM_measurementEnabled = false,
     .MIC_measurementEnabled = true
 };
-
+*/
 //static EnabledMeasurements SensorSetPower = {
 //    .HT_measurementEnabled = true,
 //    .VOC_measurementEnabled = true,
@@ -37,36 +37,42 @@ static EnabledMeasurements SensorSetTest = {
 //    .MIC_measurementEnabled = true
 //};
 
+/*
 void Gadget_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, UART_HandleTypeDef* espUart, ADC_HandleTypeDef* ADC_HANDLER) {
   // TODO: Add gadget re-init. So it works after sleep mode again.
   // Check battery power
   // Init sensor + peripherals
   Meas_SetEnabledSensors(SensorSetTest);
-  Meas_Init(sensorI2C, micI2s, ADC_HANDLER);
+  Meas_Init(sensorI2C, micI2s, ADC_HANDLER, espUart);
   // Working on ESP, disabling it now
   ESP_Init(espUart);
 //  Gadget_SetSleepDuration();
   Debug("Gadget initialised.");
 }
-
+*/
+/*
 void Gadget_DeInit(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s) {
   // Turn radio off
   // Turn off communication
   Meas_DeInit(sensorI2C, micI2s);
 }
-
+*/
+/*
 void Gadget_ReInit(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s) {
 
 }
-
+*/
+/*
 void Gadget_Test(){
   Meas_Test();
 }
+*/
 
+/*
 bool UpkeepGadget() {
   bool gadgetBusy;
   // State machine implementation?
-  /*
+
    *
    * Update data transfer state machine
    * 	Idle
@@ -78,7 +84,6 @@ bool UpkeepGadget() {
    * 	Transmit data
    * 	Close connection
    * 	Disable ESP
-   */
   MeasurementStatus = Meas_Upkeep();
   MicrophoneStatus = Mic_Upkeep();
   gadgetBusy = (MeasurementStatus != MEAS_STATE_WAIT_FOR_READY || MicrophoneStatus != MIC_STATE_WAIT);
@@ -135,4 +140,4 @@ bool UpkeepGadget() {
 //  }
 
 }
-
+*/

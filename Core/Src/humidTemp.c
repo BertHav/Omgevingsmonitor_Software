@@ -12,7 +12,7 @@
 #include "humidTemp.h"
 #include "utils.h"
 #include "wsenHIDS.h"
-
+/*
 void HT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   HIDS_Init(readFunction, writeFunction);
 }
@@ -32,5 +32,5 @@ bool HT_GetMeasurementValues(float* humidity_perc, float* temperature) {
 bool HT_DeviceConnected() {
   return HIDS_DeviceConnected();
 }
-
+*/
 

@@ -6,21 +6,21 @@
  */
 #include "stm32l0xx_hal.h"
 #include "utils.h"
-
 #include "measurement.h"
-
+#include "wsenHIDS.h"
 #include "I2CSensors.h"
 #include "microphone.h"
-#include "gasSensor.h"
+//#include "gasSensor.h"
 #include "humidTemp.h"
 #include "statusCheck.h"
 #include "sound_measurement.h"
 #include "print_functions.h"
+#include "sgp40.h"
 
 typedef struct {
     float humidityPerc;
     float temperature;
-    int32_t vocIndex;
+//    int32_t vocIndex;
     bool HT_measurementDone;
     bool VOC_measurementDone;
     bool PM_measurementDone;
@@ -32,23 +32,30 @@ typedef void (*StartMeasurementFunc)(void);
 typedef bool (*IsMeasurementDoneFunc)(void);
 
 typedef struct {
-    StartMeasurementFunc startFunc;
-    IsMeasurementDoneFunc doneFunc;
+//    StartMeasurementFunc startFunc;
+//    IsMeasurementDoneFunc doneFunc;
     bool* doneFlag;
     bool enabled;
 } MeasurementParameters;
 
-static MeasurementContext MeasurementCtx;
+static EnabledMeasurements SensorSetTest = {
+    .HT_measurementEnabled = true,
+    .VOC_measurementEnabled = true,
+    .PM_measurementEnabled = true,
+    .MIC_measurementEnabled = true
+};
+
+//static MeasurementContext MeasurementCtx;
 static MeasurementParameters Measurements[MEAS_MEASUREMENT_COUNT];
 static EnabledMeasurements MeasEnabled;
 static MeasurementTested MeasTest;
-static uint8_t CurrentMeasurementIndex = 0;
-static uint32_t MeasStamp;
-static uint32_t MicStamp;
+//static uint8_t CurrentMeasurementIndex = 0;
+//static uint32_t MeasStamp;
+// static uint32_t MicStamp;
 
-SoundData_t soundData = {0};
+// SoundData_t soundData = {0};
 
-
+/*
 static void HT_StartMeasurementWrapper(void) {
   HT_StartMeasurement();
 }
@@ -82,19 +89,20 @@ bool MIC_IsTestMeasurementDoneWrapper(void) {
 void setMeasStamp(uint32_t nrTicks) {
   MeasStamp = HAL_GetTick() + nrTicks;
 }
-
+*/
 void testInit(){
   MeasTest.ESP_Tested = false;
   MeasTest.MIC_Tested = false;
   MeasTest.HT_Tested = false;
   MeasTest.VOC_Tested = false;
 }
-void Meas_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER) {
+void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart) {
   //MeasState = MEAS_STATE_INIT;
+  Meas_SetEnabledSensors(SensorSetTest);
   testInit();
   if(MeasEnabled.HT_measurementEnabled || MeasEnabled.VOC_measurementEnabled) {
     I2CSensors_Init(sensorI2C);
-    if(!HT_DeviceConnected()) {
+    if(!HIDS_DeviceConnected()) {
        Error("Humidity / Temperature sensor NOT connected!");
        MeasTest.HT_Tested = false;
        MeasEnabled.HT_measurementEnabled = false;
@@ -104,7 +112,7 @@ void Meas_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Hand
       MeasTest.HT_Tested = true;
       Debug("Humidity / Temperature sensor initialised.");
     }
-    if(!Gas_DeviceConnected()) {
+    if(!SGP_DeviceConnected()) {
       MeasTest.VOC_Tested = false;
        Error("SGP device not connected!");
        MeasEnabled.VOC_measurementEnabled = false;
@@ -123,34 +131,41 @@ void Meas_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Hand
     }
   }
   if(MeasEnabled.MIC_measurementEnabled) {
-//    MIC_Init(micI2s);
-//    Meas_TestStart();
     Info("Meas_Init calls enableMicrophone");
-          enableMicrophone(true);
-
-  }
-  uint8_t offset = 0;
-  Measurements[offset++] = (MeasurementParameters) {HT_StartMeasurementWrapper, HT_IsMeasurementDoneWrapper, &MeasurementCtx.HT_measurementDone, MeasEnabled.HT_measurementEnabled};
-  Measurements[offset++] = (MeasurementParameters) {VOC_StartMeasurementWrapper, VOC_IsMeasurementDoneWrapper, &MeasurementCtx.VOC_measurementDone, MeasEnabled.VOC_measurementEnabled};
-  Measurements[offset++] = (MeasurementParameters) {PM_StartMeasurementWrapper, PM_IsMeasurementDoneWrapper, &MeasurementCtx.PM_measurementDone, MeasEnabled.PM_measurementEnabled};
-//  Measurements[offset++] = (MeasurementParameters) {MIC_StartMeasurementWrapper, MIC_IsMeasurementDoneWrapper, &MeasurementCtx.MIC_measurementDone, MeasEnabled.MIC_measurementEnabled};
-}
-
-void StartMeasurements(void) {
-  for(CurrentMeasurementIndex = 0; CurrentMeasurementIndex < MEAS_MEASUREMENT_COUNT; CurrentMeasurementIndex++) {
-    if(Measurements[CurrentMeasurementIndex].enabled) {
-      Measurements[CurrentMeasurementIndex].startFunc();
+    if (!enableMicrophone(true)) {
+      MeasTest.MIC_Tested = false;
+       Error("Microphone device not connected!");
+       MeasEnabled.MIC_measurementEnabled = false;
+    }
+    else{
+      MeasTest.MIC_Tested = true;
+      Debug("Microphone sensor initialised.");
     }
   }
+//  uint8_t offset = 0;
+//  Measurements[offset++] = (MeasurementParameters) {HT_StartMeasurementWrapper, HT_IsMeasurementDoneWrapper, &MeasurementCtx.HT_measurementDone, MeasEnabled.HT_measurementEnabled};
+//  Measurements[offset++] = (MeasurementParameters) {VOC_StartMeasurementWrapper, VOC_IsMeasurementDoneWrapper, &MeasurementCtx.VOC_measurementDone, MeasEnabled.VOC_measurementEnabled};
+//  Measurements[offset++] = (MeasurementParameters) {PM_StartMeasurementWrapper, PM_IsMeasurementDoneWrapper, &MeasurementCtx.PM_measurementDone, MeasEnabled.PM_measurementEnabled};
+//  Measurements[offset++] = (MeasurementParameters) {MIC_StartMeasurementWrapper, MIC_IsMeasurementDoneWrapper, &MeasurementCtx.MIC_measurementDone, MeasEnabled.MIC_measurementEnabled};
+  ESP_Init(espUart);
+  Debug("Devices initialised.");
 }
 
-void Meas_Test(){
+//void StartMeasurements(void) {
+//  for(CurrentMeasurementIndex = 0; CurrentMeasurementIndex < MEAS_MEASUREMENT_COUNT; CurrentMeasurementIndex++) {
+//    if(Measurements[CurrentMeasurementIndex].enabled) {
+//      Measurements[CurrentMeasurementIndex].startFunc();
+//    }
+//  }
+//}
+
+void Device_Test(){
   if(!MeasTest.ESP_Tested){
-    ESP_WakeTest();
+    ESP_WakeTest();  // calls in ESP.c  back to SetESPMeasurementDone()
   }
 
   if(!MeasTest.MIC_Tested){
-    if(MIC_IsTestMeasurementDoneWrapper()){
+    if(MIC_TestMeasurementDone()){
 //      Info("In Meas_Test return of MIC_IsTestMeasurementDoneWrapper = 1");
       MeasTest.MIC_Tested = true;
       SetStatusLED(LED_OFF, LED_ON, LED_OFF);
@@ -167,6 +182,8 @@ void Meas_Test(){
     SetTestDone();
   }
 }
+
+/*
 void ResetMeasurements(void) {
   MeasurementCtx.humidityPerc = 0;
   MeasurementCtx.temperature = 0;
@@ -176,7 +193,9 @@ void ResetMeasurements(void) {
   MeasurementCtx.PM_measurementDone = false;
 //  MeasurementCtx.MIC_measurementDone = false;
 }
+*/
 
+/*
 bool MeasurementsCompleted(void) {
   for(CurrentMeasurementIndex = 0; CurrentMeasurementIndex < MEAS_MEASUREMENT_COUNT; CurrentMeasurementIndex++) {
     if(Measurements[CurrentMeasurementIndex].enabled) {
@@ -189,8 +208,8 @@ bool MeasurementsCompleted(void) {
   }
   return true;
 }
-
-
+*/
+/*
 MicrophoneState Mic_Upkeep(){
   static MicrophoneState MicState = MIC_STATE_INIT;
   switch(MicState){
@@ -261,7 +280,8 @@ MicrophoneState Mic_Upkeep(){
 
   return MicState;
 }
-
+*/
+/*
 MeasurementState Meas_Upkeep(void) {
   static MeasurementState MeasState = MEAS_STATE_INIT;
   switch(MeasState) {
@@ -320,34 +340,24 @@ MeasurementState Meas_Upkeep(void) {
 
   return MeasState;
 }
-/*
-float getTemperature(){
-  float Temperature = MeasurementCtx.temperature;
-  return Temperature;
-}
-
-float getHumidity(){
-  float Humidity = MeasurementCtx.humidityPerc;
-  return Humidity;
-}
 */
+
+
 void Meas_SetEnabledSensors(EnabledMeasurements enabled) {
-  uint8_t offset = 0;
   MeasEnabled = enabled;
-  Measurements[offset++].enabled = enabled.HT_measurementEnabled;
-  Measurements[offset++].enabled = enabled.VOC_measurementEnabled;
-  Measurements[offset++].enabled = enabled.PM_measurementEnabled;
-  Measurements[offset++].enabled = enabled.MIC_measurementEnabled;
+  Measurements[0].enabled = enabled.HT_measurementEnabled;
+  Measurements[1].enabled = enabled.VOC_measurementEnabled;
+  Measurements[2].enabled = enabled.PM_measurementEnabled;
+  Measurements[3].enabled = enabled.MIC_measurementEnabled;
 }
 
 
 static void Meas_TurnOff(void) {
   // Disabling all sensors
-  uint8_t offset = 0;
-  Measurements[offset++].enabled = false;
-  Measurements[offset++].enabled = false;
-  Measurements[offset++].enabled = false;
-  Measurements[offset++].enabled = false;
+  Measurements[0].enabled = false;
+  Measurements[1].enabled = false;
+  Measurements[2].enabled = false;
+  Measurements[3].enabled = false;
 }
 
 
@@ -362,3 +372,4 @@ void Meas_DeInit(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s) {
   HAL_I2S_DeInit(micI2s);
 
 }
+

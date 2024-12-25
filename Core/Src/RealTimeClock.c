@@ -5,6 +5,7 @@
 #include "microphone.h"
 #include "ESP.h"
 #include "sgp40.h"
+#include "wsenHIDS.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -30,6 +31,9 @@ uint32_t makeTime(RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
 void breakPosixTime(uint32_t timeInput, RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
 
 void showTime() {
+  if (posixBootTime == 0) {
+    return;
+  }
   RTC_TimeTypeDef currentTime;
   RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
@@ -39,12 +43,14 @@ void showTime() {
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
 }
 
+/*
 void setBootTime(void) {
   RTC_TimeTypeDef currentTime;
   RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   posixBootTime = makeTime(&currentDate, &currentTime);
 }
+*/
 
 void UpdateSystemUptime() {
   RTC_TimeTypeDef currentTime;
@@ -59,7 +65,8 @@ void UpdateSystemUptime() {
   myUpTime.Minutes = time % 60;
   time /= 60; // now it is hours
   myUpTime.Hour = time % 24;
-  myUpTime.Day /= 24; // now it is days
+  time /= 24; // now it is days
+  myUpTime.Day = time; // now it is days
 //  Info("Current time is: %02d:%02d:%02d System uptime is: %dd %02dh:%02dm:%02ds",
 //      currentTime.Hours, currentTime.Minutes, currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
 }
@@ -109,15 +116,17 @@ void ParseTime(char* buffer) {
   currentDate.Date = aBuff2int(buffer, 21,22);
   currentDate.WeekDay = aBuff2int(buffer, 13, 15);
   Debug("Current RTC time before update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
+  Debug("Current RTC date before update is: %02dh-%02dm-%02ds", currentDate.Date , currentDate.Month, currentDate.Year  );
   RTC_SetTime(&currentTime);
   RTC_SetDate(&currentDate);
   if (currentDate.WeekDay == 2) {
     reset_fanCleaningDone();
   }
+//  Debug("PARSETIME parameters => weekday: %d, year: %d, month: %d, day: %d, hours: %d, minutes: %d, seconds: %d", weekday, year, month, day, hours, minutes, seconds);
   if (posixBootTime == 0) {
     posixBootTime = makeTime(&currentDate, &currentTime);
+//    Debug("posixBootTime: %lu", posixBootTime);
   }
-//  Debug("PARSETIME parameters => weekday: %d, year: %d, month: %d, day: %d, hours: %d, minutes: %d, seconds: %d", weekday, year, month, day, hours, minutes, seconds);
 }
 
 // Functie om de tijd in te stellen
@@ -137,6 +146,15 @@ void RTC_SetDate(RTC_DateTypeDef* sDate) {
     if (HAL_RTC_SetDate(RealTime_Handle, sDate, RTC_FORMAT_BIN) != HAL_OK) {
         // Foutafhandeling
       Error("Error setting date to RTC");
+    }
+    //check the backup register
+    if (HAL_RTCEx_BKUPRead(RealTime_Handle, RTC_BKP_DR1) != 0xBEBE) {
+      // Write Back Up Register 1 Data
+      Debug("writing backup register");
+      HAL_PWR_EnableBkUpAccess();
+      // Writes a data in a RTC Backup data Register 1
+      HAL_RTCEx_BKUPWrite(RealTime_Handle, RTC_BKP_DR1, 0xBEBE);
+      HAL_PWR_DisableBkUpAccess();
     }
 }
 
@@ -270,9 +288,11 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   HAL_ResumeTick(); // Enable SysTick after wake-up
   showTime();
   ResetDBACalculator();  // reset the DBA average calculation
-  setMeasStamp(300);
+//  setMeasStamp(300);
   ESPTransmitDone = false;
   setESPTimeStamp(4500);
+  setSGP40TimeStamp(10);
+  HIDS_setTimeStamp(10);
 }
 
 void InitClock(RTC_HandleTypeDef* h_hrtc){

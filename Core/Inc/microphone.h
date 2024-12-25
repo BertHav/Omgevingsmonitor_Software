@@ -25,6 +25,14 @@
 //#define NUMBER_OF_SAMPLES 512
 //#define AUDIO_RX_BUFFER NR_SAMPLES_512*2
 
+typedef enum {
+  MIC_STATE_INIT,
+  MIC_STATE_START_MEASUREMENT,
+  MIC_STATE_WAIT_FOR_COMPLETION,
+  MIC_STATE_WAIT,
+  MIC_STATE_OFF
+}MicrophoneState;
+
 /*
 typedef enum {
   SAMPLE_RATE_8K = 8000,
@@ -49,6 +57,7 @@ bool MIC_MeasurementDone(void);
 bool MIC_TestMeasurementDone();
 void MIC_Print();
 void ResetDBACalculator(void);
+MicrophoneState Mic_Upkeep();
 //float MIC_GetDB(void);
 extern float dBValue;
 extern char mPabuffer[12];

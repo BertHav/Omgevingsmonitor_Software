@@ -16,7 +16,7 @@
 
 #define MEAS_MAX_RETRY_ATTEMPTS 3
 #define MEAS_MEASUREMENT_COUNT 3
-
+/*
 typedef enum {
   MIC_STATE_INIT,
   MIC_STATE_START_MEASUREMENT,
@@ -24,16 +24,7 @@ typedef enum {
   MIC_STATE_WAIT,
   MIC_STATE_OFF
 }MicrophoneState;
-
-typedef enum {
-    MEAS_STATE_INIT,
-    MEAS_STATE_START_MEASUREMENTS,
-    MEAS_STATE_WAIT_FOR_COMPLETION,
-    MEAS_STATE_PROCESS_RESULTS,
-    MEAS_STATE_WAIT_FOR_READY,
-    MEAS_STATE_OFF,
-    MEAS_STATE_WAIT
-} MeasurementState;
+*/
 
 /*
 typedef enum {
@@ -68,14 +59,14 @@ typedef struct {
 }MeasurementTested;
 
 void setMeasStamp(uint32_t nrTicks);
-void Meas_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER);
-MeasurementState Meas_Upkeep(void);
-MeasurementState Meas_GetState(void);
+void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart);
+//MeasurementState Meas_Upkeep(void);
+//MeasurementState Meas_GetState(void);
 void Meas_SetEnabledSensors(EnabledMeasurements enabled);
 void Meas_DeInit(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s);
 void SetESPMeasurementDone();
 void SetMICMeasurementDone();
-void Meas_Test();
-MicrophoneState Mic_Upkeep();
+void Device_Test();
+//MicrophoneState Mic_Upkeep();
 #endif /* INC_MEASUREMENT_H_ */
 

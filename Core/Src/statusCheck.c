@@ -188,10 +188,11 @@ void GoToSleep(uint16_t sleepTime){
   HAL_ResumeTick();
 }
 
+/*
 void Status_Upkeep(){
   configCheck();
 }
-
+*/
 Battery_Status Battery_Upkeep(){
   Battery_Status status;
   status = powerCheck();

@@ -9,6 +9,7 @@
 #include "sensirion_gas_index_algorithm.h"
 #include "wsenHIDS.h"
 #include "main.h"
+#include "statusCheck.h"
 #include <sgp40.h>
 
 
@@ -34,6 +35,7 @@ static uint32_t SGP_HeatUpTime = SGP_SENSOR_HEATUP_TIME;
 static uint32_t SGP_MeasurementDutyCycle = SGP_SENSOR_DUTYCYCLE;
 static uint32_t SGP_IdleTime = SGP_SENSOR_IDLE_TIME;
 static uint32_t SGP_SelfTestRunTime = SGP_SELF_TEST_WAIT_TIME;
+static uint32_t SGP40TimeStamp;
 static bool SGP_SelfTestStarted = false;
 static bool HeatUpIsDone = false;
 static bool MeasurementIsReady = false;
@@ -43,20 +45,13 @@ static uint16_t SGP_Hum;
 static uint16_t SGP_Temp;
 static bool HT_MeasurementReceived = false;
 static bool SGP_MsgSent = false;
+static int32_t vocIndex;
 
 static uint16_t Red;
 static uint16_t Blue;
 static uint16_t Green;
 static uint16_t TimeValue = 4000;
 
-//#define SGP_TEST_BUFFER_SIZE 6
-//#define SGP_TEST_SEGMENT_SIZE 3
-// static uint8_t SGP_TestBuffer[SGP_TEST_BUFFER_SIZE] = {0xBE, 0xEF, 0x92,
-// 0xBE, 0xEF, 0x92};
-
-//void forceVOCstart(void) {
-//  SGP_MeasurementDutyCycle = HAL_GetTick() + 500;
-//}
 
 static void ReadRegister(uint8_t address, uint8_t *buffer, uint8_t nrBytes) {
   if (ReadFunction != NULL) {
@@ -79,17 +74,19 @@ void SGP_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
 void SGP_StartMeasurement(void) {
   if(HT_MeasurementReceived){
     WriteRegister(SGP_I2C_ADDRESS, MeasureRawWithCompBuffer, SGP_LONG_COMMAND_BUFFER_LENGTH);
-    SGP_IdleTime = GetCurrentHalTicks() + SGP_SENSOR_IDLE_TIME;
+    SGP_IdleTime = HAL_GetTick() + SGP_SENSOR_IDLE_TIME;
   }
   else{
     WriteRegister(SGP_I2C_ADDRESS, MeasureRawSignalBuffer, SGP_LONG_COMMAND_BUFFER_LENGTH);
-    SGP_HeatUpTime = GetCurrentHalTicks() + SGP_SENSOR_HEATUP_TIME;
+    SGP_HeatUpTime = HAL_GetTick() + SGP_SENSOR_HEATUP_TIME;
   }
   HeatUpIsDone = false;
   MeasurementIsReady = false;
 }
 
-static bool SGP_HeatedUp(void) { return TimestampIsReached(SGP_HeatUpTime); }
+static bool SGP_HeatedUp(void) {
+  return TimestampIsReached(SGP_HeatUpTime);
+}
 
 static bool SGP_MeasurementReady(void) {
   return TimestampIsReached(SGP_IdleTime);
@@ -111,11 +108,11 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
     // SGP is heated up, we ignore the output and start another measurement.
     if(HT_MeasurementReceived){
       WriteRegister(SGP_I2C_ADDRESS, MeasureRawWithCompBuffer, SGP_LONG_COMMAND_BUFFER_LENGTH);
-      SGP_IdleTime = GetCurrentHalTicks() + SGP_SENSOR_IDLE_TIME;
+      SGP_IdleTime = HAL_GetTick() + SGP_SENSOR_IDLE_TIME;
     }
     else{
       WriteRegister(SGP_I2C_ADDRESS, MeasureRawSignalBuffer, SGP_LONG_COMMAND_BUFFER_LENGTH);
-      SGP_IdleTime = GetCurrentHalTicks() + SGP_SENSOR_IDLE_TIME;
+      SGP_IdleTime = HAL_GetTick() + SGP_SENSOR_IDLE_TIME;
     }
     SGP_MsgSent = true;
   }
@@ -132,7 +129,7 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
       }
       return false;
     }
-    SGP_MeasurementDutyCycle = GetCurrentHalTicks() + SGP_SENSOR_DUTYCYCLE;
+    SGP_MeasurementDutyCycle = HAL_GetTick() + SGP_SENSOR_DUTYCYCLE;
     SGP_TurnHeaterOff();
     SGP_AmountOfSamplesDone++;
     if (SGP_AmountOfSamplesDone >= SGP_TotalSamples) {
@@ -241,7 +238,7 @@ void SGP_StartSelfTest(void) {
   // TODO: Implement the self test so it runs for the first time (above the
   // while loop)
   WriteRegister(SGP_I2C_ADDRESS, ExecuteSelfTestBuffer, SGP_SHORT_COMMAND_BUFFER_LENGTH);
-  SGP_SelfTestRunTime = GetCurrentHalTicks() + SGP_SELF_TEST_WAIT_TIME;
+  SGP_SelfTestRunTime = HAL_GetTick() + SGP_SELF_TEST_WAIT_TIME;
   SGP_SelfTestStarted = true;
   // After 320 ms, the master can read a fixed data pattern (1 word + CRC byte)
   // to check if the test was successful or not. Exit measurement mode by
@@ -289,4 +286,64 @@ void SGP_SoftReset(void) {
   // This command could take from 0.1 to 1ms.
   WriteRegister(SGP_I2C_ADDRESS, SoftResetBuffer,
                 SGP_SHORT_COMMAND_BUFFER_LENGTH);
+}
+
+void ResetVOCresult(void) {
+  vocIndex = 0;
+}
+SGP40State SGP_Upkeep(void) {
+  static SGP40State SGPState = SGP_STATE_INIT;
+  switch(SGPState) {
+  case SGP_STATE_OFF:
+    Debug("Measurements are turned off for SGP40.");
+    break;
+
+  case SGP_STATE_INIT:
+    ResetVOCresult();
+    SGPState = SGP_STATE_START_MEASUREMENTS;
+    break;
+
+  case SGP_STATE_START_MEASUREMENTS:
+    SGP_StartMeasurement();
+    SetMeasurementIndicator();
+    SGPState = SGP_STATE_WAIT_FOR_COMPLETION;
+   break;
+
+  case SGP_STATE_WAIT_FOR_COMPLETION:
+    if(SGP_GetMeasurementValues(&vocIndex)) {
+      SGPState = SGP_STATE_PROCESS_RESULTS;
+    }
+    break;
+
+  case SGP_STATE_PROCESS_RESULTS:
+//    Debug("Processing results.");
+    Debug("SGP40 index value: %d", vocIndex);
+    setVOC(vocIndex);
+    ResetMeasurementIndicator();
+    if (powerCheck() == USB_PLUGGED_IN) {
+      SGP40TimeStamp = HAL_GetTick() + 60000;  // about every minute
+    }
+    else {
+      SGP40TimeStamp = HAL_GetTick() + 300000;  // about every 5 minutes
+    }
+    SGPState = SGP_STATE_WAIT;
+    break;
+
+  case SGP_STATE_WAIT:
+    if(TimestampIsReached(SGP40TimeStamp)){
+      SGPState = SGP_STATE_INIT;
+    }
+    break;
+
+  default:
+    // Handle unexpected state
+    SGPState = SGP_STATE_INIT;
+    break;
+  }
+
+  return SGPState;
+}
+
+void setSGP40TimeStamp(uint32_t ticks) {
+  SGP40TimeStamp = HAL_GetTick() + ticks;
 }

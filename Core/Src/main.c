@@ -31,6 +31,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "gadget.h"
+#include "microphone.h"
 #include "utils.h"
 #include "measurement.h"
 #include "globals.h"
@@ -42,6 +43,9 @@
 #include "sound_measurement.h"
 #include "print_functions.h"
 #include "sen5x.h"
+#include "sgp40.h"
+#include "wsenHIDS.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,10 +69,13 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
-  bool MeasurementBusy;
+//  bool MeasurementBusy;  // replaced bij next specific results
+  static uint8_t SGPBusy;
+  static uint8_t HIDSBusy;
   bool sen5x_Present = false;
   bool waitforSamples = false;
-  uint8_t RxData[UART_CDC_DMABUFFERSIZE] = {0};
+  uint8_t u1_rx_buff[16];  // rxbuffer for serial logger
+  uint8_t RxData[UART_CDC_DMABUFFERSIZE] = {0};  //rx buffer for USB
   uint16_t IndexRxData = 0;
   uint32_t LastRxTime = 0;
   uint32_t batteryReadTimer = 0;
@@ -78,6 +85,7 @@
 
   Battery_Status charge;
   ESP_States ESP_Status;
+  MicrophoneState mic_Status;
   extern DMA_HandleTypeDef hdma_spi2_rx;
 
 /* USER CODE END PV */
@@ -156,7 +164,6 @@ void ESP_Programming_Read_Remaining_DMA()
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t u1_rx_buff[16];  // rxbuffer for serial logger
 
 /* USER CODE END 0 */
 
@@ -223,16 +230,19 @@ int main(void)
   BinaryReleaseInfo();
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
   InitClock(&hrtc);
+  Debug("Clock init done");
 
   if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn))
   {
       errorHandler(__func__, __LINE__, __FILE__);
   }
 
-  Gadget_Init(&hi2c1, &hi2s2, &huart4, &hadc);
-  Debug("Clock init done");
+//  Gadget_Init(&hi2c1, &hi2s2, &huart4, &hadc);
+  Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
   if (!probe_sen5x()) {
     sen5x_Present = true; // not present
+  }
+  else {
     sen5x_Power_Off();      // switch off buck converter
     Debug("sen5x sensor not detected, polling disabled.");
   }
@@ -243,32 +253,39 @@ int main(void)
   while (1) {
 	  // Upkeep gadget
     if(testDone && !ESP_Programming && !batteryEmpty){
-      MeasurementBusy = UpkeepGadget();
-      ESP_Status = ESP_Upkeep();
+//      MeasurementBusy = UpkeepGadget();
+      if (SGPBusy != SGP_STATE_START_MEASUREMENTS && SGPBusy != SGP_STATE_WAIT_FOR_COMPLETION) {
+          HIDSBusy = HIDS_Upkeep();
+      }
+      if (HIDSBusy != HIDS_STATE_START_MEASUREMENTS && HIDSBusy != HIDS_STATE_WAIT_FOR_COMPLETION)  {
+        SGPBusy = SGP_Upkeep();
+      }
+      mic_Status = Mic_Upkeep();
 
+      if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && sen5x_Present) {
+        if  (charge > BATTERY_LOW) {
+          sen5x_statemachine(0);
+        }
+        else {
+          if (charge == USB_PLUGGED_IN) {
+            sen5x_statemachine(USB_PLUGGED_IN);
+          }
+          else  {
+            Info("Battery level insufficient for sen5x operation");
+          }
+        }
+      }
+// Bovenstaande moet gereed zijn om te gaan verzenden
+      ESP_Status = ESP_Upkeep(); // deze is onafhankelijk van bovenstaande moet altijd uitgevoerd worden in ESP.c checken of alle waarden binnen zijn
     }
     if(!testDone && !ESP_Programming && !batteryEmpty){
-      Gadget_Test();
+      Device_Test();  // for device with startup time
     }
-    Status_Upkeep();
+    configCheck();
     if(TimestampIsReached(batteryReadTimer)){
       charge = Battery_Upkeep();
       batteryReadTimer  = HAL_GetTick() + 50000;
-      showTime();
-    }
-
-    if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && sen5x_Present) {
-      if  (charge > BATTERY_LOW) {
-        sen5x_statemachine(0);
-      }
-      else {
-        if (charge == USB_PLUGGED_IN) {
-          sen5x_statemachine(USB_PLUGGED_IN);
-        }
-        else  {
-          Info("Battery level insufficient for sen5x operation");
-        }
-      }
+        showTime();
     }
 
     if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){

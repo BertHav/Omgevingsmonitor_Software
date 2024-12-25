@@ -387,6 +387,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
     case CLEAN_FAN:
       // start the cleaning procedure once a week
       sen5x_start_fan_cleaning();
+      Info("executing fan cleaning");
       sen5xReadTimer = HAL_GetTick() + 11000;
       fanCleaningDone = true;
       samplesState = SAMPLES_TAKEN;

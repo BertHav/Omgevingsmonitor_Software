@@ -29,7 +29,7 @@ extern bool usbPluggedIn;
 extern bool userToggle;
 
 void setuserToggle(void);
-void Status_Upkeep();
+void configCheck();
 Battery_Status Battery_Upkeep();
 Battery_Status powerCheck();
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue);   // Sets Status LED to (RGB) color
