@@ -12,14 +12,6 @@
 #include "sound_measurement.h"
 #include "print_functions.h"
 
-// TODO: include arm math libraries differently.
-//#define CORTEX_M0
-//#include "arm_math.h"
-//#include "arm_const_structs.h"
-//#include <stdlib.h>
-
-//#define nrOfSamples 10
-
 static volatile uint32_t StartTime = 0;
 static volatile uint32_t StartupDoneTime = 0;
 static volatile bool StartUpDone = false;
@@ -34,11 +26,13 @@ float dBAmax = 0.0;
 uint8_t counter = 0;
 uint8_t denominator = 1;
 bool samplebufferfilled = false;
-static uint32_t MicStamp;
-//bool averageReached = false;
-//float sample[NUMBER_OF_SAMPLES];
+static uint32_t MICTimeStamp;
 
 SoundData_t soundData = {0};
+
+void setMICTimeStamp(uint32_t ticks) {
+  MICTimeStamp = HAL_GetTick() + ticks;
+}
 
 void ResetDBACalculator(void) {
   counter = 0;
@@ -48,11 +42,8 @@ void ResetDBACalculator(void) {
 
 void MIC_Print(void) {
   dBA = dBValue; // dBValue is the actual sample
-//  Info("IN MIC_Print dBA: %02.1f", dBA);
   dBASamples[counter] = dBA;
-//  print("dBA: %f, counter: %d, dBASamples[counter]: %f\r\n", dBA, counter, dBASamples[counter]);
   counter++;
-
   if (counter < NUMBER_OF_SAMPLES && !samplebufferfilled) {
     denominator = counter;
   }
@@ -64,12 +55,10 @@ void MIC_Print(void) {
   dBAsum = 0.0;
   for(uint8_t i=0; i < denominator; i++){
     dBAsum += dBASamples[i];
-//    print("sum of dBAsum: %f after step i:%d dBASampels[i]: %f\r\n", dBAsum, i, dBASamples[i]);
     if (dBASamples[i] > dBAmax) {
       dBAmax = dBASamples[i];
   }
   dBAAverage = dBAsum/(float)denominator;
-//    Debug("Average dBA value used for upload: %.1f", dBAAverage);
   setMic(dBAAverage);
   }
   print("SPL_dBA: %.1f, SPL_peak_mPa: %s, dBA peak: %.1f, dBA average: %.1f\r\n", dBA,mPabuffer, dBAmax, dBAAverage);
@@ -77,7 +66,6 @@ void MIC_Print(void) {
   if(counter > NUMBER_OF_SAMPLES){
     counter = 0;
   }
-
   if(dBA >= 90){//white
     SetDBLED(true, true, true);
   }
@@ -118,7 +106,6 @@ bool MIC_TestMeasurementDone(void) {
   bool Check;
   Info("DataReady in MIC_TestMeasurementDone: %d", DataReady);
   if(DataReady) {
-//    Check = MIC_Check();
     Check = micEnabled;
     Info("status micEnabled: %d",micEnabled );
     ResetMICIndicator();
@@ -133,11 +120,10 @@ MicrophoneState Mic_Upkeep(){
 
   case MIC_STATE_INIT:
     //reset if necesarry
-    if (!enableMicrophone(true))
-      {
-        errorHandler(__func__, __LINE__, __FILE__);
-      }
-  MicState = MIC_STATE_START_MEASUREMENT;
+    if (!enableMicrophone(true)) {
+      errorHandler(__func__, __LINE__, __FILE__);
+    }
+    MicState = MIC_STATE_START_MEASUREMENT;
     break;
 
   case MIC_STATE_START_MEASUREMENT:
@@ -153,37 +139,29 @@ MicrophoneState Mic_Upkeep(){
   case MIC_STATE_WAIT_FOR_COMPLETION:
     if (getSoundData(&soundData, true, true)) {
       clearMaximumAmplitude();
-//      print("SPL_dBA: %u.%u peak_amp_mPa: %u.%02u   \r\n", soundData.SPL_dBA_int,
-//             soundData.SPL_dBA_fr_1dp, soundData.peak_amp_mPa_int,
-//             soundData.peak_amp_mPa_fr_2dp);
       char dBbuffer[8];
-
       sprintf(dBbuffer, "%u.%1u", soundData.SPL_dBA_int, soundData.SPL_dBA_fr_1dp);
       sprintf(mPabuffer, "%u.%02u", soundData.peak_amp_mPa_int, soundData.peak_amp_mPa_fr_2dp);
       dBValue = atof(dBbuffer);
       dBValue = ((int)(dBValue * 100 + .5) / 100.0);
-
       MIC_Print();
       if (!startSPLcalculation()) {
         errorHandler(__func__, __LINE__, __FILE__);
       }
-      if (!enableMicrophone(false))
-        {
-          errorHandler(__func__, __LINE__, __FILE__);
-        }
-
-      MicStamp = HAL_GetTick() + 755;  // about every second
+      if (!enableMicrophone(false)) {
+        errorHandler(__func__, __LINE__, __FILE__);
+      }
+      MICTimeStamp = HAL_GetTick() + 755;  // about every second
       MicState = MIC_STATE_WAIT;
       ResetMICIndicator();
     }
     break;
 
   case MIC_STATE_WAIT:
-    if(TimestampIsReached(MicStamp)){
-      if (!enableMicrophone(true))
-        {
-          errorHandler(__func__, __LINE__, __FILE__);
-        }
+    if(TimestampIsReached(MICTimeStamp)){
+      if (!enableMicrophone(true)) {
+        errorHandler(__func__, __LINE__, __FILE__);
+      }
       MicState = MIC_STATE_START_MEASUREMENT;
       SetMICIndicator();
     }

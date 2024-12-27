@@ -20,7 +20,7 @@
 #define SEN5X_FAN_BLOCKED_ERROR 0x00000010
 #define SEN5X_NO_RESPONSE       0X80000000
 
-#define SEN5X_START_UP_TIME 30
+#define SEN5X_START_UP_TIME 27
 
 typedef enum {
   S5X_DISABLED,
@@ -48,6 +48,7 @@ extern uint32_t sen5xReadTimer;
 extern uint8_t sen5xErrors;
 extern bool sen5x_On;
 extern bool sen5x_Present;
+extern sen5x_states PMsamplesState;
 
 bool enable_sen5x(uint32_t sleepTime);
 void setsen5xReadTimer(uint32_t delayms);

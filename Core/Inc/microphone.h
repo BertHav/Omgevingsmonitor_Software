@@ -57,11 +57,11 @@ bool MIC_MeasurementDone(void);
 bool MIC_TestMeasurementDone();
 void MIC_Print();
 void ResetDBACalculator(void);
+void setMICTimeStamp();
 MicrophoneState Mic_Upkeep();
 //float MIC_GetDB(void);
 extern float dBValue;
 extern char mPabuffer[12];
-
 
 
 #endif /* INC_MICROPHONE_H_ */

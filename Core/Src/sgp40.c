@@ -284,8 +284,8 @@ void SGP_SoftReset(void) {
   Worth mentioning. */
   // Danny: Its not odd, its a general reset command which is a standard syntaxis. So do not use blind.
   // This command could take from 0.1 to 1ms.
-  WriteRegister(SGP_I2C_ADDRESS, SoftResetBuffer,
-                SGP_SHORT_COMMAND_BUFFER_LENGTH);
+  Debug("SGP40 brougt to idle");
+  WriteRegister(SGP_I2C_ADDRESS, SoftResetBuffer, SGP_SHORT_COMMAND_BUFFER_LENGTH);
 }
 
 void ResetVOCresult(void) {

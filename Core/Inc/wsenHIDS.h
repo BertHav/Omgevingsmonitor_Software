@@ -72,6 +72,6 @@ bool HIDS_DeviceConnected(void);
 void HIDS_SetHeaterMode(HIDSHeaterModes modeHeater);
 void HIDS_SoftReset(void);
 wsenHIDSState HIDS_Upkeep(void);
-void HIDS_setTimeStamp(uint32_t ticks);
+void setHIDSTimeStamp(uint32_t ticks);
 
 #endif /* INC_WSENHIDS_H_ */

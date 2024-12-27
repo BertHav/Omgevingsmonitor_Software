@@ -15,7 +15,7 @@
 
 
 #define MEAS_MAX_RETRY_ATTEMPTS 3
-#define MEAS_MEASUREMENT_COUNT 3
+#define SENSOR_MEASUREMENT_COUNT 3
 /*
 typedef enum {
   MIC_STATE_INIT,
@@ -42,22 +42,10 @@ typedef enum {
   NR_SAMPLES_512 = 512,
   NR_SAMPLES_1024 = 1024
 } NrOfSamples;
-*/
+
 // TODO: add battery measurement
-typedef struct {
-    bool HT_measurementEnabled;
-    bool VOC_measurementEnabled;
-    bool PM_measurementEnabled;
-    bool MIC_measurementEnabled;
-} EnabledMeasurements;
-
-typedef struct {
-  bool HT_Tested;
-  bool VOC_Tested;
-  bool MIC_Tested;
-  bool ESP_Tested;
-}MeasurementTested;
-
+*/
+/*
 void setMeasStamp(uint32_t nrTicks);
 void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart);
 //MeasurementState Meas_Upkeep(void);
@@ -67,6 +55,7 @@ void Meas_DeInit(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s);
 void SetESPMeasurementDone();
 void SetMICMeasurementDone();
 void Device_Test();
+*/
 //MicrophoneState Mic_Upkeep();
 #endif /* INC_MEASUREMENT_H_ */
 

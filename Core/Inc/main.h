@@ -28,6 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l0xx_hal.h"
+#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,7 +47,6 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-#define UART_CDC_DMABUFFERSIZE 16
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -100,13 +100,19 @@ void Error_Handler(void);
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "3.1 BH"
-#define CURRENT_WEEK "24w52-3"  // -x is daynumber of week i.e. monday = 1
+#define SRC_VERSION "3.2 BH"
+#define CURRENT_WEEK "24w52-5"  // -x is daynumber of week i.e. monday = 1
+#define WAIT_WITH_PM 870
+#define WAIT_WITHOUT_PM 900
+
+#define UART_CDC_DMABUFFERSIZE 16
 #define PUBLIC
 #define LED_BLINK_INTERVAL 1000
 void SetTestDone();
 void SystemClock_Config(void);
-
+void SetESPMeasurementDone();
+bool IsPMSensorEnabled();
+bool GetPMSensorPresence();
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

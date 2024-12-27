@@ -100,7 +100,7 @@ void HIDS_SetMeasurementMode(HIDSMeasureModes modeMeasure) {
   MeasureMode = modeMeasure;
 }
 
-void HIDS_setTimeStamp(uint32_t ticks) {
+void setHIDSTimeStamp(uint32_t ticks) {
   HIDSTimeStamp = HAL_GetTick() + ticks;
 }
 
@@ -210,9 +210,9 @@ bool HIDS_GetMeasurementValues(float* humidity, float* temperature) {
   // Temperature formula in degrees Celsius:
   //  T = ((-45 + (175 * ST) / (2^16 - 1)))
 	currentTemperature = (((175 * ((MeasureBuffer[0] << 8) | MeasureBuffer[1]))) / HIDS_POW_2_16_MINUS_1);
-	currentTemperature += -45;
+	currentTemperature -= 45;
 	currentHumidity = ((125 * ((MeasureBuffer[3] << 8) | MeasureBuffer[4]) / HIDS_POW_2_16_MINUS_1));
-	currentHumidity += -6;
+	currentHumidity -= 6;
 
 //	if(measurements < amountOfMeasurements) {
 //	  temperatures[measurements] = currentTemperature;
@@ -264,8 +264,8 @@ wsenHIDSState HIDS_Upkeep(void) {
 
     case HIDS_STATE_START_MEASUREMENTS:
 //      Debug("entered HIDS_STATE_START_MEASUREMENTS");
-      HIDS_StartMeasurement();
       SetMeasurementIndicator();
+      HIDS_StartMeasurement();
       HIDSState = HIDS_STATE_WAIT_FOR_COMPLETION;
       break;
 
@@ -282,7 +282,7 @@ wsenHIDSState HIDS_Upkeep(void) {
       Debug("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
       setHIDS(temp, humid);
       ResetMeasurementIndicator();
-      HIDSTimeStamp = HAL_GetTick() + 10000;  // about every ten seconds when power is plugged
+      HIDSTimeStamp = HAL_GetTick() + powerCheck()==USB_PLUGGED_IN?10000:1000;  // about every ten seconds when power is plugged
       HIDSState = HIDS_STATE_WAIT;
       break;
 

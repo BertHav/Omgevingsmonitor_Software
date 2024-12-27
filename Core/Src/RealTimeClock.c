@@ -6,6 +6,7 @@
 #include "ESP.h"
 #include "sgp40.h"
 #include "wsenHIDS.h"
+#include "statusCheck.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -116,7 +117,7 @@ void ParseTime(char* buffer) {
   currentDate.Date = aBuff2int(buffer, 21,22);
   currentDate.WeekDay = aBuff2int(buffer, 13, 15);
   Debug("Current RTC time before update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
-  Debug("Current RTC date before update is: %02dh-%02dm-%02ds", currentDate.Date , currentDate.Month, currentDate.Year  );
+  Debug("Current RTC date before update is: %02d-%02d-%02d", currentDate.Date , currentDate.Month, currentDate.Year  );
   RTC_SetTime(&currentTime);
   RTC_SetDate(&currentDate);
   if (currentDate.WeekDay == 2) {
@@ -160,12 +161,33 @@ void RTC_SetDate(RTC_DateTypeDef* sDate) {
 
 // Functie om de tijd uit te lezen
 void RTC_GetTime(RTC_TimeTypeDef* gTime, RTC_DateTypeDef* gDate) {
+uint8_t t = 1;
+uint8_t prevValue = 0;
+Battery_Status status;
+  status = powerCheck();
+  if ( status == BATTERY_CRITICAL) {
+//    To be able to read the RTC calendar register when the APB1 clock frequency is less than
+//    seven times the RTC clock frequency (7*RTCLCK), the software must read the calendar
+//    time and date registers twice.
+    t++; //
+  }
+  for (uint8_t i= 0; i < t; i++) {
     if (HAL_RTC_GetTime(RealTime_Handle, gTime, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting time from RTC");
     }
     if (HAL_RTC_GetDate(RealTime_Handle, gDate, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting date from RTC");
     }
+    if ( status == BATTERY_CRITICAL) {
+      if (prevValue != gTime->Hours) {
+        prevValue = gTime->Hours;
+        t++;
+      }
+      else {
+        return;
+      }
+    }
+  }
 }
 
 uint8_t RTC_GetWeekday(void) {
@@ -265,7 +287,11 @@ void Enter_Standby_Mode(void)
 
 void Enter_Stop_Mode(uint16_t sleepTime)
 {
-  sen5x_Power_Off();
+  if (GetPMSensorPresence()) {
+    sen5x_Power_Off();
+  }
+  // restart the SGP40 with a soft reset to enter idle mode
+  SGP_SoftReset();
   Info("Battery voltage %.2fV", ReadBatteryVoltage());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
@@ -273,6 +299,8 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   HAL_Delay(100);
   HAL_SuspendTick();
   RTC_SetWakeUpTimer(sleepTime);
+//  HAL_PWREx_EnableFlashPowerDown();  // is default stopped in l0xx cpu's
+//  SET_BIT(PWR->CR, PWR_CR_ULP); seems of no influence
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
   SystemClock_Config();
   if (enable_sen5x((uint32_t)sleepTime)) {
@@ -283,16 +311,19 @@ void Enter_Stop_Mode(uint16_t sleepTime)
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
       HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
       SystemClock_Config();
+      setsen5xReadTimer(2000);
+
     }
   }
   HAL_ResumeTick(); // Enable SysTick after wake-up
   showTime();
   ResetDBACalculator();  // reset the DBA average calculation
 //  setMeasStamp(300);
-  ESPTransmitDone = false;
-  setESPTimeStamp(4500);
-  setSGP40TimeStamp(10);
-  HIDS_setTimeStamp(10);
+//  ESPTransmitDone = false;
+  setESPTimeStamp(3000);
+  setSGP40TimeStamp(0);
+  setHIDSTimeStamp(0);
+  setMICTimeStamp(0);
 }
 
 void InitClock(RTC_HandleTypeDef* h_hrtc){

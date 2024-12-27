@@ -32,6 +32,7 @@
 /* USER CODE BEGIN Includes */
 #include "gadget.h"
 #include "microphone.h"
+#include "I2CSensors.h"
 #include "utils.h"
 #include "measurement.h"
 #include "globals.h"
@@ -50,11 +51,31 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef struct {
+    bool HT_measurementEnabled;
+    bool VOC_measurementEnabled;
+    bool PM_measurementEnabled;
+    bool MIC_measurementEnabled;
+} EnabledMeasurements;
+
+typedef struct {
+  bool HT_Present;
+  bool VOC_Present;
+  bool PM_Present;
+  bool MIC_Present;
+  bool ESP_Present;
+}DevicePresent;
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+static EnabledMeasurements Sensor = {
+    .HT_measurementEnabled = true,
+    .VOC_measurementEnabled = true,
+    .PM_measurementEnabled = true,
+    .MIC_measurementEnabled = true
+};
 
 /* USER CODE END PD */
 
@@ -69,19 +90,21 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
-//  bool MeasurementBusy;  // replaced bij next specific results
-  static uint8_t SGPBusy;
-  static uint8_t HIDSBusy;
-  bool sen5x_Present = false;
+  static uint8_t SGPstate;
+  static uint8_t HIDSstate;
   bool waitforSamples = false;
+  uint8_t hidscount = 0;
   uint8_t u1_rx_buff[16];  // rxbuffer for serial logger
   uint8_t RxData[UART_CDC_DMABUFFERSIZE] = {0};  //rx buffer for USB
   uint16_t IndexRxData = 0;
+  uint32_t deviceTimeOut = 0;
   uint32_t LastRxTime = 0;
   uint32_t batteryReadTimer = 0;
   uint32_t timeReadTimer = 0;
   uint32_t sleepTime = 0;
   uint16_t size = 0;
+  static EnabledMeasurements Sensor;
+  static DevicePresent SensorProbe;
 
   Battery_Status charge;
   ESP_States ESP_Status;
@@ -93,6 +116,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
 void SetTestDone(){
   testDone = true;
 //  Info("testDone true in SetTestDone\r\n");
@@ -165,6 +189,182 @@ void ESP_Programming_Read_Remaining_DMA()
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void testInit(){
+  SensorProbe.HT_Present = false;
+  SensorProbe.VOC_Present = false;
+  SensorProbe.PM_Present = false;
+  SensorProbe.MIC_Present = false;
+  SensorProbe.ESP_Present = false;
+}
+
+bool GetPMSensorPresence(){
+  return SensorProbe.PM_Present;
+}
+
+bool IsHTSensorEnabled() {
+  return Sensor.HT_measurementEnabled;
+}
+
+bool IsVOCSensorEnabled() {
+  return Sensor.VOC_measurementEnabled;
+}
+
+bool IsPMSensorEnabled() {
+  return Sensor.PM_measurementEnabled;
+}
+
+bool IsMICSensorEnabled() {
+  return Sensor.MIC_measurementEnabled;
+}
+
+void SetHTSensorStatus(bool setting) {
+  Sensor.HT_measurementEnabled =  setting;
+}
+
+void SetVOCSensorStatus(bool setting) {
+  Sensor.VOC_measurementEnabled = setting;
+}
+
+void SetPMSensorStatus(bool setting) {
+  Sensor.PM_measurementEnabled = setting;
+}
+
+void SetMICSensorStatus(bool setting) {
+  Sensor.MIC_measurementEnabled = setting;
+}
+
+void SetESPMeasurementDone(){
+  SensorProbe.ESP_Present = true;
+}
+
+void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart) {
+  testInit();
+  I2CSensors_Init(sensorI2C);
+  if(!HIDS_DeviceConnected()) {
+     Error("Humidity / Temperature sensor NOT connected!");
+     SensorProbe.HT_Present = false;
+     Sensor.HT_measurementEnabled = false;
+     // HT Device NOT connected, turning LED on RED.
+  }else {
+    // HT Device is connected, turning led on GREEN.
+    SensorProbe.HT_Present = true;
+    Debug("Humidity / Temperature sensor initialised.");
+  }
+  if(!SGP_DeviceConnected()) {
+    SensorProbe.VOC_Present = false;
+     Error("SGP device not connected!");
+     Sensor.VOC_measurementEnabled = false;
+  }
+  else{
+    SensorProbe.VOC_Present = true;
+    Debug("SGP sensor initialised.");
+  }
+  if(SensorProbe.VOC_Present && SensorProbe.HT_Present){
+    SetDBLED(false, true, false);
+  }
+  else{
+    SetDBLED(true, false, false);
+    HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, 0);
+    HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, 1);
+    HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, 1);
+  }
+  if(Sensor.MIC_measurementEnabled) {
+    Info("Device_Init calls enableMicrophone");
+    if (!enableMicrophone(true)) {
+      Error("Microphone device not connected! DMA Error.");
+      SensorProbe.MIC_Present = false;
+      Sensor.MIC_measurementEnabled = false;
+    }
+    else{
+      SensorProbe.MIC_Present = true;
+      Sensor.MIC_measurementEnabled = true;
+      Debug("DMA and IRQ armed for Microphone sensor.");
+    }
+  }
+  if (!probe_sen5x()) {
+    Debug("PM sensor initialised.");
+    SensorProbe.PM_Present = true; // not present
+    Sensor.PM_measurementEnabled = true;
+  }
+  else {
+    sen5x_Power_Off();      // switch off buck converter
+    Debug("PM sensor not detected/connected.");
+    SensorProbe.MIC_Present = false;
+    Sensor.PM_measurementEnabled = false;
+  }
+  Info("SensorProbe.HT_Present: %s", SensorProbe.HT_Present?"yes":"no");
+  Info("SensorProbe.VOC_Present: %s", SensorProbe.VOC_Present?"yes":"no");
+  Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
+  Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
+  ESP_Init(espUart);
+  Debug("Sensors initialized, probing ESP.");
+}
+
+void Device_Test(){
+  if(!SensorProbe.MIC_Present){
+    if(MIC_TestMeasurementDone()){
+      //when this condition is met, the device is definite operational
+//      Debug("MIC_TestMeasurementDone() is true");
+      SensorProbe.MIC_Present = true;
+      Sensor.MIC_measurementEnabled = true;
+      SetStatusLED(LED_OFF, LED_ON, LED_OFF);
+    }
+    else{
+      if (micSettlingComplete()) {
+        // his has to be met first
+//        Debug("micSettlingComplete() is true");
+        Sensor.MIC_measurementEnabled = true;
+        SetStatusLED(LED_ON, LED_OFF, LED_OFF);
+      }
+    }
+  }
+  if(!SensorProbe.ESP_Present){
+    ESP_WakeTest();  // calls in ESP.c  back to SetESPMeasurementDone()
+  }
+  if((SensorProbe.ESP_Present && SensorProbe.MIC_Present) || TimestampIsReached(deviceTimeOut)){
+    Info("Test completed");
+    Info("ESP function: %s", SensorProbe.ESP_Present?"passed": "failed");
+    Info("MIC function:%s", SensorProbe.MIC_Present?"passed": "failed");
+    SetTestDone();
+  }
+}
+
+bool AllDevicesReady() {
+  if (TimestampIsReached(deviceTimeOut)) {
+    if (HIDSstate == HIDS_STATE_WAIT) {
+      Sensor.HT_measurementEnabled = false;
+    }
+    if (SGPstate == SGP_STATE_WAIT) {
+      Sensor.VOC_measurementEnabled = false;
+    }
+    if (PMsamplesState == LIGHT_OUT) {
+      Sensor.PM_measurementEnabled = false;
+    }
+    if (mic_Status == MIC_STATE_WAIT){
+      Sensor.MIC_measurementEnabled = false;
+    }
+    if (ESP_Status == ESP_STATE_RESET) {
+      return !(Sensor.HT_measurementEnabled || Sensor.VOC_measurementEnabled ||
+          Sensor.PM_measurementEnabled || Sensor.MIC_measurementEnabled);
+    }
+  }
+  return false;
+}
+
+void EnabledConnectedDevices() {
+  if (SensorProbe.HT_Present) {
+    Sensor.HT_measurementEnabled = true;
+  }
+  if (SensorProbe.VOC_Present) {
+    Sensor.VOC_measurementEnabled = true;
+  }
+  if (SensorProbe.PM_Present) {
+    Sensor.PM_measurementEnabled = true;
+  }
+  if (SensorProbe.MIC_Present) {
+    Sensor.MIC_measurementEnabled = true;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -232,37 +432,56 @@ int main(void)
   InitClock(&hrtc);
   Debug("Clock init done");
 
-  if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn))
-  {
-      errorHandler(__func__, __LINE__, __FILE__);
+  if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn)) {
+    errorHandler(__func__, __LINE__, __FILE__);
   }
 
 //  Gadget_Init(&hi2c1, &hi2s2, &huart4, &hadc);
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
-  if (!probe_sen5x()) {
-    sen5x_Present = true; // not present
-  }
-  else {
-    sen5x_Power_Off();      // switch off buck converter
-    Debug("sen5x sensor not detected, polling disabled.");
-  }
+  deviceTimeOut = HAL_GetTick() + 5000;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-	  // Upkeep gadget
+    if(TimestampIsReached(batteryReadTimer)){
+      charge = Battery_Upkeep();
+      batteryReadTimer  = HAL_GetTick() + 50000;
+        showTime();
+    }
+    /*
+    //==== disable for power measurements in test condition
+        if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
+          FlashLEDs();
+        }
+        if(charge == BATTERY_CRITICAL && ESP_Status == ESP_STATE_RESET){
+          batteryEmpty = true;
+          Enter_Standby_Mode(); // we are going in deep sleep, nearly off and no wakeup from RTC
+        }
+        else{
+          batteryEmpty = false;
+        }
+    //====
+    */
+    if (!usbPluggedIn) {
+      if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
+//        Debug("SensorProbe.ESP_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM => %d", SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        EnabledConnectedDevices();
+        deviceTimeOut = HAL_GetTick() + 3000;
+      }
+    }
     if(testDone && !ESP_Programming && !batteryEmpty){
-//      MeasurementBusy = UpkeepGadget();
-      if (SGPBusy != SGP_STATE_START_MEASUREMENTS && SGPBusy != SGP_STATE_WAIT_FOR_COMPLETION) {
-          HIDSBusy = HIDS_Upkeep();
+      if (SGPstate != SGP_STATE_START_MEASUREMENTS && SGPstate != SGP_STATE_WAIT_FOR_COMPLETION && Sensor.HT_measurementEnabled) {
+        HIDSstate = HIDS_Upkeep();
       }
-      if (HIDSBusy != HIDS_STATE_START_MEASUREMENTS && HIDSBusy != HIDS_STATE_WAIT_FOR_COMPLETION)  {
-        SGPBusy = SGP_Upkeep();
+      if (HIDSstate != HIDS_STATE_START_MEASUREMENTS && HIDSstate != HIDS_STATE_WAIT_FOR_COMPLETION && Sensor.VOC_measurementEnabled) {
+        SGPstate = SGP_Upkeep();
       }
-      mic_Status = Mic_Upkeep();
-
-      if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && sen5x_Present) {
+      if (Sensor.MIC_measurementEnabled) {
+        mic_Status = Mic_Upkeep();
+      }
+      if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && Sensor.PM_measurementEnabled) {
         if  (charge > BATTERY_LOW) {
           sen5x_statemachine(0);
         }
@@ -275,33 +494,13 @@ int main(void)
           }
         }
       }
-// Bovenstaande moet gereed zijn om te gaan verzenden
-      ESP_Status = ESP_Upkeep(); // deze is onafhankelijk van bovenstaande moet altijd uitgevoerd worden in ESP.c checken of alle waarden binnen zijn
+      ESP_Status = ESP_Upkeep();
     }
     if(!testDone && !ESP_Programming && !batteryEmpty){
       Device_Test();  // for device with startup time
     }
     configCheck();
-    if(TimestampIsReached(batteryReadTimer)){
-      charge = Battery_Upkeep();
-      batteryReadTimer  = HAL_GetTick() + 50000;
-        showTime();
-    }
 
-    if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
-      FlashLEDs();
-    }
-    if(charge == BATTERY_CRITICAL && ESP_Status == ESP_STATE_RESET){
-      batteryEmpty = true;
-      Enter_Standby_Mode(); // we are going in deep sleep, nearly off and no wakeup from RTC
-    }
-    else{
-      batteryEmpty = false;
-    }
-    if (!usbPluggedIn && !userToggle && ESPTransmitDone && !EspTurnedOn) {
-      // ok to operate on battery
-      Enter_Stop_Mode(880);
-    }
 
     //    if(TimestampIsReached(LedBlinkTimestamp)) {
     // Red LED

@@ -5069,7 +5069,7 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  *fill*         0x2000000a        0x2 
  .data.Vref     0x2000000c        0x4 ./Core/Src/PowerUtils.o
                 0x2000000c                Vref
- .data.samplesState
+ .data.PMsamplesState
                 0x20000010        0x1 ./Core/Src/sen5x.o
  *fill*         0x20000011        0x3 
  .data.SGP_IdleTime
@@ -5370,13 +5370,13 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .bss.voccount  0x20000eae        0x1 ./Core/Src/measurement.o
                 0x20000eae                voccount
  *fill*         0x20000eaf        0x1 
- .bss.MicStamp  0x20000eb0        0x4 ./Core/Src/measurement.o
+ .bss.MICTimeStamp  0x20000eb0        0x4 ./Core/Src/measurement.o
  .bss.MeasStamp
                 0x20000eb4        0x4 ./Core/Src/measurement.o
  .bss.CurrentMeasurementIndex
                 0x20000eb8        0x1 ./Core/Src/measurement.o
- .bss.MeasTest  0x20000eb9        0x4 ./Core/Src/measurement.o
- .bss.MeasEnabled
+ .bss.SensorProbe  0x20000eb9        0x4 ./Core/Src/measurement.o
+ .bss.Sensor
                 0x20000ebd        0x4 ./Core/Src/measurement.o
  *fill*         0x20000ec1        0x3 
  .bss.Measurements

@@ -18,6 +18,7 @@
 #endif
 #include "RealTimeClock.h"
 #include "sen5x.h"
+#include "main.h"
 #include <stdint.h>
 
 static UART_HandleTypeDef* EspUart = NULL;
@@ -888,6 +889,7 @@ void ESP_WakeTest(void) {
   switch (TestState){
 
     case ESP_TEST_INIT:
+//      Debug("TestState: ESP_TEST_INIT");
       if(!EspTurnedOn){
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
         HAL_Delay(50);
@@ -908,6 +910,7 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_SEND:
+//      Debug("TestState: ESP_TEST_SEND");
       if(TimestampIsReached(ESPTimeStamp)){
         ATSend = AT_Send(ATCommand);
         if(ATSend){
@@ -917,6 +920,7 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_RECEIVE:
+//      Debug("TestState: ESP_TEST_RECEIVE");
       if(TimestampIsReached(ESPTimeStamp)){
         ATReceived = DMA_ProcessBuffer(ATExpectation);
         bool proceed = ATCompare(ATReceived, ATExpectation);
@@ -942,6 +946,7 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_VALIDATE:
+//      Debug("TestState: ESP_TEST_VALIDATE");
       //Set measurement completed
       TIM3 -> CCR1 = LED_OFF;
       TIM3 -> CCR2 = LED_ON;
@@ -951,6 +956,7 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_DEINIT:
+//      Debug("TestState: ESP_TEST_DEINIT");
       testRound = false;
       EspTurnedOn = false;
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
@@ -961,10 +967,12 @@ void ESP_WakeTest(void) {
       break;
 
     default:
+//      Debug("TestState: ESP_TEST_INIT");
       TestState = ESP_TEST_INIT;
       break;
 
     case ESP_TEST_BOOT:
+//      Debug("TestState: ESP_TEST_BOOT");
       TIM3 -> CCR1 = 4000;
       TIM3 -> CCR2 = 4000;
       TIM3 -> CCR3 = 0;
@@ -1210,6 +1218,7 @@ ESP_States ESP_Upkeep(void) {
 
     case ESP_STATE_RESET:
       if(TimestampIsReached(ESPTimeStamp) || ReconfigSet){
+        ESPTransmitDone = false;
         if(Mode == AT_MODE_INIT){
           InitIsDone = true;
           EspState = ESP_STATE_MODE_SELECT;
