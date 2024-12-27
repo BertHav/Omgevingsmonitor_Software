@@ -39,9 +39,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   000405a3  00000000  00000000  00088e9f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000a035c  00000000  00000000  000c9442  2**0
+ 18 .debug_str    000a035d  00000000  00000000  000c9442  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      000000b1  00000000  00000000  0016979e  2**0
+ 19 .comment      000000b1  00000000  00000000  0016979f  2**0
                   CONTENTS, READONLY
  20 .debug_frame  0000ac98  00000000  00000000  00169850  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -20967,7 +20967,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
  80093ce:	4b59      	ldr	r3, [pc, #356]	@ (8009534 <sen5x_statemachine+0x200>)
  80093d0:	2203      	movs	r2, #3
  80093d2:	701a      	strb	r2, [r3, #0]
-      sen5xReadTimer = HAL_GetTick() + 228000; // about every 50 minutes with microphone enabled
+      sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s with microphone enabled
  80093d4:	f004 fe94 	bl	800e100 <HAL_GetTick>
  80093d8:	0003      	movs	r3, r0
  80093da:	4a5e      	ldr	r2, [pc, #376]	@ (8009554 <sen5x_statemachine+0x220>)
@@ -21192,7 +21192,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
  8009548:	08023b98 	.word	0x08023b98
  800954c:	080236e8 	.word	0x080236e8
  8009550:	08023bc4 	.word	0x08023bc4
- 8009554:	00037aa0 	.word	0x00037aa0
+ 8009554:	00005910 	.word	0x00005910
  8009558:	200011cd 	.word	0x200011cd
  800955c:	08023bf0 	.word	0x08023bf0
  8009560:	08023c08 	.word	0x08023c08

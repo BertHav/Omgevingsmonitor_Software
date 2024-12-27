@@ -346,7 +346,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
         Error("Error executing sen5x_lightup_measurement()");
       }
       PMsamplesState = CHECK_SEN5X;
-      sen5xReadTimer = HAL_GetTick() + 228000; // about every 50 minutes with microphone enabled
+      sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s with microphone enabled
       break;
     case CHECK_SEN5X:
       PMsamplesState = LIGHT_ON;

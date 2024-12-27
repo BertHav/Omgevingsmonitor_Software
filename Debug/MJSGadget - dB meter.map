@@ -1581,7 +1581,7 @@ Discarded input sections
  .debug_macro   0x00000000       0xac ./Core/Src/gadget.o
  .debug_macro   0x00000000       0x10 ./Core/Src/gadget.o
  .debug_line    0x00000000      0xca7 ./Core/Src/gadget.o
- .debug_str     0x00000000    0x8e40e ./Core/Src/gadget.o
+ .debug_str     0x00000000    0x8e40f ./Core/Src/gadget.o
  .comment       0x00000000       0x44 ./Core/Src/gadget.o
  .ARM.attributes
                 0x00000000       0x2c ./Core/Src/gadget.o
@@ -1762,7 +1762,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 ./Core/Src/gasSensor.o
  .debug_macro   0x00000000       0x76 ./Core/Src/gasSensor.o
  .debug_line    0x00000000      0xcca ./Core/Src/gasSensor.o
- .debug_str     0x00000000    0x8e67a ./Core/Src/gasSensor.o
+ .debug_str     0x00000000    0x8e67b ./Core/Src/gasSensor.o
  .comment       0x00000000       0x44 ./Core/Src/gasSensor.o
  .ARM.attributes
                 0x00000000       0x2c ./Core/Src/gasSensor.o
@@ -14978,152 +14978,152 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_line    0x000402e5      0x156 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
  .debug_line    0x0004043b      0x168 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
 
-.debug_str      0x00000000    0xa035c
+.debug_str      0x00000000    0xa035d
  .debug_str     0x00000000    0x8c8f3 ./Core/Src/EEProm.o
                               0x8ccac (size before relaxing)
- .debug_str     0x0008c8f3     0x2c3f ./Core/Src/ESP.o
-                              0x8fb14 (size before relaxing)
- .debug_str     0x0008f532      0x746 ./Core/Src/I2CSensors.o
-                              0x8eddb (size before relaxing)
- .debug_str     0x0008fc78      0x101 ./Core/Src/PC_Config.o
-                              0x8e5b7 (size before relaxing)
- .debug_str     0x0008fd79      0x36e ./Core/Src/PowerUtils.o
-                              0x8d7af (size before relaxing)
- .debug_str     0x000900e7      0x704 ./Core/Src/RealTimeClock.o
-                              0x8f296 (size before relaxing)
- .debug_str     0x000907eb       0xfa ./Core/Src/adc.o
-                              0x89d90 (size before relaxing)
- .debug_str     0x000908e5      0x1aa ./Core/Src/dma.o
-                              0x89a4c (size before relaxing)
- .debug_str     0x00090a8f      0x11c ./Core/Src/efficient_10log10.o
+ .debug_str     0x0008c8f3     0x2c40 ./Core/Src/ESP.o
+                              0x8fb15 (size before relaxing)
+ .debug_str     0x0008f533      0x746 ./Core/Src/I2CSensors.o
+                              0x8eddc (size before relaxing)
+ .debug_str     0x0008fc79      0x101 ./Core/Src/PC_Config.o
+                              0x8e5b8 (size before relaxing)
+ .debug_str     0x0008fd7a      0x36e ./Core/Src/PowerUtils.o
+                              0x8d7b0 (size before relaxing)
+ .debug_str     0x000900e8      0x704 ./Core/Src/RealTimeClock.o
+                              0x8f297 (size before relaxing)
+ .debug_str     0x000907ec       0xfa ./Core/Src/adc.o
+                              0x89d91 (size before relaxing)
+ .debug_str     0x000908e6      0x1aa ./Core/Src/dma.o
+                              0x89a4d (size before relaxing)
+ .debug_str     0x00090a90      0x11c ./Core/Src/efficient_10log10.o
                                0x3dc5 (size before relaxing)
- .debug_str     0x00090bab      0x295 ./Core/Src/gpio.o
-                              0x8a02b (size before relaxing)
- .debug_str     0x00090e40       0xc6 ./Core/Src/i2c.o
-                              0x8a0a6 (size before relaxing)
- .debug_str     0x00090f06      0x182 ./Core/Src/i2s.o
-                              0x89d0d (size before relaxing)
- .debug_str     0x00091088      0xac1 ./Core/Src/main.o
-                              0x90ab6 (size before relaxing)
- .debug_str     0x00091b49      0x1cd ./Core/Src/microphone.o
-                              0x8e838 (size before relaxing)
- .debug_str     0x00091d16       0x57 ./Core/Src/print_functions.o
+ .debug_str     0x00090bac      0x295 ./Core/Src/gpio.o
+                              0x8a02c (size before relaxing)
+ .debug_str     0x00090e41       0xc6 ./Core/Src/i2c.o
+                              0x8a0a7 (size before relaxing)
+ .debug_str     0x00090f07      0x182 ./Core/Src/i2s.o
+                              0x89d0e (size before relaxing)
+ .debug_str     0x00091089      0xac1 ./Core/Src/main.o
+                              0x90ab7 (size before relaxing)
+ .debug_str     0x00091b4a      0x1cd ./Core/Src/microphone.o
+                              0x8e839 (size before relaxing)
+ .debug_str     0x00091d17       0x57 ./Core/Src/print_functions.o
                                0x79c9 (size before relaxing)
- .debug_str     0x00091d6d       0x4b ./Core/Src/rtc.o
-                              0x89d75 (size before relaxing)
- .debug_str     0x00091db8      0x58b ./Core/Src/sen5x.o
-                              0x8f2ce (size before relaxing)
- .debug_str     0x00092343      0x5bf ./Core/Src/sen5x_i2c.o
-                              0x8d493 (size before relaxing)
- .debug_str     0x00092902      0x11d ./Core/Src/sensirion_common.o
+ .debug_str     0x00091d6e       0x4b ./Core/Src/rtc.o
+                              0x89d76 (size before relaxing)
+ .debug_str     0x00091db9      0x58b ./Core/Src/sen5x.o
+                              0x8f2cf (size before relaxing)
+ .debug_str     0x00092344      0x5bf ./Core/Src/sen5x_i2c.o
+                              0x8d494 (size before relaxing)
+ .debug_str     0x00092903      0x11d ./Core/Src/sensirion_common.o
                                0x74b6 (size before relaxing)
- .debug_str     0x00092a1f     0x1cfb ./Core/Src/sensirion_gas_index_algorithm.o
+ .debug_str     0x00092a20     0x1cfb ./Core/Src/sensirion_gas_index_algorithm.o
                                0x8e77 (size before relaxing)
- .debug_str     0x0009471a      0x21c ./Core/Src/sensirion_i2c.o
+ .debug_str     0x0009471b      0x21c ./Core/Src/sensirion_i2c.o
                               0x8cab2 (size before relaxing)
- .debug_str     0x00094936      0x343 ./Core/Src/sgp40.o
-                              0x8fd4a (size before relaxing)
- .debug_str     0x00094c79      0x459 ./Core/Src/sound_LUTs.o
+ .debug_str     0x00094937      0x343 ./Core/Src/sgp40.o
+                              0x8fd4b (size before relaxing)
+ .debug_str     0x00094c7a      0x459 ./Core/Src/sound_LUTs.o
                                0x40dc (size before relaxing)
- .debug_str     0x000950d2     0x1149 ./Core/Src/sound_measurement.o
-                              0x908ad (size before relaxing)
- .debug_str     0x0009621b      0x149 ./Core/Src/sound_utilities.o
+ .debug_str     0x000950d3     0x1149 ./Core/Src/sound_measurement.o
+                              0x908ae (size before relaxing)
+ .debug_str     0x0009621c      0x149 ./Core/Src/sound_utilities.o
                                0x83ec (size before relaxing)
- .debug_str     0x00096364       0x88 ./Core/Src/statusCheck.o
-                              0x8e889 (size before relaxing)
- .debug_str     0x000963ec       0x2c ./Core/Src/stm32l0xx_hal_msp.o
-                              0x89859 (size before relaxing)
- .debug_str     0x00096418      0x491 ./Core/Src/stm32l0xx_it.o
-                              0x8a646 (size before relaxing)
- .debug_str     0x000968a9     0x1fb6 ./Core/Src/syscalls.o
+ .debug_str     0x00096365       0x88 ./Core/Src/statusCheck.o
+                              0x8e88a (size before relaxing)
+ .debug_str     0x000963ed       0x2c ./Core/Src/stm32l0xx_hal_msp.o
+                              0x8985a (size before relaxing)
+ .debug_str     0x00096419      0x491 ./Core/Src/stm32l0xx_it.o
+                              0x8a647 (size before relaxing)
+ .debug_str     0x000968aa     0x1fb6 ./Core/Src/syscalls.o
                                0x97c9 (size before relaxing)
- .debug_str     0x0009885f       0x6b ./Core/Src/sysmem.o
+ .debug_str     0x00098860       0x6b ./Core/Src/sysmem.o
                                0x5fe1 (size before relaxing)
- .debug_str     0x000988ca       0x99 ./Core/Src/system_stm32l0xx.o
+ .debug_str     0x000988cb       0x99 ./Core/Src/system_stm32l0xx.o
                               0x8938e (size before relaxing)
- .debug_str     0x00098963      0x1a6 ./Core/Src/tim.o
-                              0x89f99 (size before relaxing)
- .debug_str     0x00098b09       0x51 ./Core/Src/usart.o
-                              0x8a0f5 (size before relaxing)
- .debug_str     0x00098b5a       0xaa ./Core/Src/utils.o
-                              0x8d835 (size before relaxing)
- .debug_str     0x00098c04      0x2cb ./Core/Src/wsenHIDS.o
-                              0x8ee10 (size before relaxing)
- .debug_str     0x00098ecf       0x44 ./Core/Startup/startup_stm32l072rztx.o
+ .debug_str     0x00098964      0x1a6 ./Core/Src/tim.o
+                              0x89f9a (size before relaxing)
+ .debug_str     0x00098b0a       0x51 ./Core/Src/usart.o
+                              0x8a0f6 (size before relaxing)
+ .debug_str     0x00098b5b       0xaa ./Core/Src/utils.o
+                              0x8d836 (size before relaxing)
+ .debug_str     0x00098c05      0x2cb ./Core/Src/wsenHIDS.o
+                              0x8ee11 (size before relaxing)
+ .debug_str     0x00098ed0       0x44 ./Core/Startup/startup_stm32l072rztx.o
                                  0x89 (size before relaxing)
- .debug_str     0x00098f13      0x455 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
+ .debug_str     0x00098f14      0x455 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
                               0x89af2 (size before relaxing)
- .debug_str     0x00099368      0x33a ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_adc.o
+ .debug_str     0x00099369      0x33a ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_adc.o
                               0x89ab3 (size before relaxing)
- .debug_str     0x000996a2      0x24d ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_cortex.o
+ .debug_str     0x000996a3      0x24d ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_cortex.o
                               0x89846 (size before relaxing)
- .debug_str     0x000998ef      0x252 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_dma.o
+ .debug_str     0x000998f0      0x252 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_dma.o
                               0x8973b (size before relaxing)
- .debug_str     0x00099b41      0x27f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
+ .debug_str     0x00099b42      0x27f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
                               0x895d1 (size before relaxing)
- .debug_str     0x00099dc0      0x423 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash_ex.o
+ .debug_str     0x00099dc1      0x423 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash_ex.o
                               0x89920 (size before relaxing)
- .debug_str     0x0009a1e3       0xcb ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_gpio.o
+ .debug_str     0x0009a1e4       0xcb ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_gpio.o
                               0x89567 (size before relaxing)
- .debug_str     0x0009a2ae      0xd38 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c.o
+ .debug_str     0x0009a2af      0xd38 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c.o
                               0x8a6d5 (size before relaxing)
- .debug_str     0x0009afe6       0xf1 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c_ex.o
+ .debug_str     0x0009afe7       0xf1 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c_ex.o
                               0x89955 (size before relaxing)
- .debug_str     0x0009b0d7      0x25c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2s.o
+ .debug_str     0x0009b0d8      0x25c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2s.o
                               0x8996c (size before relaxing)
- .debug_str     0x0009b333      0x58b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd.o
+ .debug_str     0x0009b334      0x58b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd.o
                               0x89c1f (size before relaxing)
- .debug_str     0x0009b8be      0x1bf ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd_ex.o
+ .debug_str     0x0009b8bf      0x1bf ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd_ex.o
                               0x8987b (size before relaxing)
- .debug_str     0x0009ba7d      0x237 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pwr.o
+ .debug_str     0x0009ba7e      0x237 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pwr.o
                               0x89652 (size before relaxing)
- .debug_str     0x0009bcb4      0x2c2 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc.o
+ .debug_str     0x0009bcb5      0x2c2 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc.o
                               0x89914 (size before relaxing)
- .debug_str     0x0009bf76      0x35f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc_ex.o
+ .debug_str     0x0009bf77      0x35f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc_ex.o
                               0x898b8 (size before relaxing)
- .debug_str     0x0009c2d5      0x23f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc.o
+ .debug_str     0x0009c2d6      0x23f ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc.o
                               0x8987d (size before relaxing)
- .debug_str     0x0009c514      0x513 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc_ex.o
+ .debug_str     0x0009c515      0x513 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc_ex.o
                               0x89b5c (size before relaxing)
- .debug_str     0x0009ca27      0xd32 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim.o
+ .debug_str     0x0009ca28      0xd32 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim.o
                               0x8a68f (size before relaxing)
- .debug_str     0x0009d759       0x74 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim_ex.o
+ .debug_str     0x0009d75a       0x74 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim_ex.o
                               0x89844 (size before relaxing)
- .debug_str     0x0009d7cd      0xa1b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart.o
+ .debug_str     0x0009d7ce      0xa1b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart.o
                               0x8a499 (size before relaxing)
- .debug_str     0x0009e1e8      0x230 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart_ex.o
+ .debug_str     0x0009e1e9      0x230 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart_ex.o
                               0x89b30 (size before relaxing)
- .debug_str     0x0009e418      0x10c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_ll_usb.o
+ .debug_str     0x0009e419      0x10c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_ll_usb.o
                               0x8975c (size before relaxing)
- .debug_str     0x0009e524      0x65d ./Middlewares/USB_Device_Library/usbd_cdc.o
-                              0x8e779 (size before relaxing)
- .debug_str     0x0009eb81      0x2c1 ./Middlewares/USB_Device_Library/usbd_core.o
-                              0x8e07d (size before relaxing)
- .debug_str     0x0009ee42      0x159 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
-                              0x8df97 (size before relaxing)
- .debug_str     0x0009ef9b       0x8a ./Middlewares/USB_Device_Library/usbd_ioreq.o
-                              0x8dec4 (size before relaxing)
- .debug_str     0x0009f025       0xc6 ./USB_DEVICE/App/usb_device.o
-                              0x8e216 (size before relaxing)
- .debug_str     0x0009f0eb       0xb0 ./USB_DEVICE/App/usbd_cdc_if.o
-                              0x8e808 (size before relaxing)
- .debug_str     0x0009f19b      0x258 ./USB_DEVICE/App/usbd_desc.o
-                              0x8ddc7 (size before relaxing)
- .debug_str     0x0009f3f3       0x81 ./USB_DEVICE/Target/usbd_conf.o
-                              0x8ebe1 (size before relaxing)
- .debug_str     0x0009f474      0xb8f C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_const_structs.o)
+ .debug_str     0x0009e525      0x65d ./Middlewares/USB_Device_Library/usbd_cdc.o
+                              0x8e77a (size before relaxing)
+ .debug_str     0x0009eb82      0x2c1 ./Middlewares/USB_Device_Library/usbd_core.o
+                              0x8e07e (size before relaxing)
+ .debug_str     0x0009ee43      0x159 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
+                              0x8df98 (size before relaxing)
+ .debug_str     0x0009ef9c       0x8a ./Middlewares/USB_Device_Library/usbd_ioreq.o
+                              0x8dec5 (size before relaxing)
+ .debug_str     0x0009f026       0xc6 ./USB_DEVICE/App/usb_device.o
+                              0x8e217 (size before relaxing)
+ .debug_str     0x0009f0ec       0xb0 ./USB_DEVICE/App/usbd_cdc_if.o
+                              0x8e809 (size before relaxing)
+ .debug_str     0x0009f19c      0x258 ./USB_DEVICE/App/usbd_desc.o
+                              0x8ddc8 (size before relaxing)
+ .debug_str     0x0009f3f4       0x81 ./USB_DEVICE/Target/usbd_conf.o
+                              0x8ebe2 (size before relaxing)
+ .debug_str     0x0009f475      0xb8f C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_const_structs.o)
                                 0xcfd (size before relaxing)
- .debug_str     0x000a0003       0x86 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_common_tables.o)
+ .debug_str     0x000a0004       0x86 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_common_tables.o)
                                 0x6e2 (size before relaxing)
- .debug_str     0x000a0089       0xe9 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_q31.o)
+ .debug_str     0x000a008a       0xe9 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_q31.o)
                                 0x32a (size before relaxing)
- .debug_str     0x000a0172       0xfe C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_radix4_q31.o)
+ .debug_str     0x000a0173       0xfe C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_radix4_q31.o)
                                 0x372 (size before relaxing)
- .debug_str     0x000a0270       0x62 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cmplx_mag_squared_q31.o)
+ .debug_str     0x000a0271       0x62 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cmplx_mag_squared_q31.o)
                                 0x255 (size before relaxing)
- .debug_str     0x000a02d2       0x5c C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
+ .debug_str     0x000a02d3       0x5c C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
                                 0x242 (size before relaxing)
- .debug_str     0x000a032e       0x2e C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
+ .debug_str     0x000a032f       0x2e C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
                                 0x240 (size before relaxing)
 
 .comment        0x00000000       0xb1

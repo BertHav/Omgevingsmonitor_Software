@@ -100,7 +100,7 @@ void Error_Handler(void);
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "3.2 BH"
+#define SRC_VERSION "3.21 BH"
 #define CURRENT_WEEK "24w52-5"  // -x is daynumber of week i.e. monday = 1
 #define WAIT_WITH_PM 870
 #define WAIT_WITHOUT_PM 900
