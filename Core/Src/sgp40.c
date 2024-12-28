@@ -285,6 +285,8 @@ void SGP_SoftReset(void) {
   // Danny: Its not odd, its a general reset command which is a standard syntaxis. So do not use blind.
   // This command could take from 0.1 to 1ms.
   Debug("SGP40 brougt to idle");
+  SGP_TurnHeaterOff();
+  HAL_Delay(10);
   WriteRegister(SGP_I2C_ADDRESS, SoftResetBuffer, SGP_SHORT_COMMAND_BUFFER_LENGTH);
 }
 
@@ -317,15 +319,10 @@ SGP40State SGP_Upkeep(void) {
 
   case SGP_STATE_PROCESS_RESULTS:
 //    Debug("Processing results.");
-    Debug("SGP40 index value: %d", vocIndex);
-    setVOC(vocIndex);
     ResetMeasurementIndicator();
-    if (powerCheck() == USB_PLUGGED_IN) {
-      SGP40TimeStamp = HAL_GetTick() + 60000;  // about every minute
-    }
-    else {
-      SGP40TimeStamp = HAL_GetTick() + 300000;  // about every 5 minutes
-    }
+    Debug("VOC index value: %d", vocIndex);
+    setVOC(vocIndex);
+    SGP40TimeStamp = HAL_GetTick() + (powerCheck()==USB_PLUGGED_IN?10000:1000);  // about every 10 seconds
     SGPState = SGP_STATE_WAIT;
     break;
 

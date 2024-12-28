@@ -282,7 +282,7 @@ wsenHIDSState HIDS_Upkeep(void) {
       Debug("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
       setHIDS(temp, humid);
       ResetMeasurementIndicator();
-      HIDSTimeStamp = HAL_GetTick() + powerCheck()==USB_PLUGGED_IN?10000:1000;  // about every ten seconds when power is plugged
+      HIDSTimeStamp = HAL_GetTick() + (powerCheck() == USB_PLUGGED_IN?10000:1000);  // about every ten seconds when power is plugged
       HIDSState = HIDS_STATE_WAIT;
       break;
 

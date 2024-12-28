@@ -228,10 +228,12 @@ int16_t sen5x_measurement(void) {
       printf("Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
     }
     if (sen5x_data.voc_index != 0x7fff) {
-      printf("Voc index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
+      Debug("raw VOC index: %d", sen5x_data.voc_index);
+      printf("VOC index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
     }
     if (sen5x_data.nox_index != 0x7fff) {
-      printf("Nox index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
+      Debug("raw NOx value %d", sen5x_data.nox_index);
+      printf("NOx index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
     }
   }
   return error;
@@ -325,8 +327,14 @@ bool sen5x_check_for_errors(void){
 }
 
 void set_light_on_state(void) {
-  sen5x_Power_On();
-  Debug("sen5x powered on, warming up for 30 sec.");
+  if (!sen5x_On) {
+    sen5x_Power_On();
+    Debug("sen5x powered on, warming up for 30 sec.");
+  }
+  else {
+    sen5xReadTimer = HAL_GetTick();
+    Debug("sen5x already powered");
+  }
   if (sen5x_lightup_measurement()) {
     Error("Error executing sen5x_lightup_measurement()");
   }
@@ -339,7 +347,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
     delayfactor =100; // if operated on USB read about every 30 seconds
   }
   else {
-    delayfactor = 1;
+    delayfactor = 1; // otherwise 1 time an hour
   }
   if (TimestampIsReached(sen5xReadTimer)) {
     switch (PMsamplesState) {
@@ -349,10 +357,11 @@ void sen5x_statemachine(uint8_t delayfactor) {
       break;
     case LIGHT_OUT:
       Debug(" state is LIGHT_OUT");
-      set_light_on_state();
       sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s with microphone enabled
+      set_light_on_state();
       break;
     case CHECK_SEN5X:
+      Debug(" state is CHECK_SEN5X");
       PMsamplesState = LIGHT_ON;
       if (sen5xErrors > 5) {
         PMsamplesState = S5X_DISABLED;
@@ -372,7 +381,7 @@ void sen5x_statemachine(uint8_t delayfactor) {
       }
       break;
     case LIGHT_ON:
-//      Debug(" state is LIGHT_ON");
+      Debug(" state is LIGHT_ON");
       sen5x_read_data_ready(&data_ready);  // is new data ready?
       if (data_ready) {
         if (sen5x_measurement()) {
@@ -400,13 +409,16 @@ void sen5x_statemachine(uint8_t delayfactor) {
       break;
 
     case SAMPLES_TAKEN:
-//      Debug(" state is SAMPLES_TAKEN");
+      Debug(" state is SAMPLES_TAKEN");
       sen5xSamples = 0;
       if (sen5x_extinguish_measurement()) {
         Error("Error executing sen5x_extinguish_measurement()");
       }
-      sen5x_Power_Off();
+      if (!usbPluggedIn) {
+        sen5x_Power_Off();
+      }
       sen5xReadTimer = HAL_GetTick() + (3141592 / delayfactor); //some more less then an hour
+      Debug("Added ticks for sen5x: %d", (3141592 / delayfactor));
       PMsamplesState = LIGHT_OUT;
     }
   }

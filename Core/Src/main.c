@@ -365,6 +365,22 @@ void EnabledConnectedDevices() {
     Sensor.MIC_measurementEnabled = true;
   }
 }
+
+void DisableConnectedDevices() {
+  if (SensorProbe.HT_Present) {
+    Sensor.HT_measurementEnabled = false;
+  }
+  if (SensorProbe.VOC_Present) {
+    Sensor.VOC_measurementEnabled = false;
+  }
+  if (SensorProbe.PM_Present) {
+    Sensor.PM_measurementEnabled = false;
+  }
+  if (SensorProbe.MIC_Present) {
+    Sensor.MIC_measurementEnabled = false;
+  }
+}
+
 /* USER CODE END 0 */
 
 /**

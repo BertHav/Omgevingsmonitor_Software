@@ -15,6 +15,7 @@ static bool init = true;
 static bool buttonHeld = false;
 uint32_t ConfigStamp;
 uint32_t PowerStamp = 0;
+static float batteryCharge = 0.0;
 
 void InitDone(){
   init = false;
@@ -37,7 +38,7 @@ void InitDone(){
 
 Battery_Status batteryChargeCheck(){
   Battery_Status status;
-  float batteryCharge = ReadBatteryVoltage();
+  batteryCharge = ReadBatteryVoltage();
   if(batteryCharge < 3.5){
     status = BATTERY_CRITICAL;
   }
@@ -91,10 +92,26 @@ void SetMICIndicator(){
   if(usbPluggedIn||userToggle){
     TIM2 -> CCR1 = LED_ON;
   }
+  else {
+    if (batteryCharge > 3.7) {
+      TIM2 -> CCR3 = LED_ON;
+    }
+    else {
+      TIM2 -> CCR1 = LED_ON;
+    }
+  }
 }
 void ResetMICIndicator(){
   if(usbPluggedIn||userToggle){
     TIM2 -> CCR1 = LED_OFF;
+  }
+  else {
+    if (batteryCharge > 3.7) {
+      TIM2 -> CCR3 = LED_OFF;
+    }
+    else {
+      TIM2 -> CCR1 = LED_OFF;
+    }
   }
 }
 void SetESPIndicator(){
@@ -160,7 +177,11 @@ void configCheck(){
   }
   if(!BootButton_Pressed() && UserButton_Pressed() && !buttonHeld){
     SetLEDsOff();
+    Debug("userToggle flipped");
     userToggle = !userToggle;
+    if (userToggle) {
+      EnabledConnectedDevices();
+    }
     buttonHeld = true;
   }
   if(!BootButton_Pressed() && !UserButton_Pressed()){
@@ -168,6 +189,7 @@ void configCheck(){
   }
   if(Check_USB_PowerOn()){
     usbPluggedIn = true;
+    EnabledConnectedDevices();
   }
   else{
     if(!userToggle && !init){

@@ -1074,6 +1074,8 @@ ESP_States ESP_Upkeep(void) {
       }
       if(ReconfigSet){
         memcpy(ATCommandArray, AT_WIFI_RECONFIG, 5);
+        Debug("Reconfig mode voor local wifi config selected");
+        DisableConnectedDevices();
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
         Mode = AT_MODE_RECONFIG;
