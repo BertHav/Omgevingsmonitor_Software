@@ -29790,7 +29790,7 @@ void ResetMICIndicator(){
   }
 }
  800cd8a:	e015      	b.n	800cdb8 <ResetMICIndicator+0x4c>
-    if (batteryCharge > 3.7) {
+    if (batteryCharge > 3.74) {
  800cd8c:	4b0e      	ldr	r3, [pc, #56]	@ (800cdc8 <ResetMICIndicator+0x5c>)
  800cd8e:	681b      	ldr	r3, [r3, #0]
  800cd90:	1c18      	adds	r0, r3, #0
@@ -29822,8 +29822,8 @@ void ResetMICIndicator(){
  800cdc0:	2000214d 	.word	0x2000214d
  800cdc4:	2000214e 	.word	0x2000214e
  800cdc8:	20002154 	.word	0x20002154
- 800cdcc:	9999999a 	.word	0x9999999a
- 800cdd0:	400d9999 	.word	0x400d9999
+ 800cdcc:	1eb851ec 	.word	0x1eb851ec
+ 800cdd0:	400deb85 	.word	0x400deb85
 
 0800cdd4 <SetESPIndicator>:
 void SetESPIndicator(){

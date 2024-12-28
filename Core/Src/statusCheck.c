@@ -106,7 +106,7 @@ void ResetMICIndicator(){
     TIM2 -> CCR1 = LED_OFF;
   }
   else {
-    if (batteryCharge > 3.7) {
+    if (batteryCharge > 3.74) {
       TIM2 -> CCR3 = LED_OFF;
     }
     else {
