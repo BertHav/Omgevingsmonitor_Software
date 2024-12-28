@@ -3163,9 +3163,9 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .text.setsen5xReadTimer
                 0x08006b1c       0x14 ./Core/Src/sen5x.o
                 0x08006b1c                setsen5xReadTimer
- .text.enable_sen5x
+ .text.sen5x_enable
                 0x08006b30       0x50 ./Core/Src/sen5x.o
-                0x08006b30                enable_sen5x
+                0x08006b30                sen5x_enable
  .text.sen5x_Power_On
                 0x08006b80       0x38 ./Core/Src/sen5x.o
                 0x08006b80                sen5x_Power_On
@@ -4846,7 +4846,7 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .rodata.MIC_TestMeasurementDone.str1.1
                 0x080170bf       0x3f ./Core/Src/microphone.o
                                  0x41 (size before relaxing)
- .rodata.enable_sen5x.str1.1
+ .rodata.sen5x_enable.str1.1
                 0x080170fe       0x20 ./Core/Src/sen5x.o
                                  0x22 (size before relaxing)
  .rodata.sen5x_Power_On.str1.1

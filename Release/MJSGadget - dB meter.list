@@ -10330,7 +10330,7 @@ Disassembly of section .text:
  80055a8:	f007 fa08 	bl	800c9bc <HAL_PWR_EnterSTOPMode>
  80055ac:	f000 fcce 	bl	8005f4c <SystemClock_Config>
  80055b0:	2000      	movs	r0, #0
- 80055b2:	f001 fabd 	bl	8006b30 <enable_sen5x>
+ 80055b2:	f001 fabd 	bl	8006b30 <sen5x_enable>
  80055b6:	4c1d      	ldr	r4, [pc, #116]	@ (800562c <Enter_Stop_Mode+0xe8>)
  80055b8:	2800      	cmp	r0, #0
  80055ba:	d015      	beq.n	80055e8 <Enter_Stop_Mode+0xa4>
@@ -12669,33 +12669,33 @@ Disassembly of section .text:
  8006b2a:	bd10      	pop	{r4, pc}
  8006b2c:	200011a0 	.word	0x200011a0
 
-08006b30 <enable_sen5x>:
- 8006b30:	4b0e      	ldr	r3, [pc, #56]	@ (8006b6c <enable_sen5x+0x3c>)
+08006b30 <sen5x_enable>:
+ 8006b30:	4b0e      	ldr	r3, [pc, #56]	@ (8006b6c <sen5x_enable+0x3c>)
  8006b32:	b510      	push	{r4, lr}
  8006b34:	781b      	ldrb	r3, [r3, #0]
- 8006b36:	4c0e      	ldr	r4, [pc, #56]	@ (8006b70 <enable_sen5x+0x40>)
+ 8006b36:	4c0e      	ldr	r4, [pc, #56]	@ (8006b70 <sen5x_enable+0x40>)
  8006b38:	2b00      	cmp	r3, #0
- 8006b3a:	d00c      	beq.n	8006b56 <enable_sen5x+0x26>
+ 8006b3a:	d00c      	beq.n	8006b56 <sen5x_enable+0x26>
  8006b3c:	2301      	movs	r3, #1
  8006b3e:	7822      	ldrb	r2, [r4, #0]
  8006b40:	4053      	eors	r3, r2
  8006b42:	7023      	strb	r3, [r4, #0]
- 8006b44:	d00c      	beq.n	8006b60 <enable_sen5x+0x30>
+ 8006b44:	d00c      	beq.n	8006b60 <sen5x_enable+0x30>
  8006b46:	f7ff ffe9 	bl	8006b1c <setsen5xReadTimer>
  8006b4a:	2003      	movs	r0, #3
  8006b4c:	7823      	ldrb	r3, [r4, #0]
- 8006b4e:	4a09      	ldr	r2, [pc, #36]	@ (8006b74 <enable_sen5x+0x44>)
- 8006b50:	4909      	ldr	r1, [pc, #36]	@ (8006b78 <enable_sen5x+0x48>)
+ 8006b4e:	4a09      	ldr	r2, [pc, #36]	@ (8006b74 <sen5x_enable+0x44>)
+ 8006b50:	4909      	ldr	r1, [pc, #36]	@ (8006b78 <sen5x_enable+0x48>)
  8006b52:	f002 fc45 	bl	80093e0 <CreateLine>
  8006b56:	2201      	movs	r2, #1
- 8006b58:	4b08      	ldr	r3, [pc, #32]	@ (8006b7c <enable_sen5x+0x4c>)
+ 8006b58:	4b08      	ldr	r3, [pc, #32]	@ (8006b7c <sen5x_enable+0x4c>)
  8006b5a:	7820      	ldrb	r0, [r4, #0]
  8006b5c:	701a      	strb	r2, [r3, #0]
  8006b5e:	bd10      	pop	{r4, pc}
  8006b60:	20a5      	movs	r0, #165	@ 0xa5
  8006b62:	0100      	lsls	r0, r0, #4
  8006b64:	f7ff ffda 	bl	8006b1c <setsen5xReadTimer>
- 8006b68:	e7f5      	b.n	8006b56 <enable_sen5x+0x26>
+ 8006b68:	e7f5      	b.n	8006b56 <sen5x_enable+0x26>
  8006b6a:	46c0      	nop			@ (mov r8, r8)
  8006b6c:	20000e94 	.word	0x20000e94
  8006b70:	200011a5 	.word	0x200011a5

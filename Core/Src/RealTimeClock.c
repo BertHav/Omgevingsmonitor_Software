@@ -303,7 +303,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
 //  SET_BIT(PWR->CR, PWR_CR_ULP); seems of no influence
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
   SystemClock_Config();
-  if (enable_sen5x((uint32_t)sleepTime)) {
+  if (sen5x_enable((uint32_t)sleepTime)) {
     showTime();
     set_light_on_state();
     if (!userToggle) {

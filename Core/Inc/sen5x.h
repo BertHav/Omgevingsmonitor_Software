@@ -50,7 +50,7 @@ extern bool sen5x_On;
 extern bool sen5x_Present;
 extern sen5x_states PMsamplesState;
 
-bool enable_sen5x(uint32_t sleepTime);
+bool sen5x_enable(uint32_t sleepTime);
 void setsen5xReadTimer(uint32_t delayms);
 void sen5x_Power_On(void);
 void sen5x_Power_Off(void);

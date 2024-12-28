@@ -30,16 +30,21 @@ void setsen5xReadTimer(uint32_t delayms) {
   sen5xReadTimer = HAL_GetTick() + delayms;
 }
 
-bool enable_sen5x(uint32_t sleepTime) {
+bool sen5x_enable(uint32_t sleepTime) {
   if (IsPMSensorEnabled()) {
+    Debug("sen5x measurement is enabled");
     sen5x_Enable = !sen5x_Enable;
     if (sen5x_Enable) {
       setsen5xReadTimer(0);
       Debug("SEN5X status of sen5x_Enable %d", sen5x_Enable);
     }
     else {
+      Debug("This cycle the sen5x is disabled");
       setsen5xReadTimer(HAL_GetTick() +( 3 * (sleepTime*1000))); //The ticker starts after 3*880, effective this turn the sen5x device will not start
     }
+  }
+  else {
+    Debug("sen5x measurement is disabled");
   }
   PMsamplesState = LIGHT_OUT; // just to be sure if USB_power is disconnected during measurement cycle
   return sen5x_Enable;
@@ -320,8 +325,12 @@ bool sen5x_check_for_errors(void){
 }
 
 void set_light_on_state(void) {
-  PMsamplesState = LIGHT_OUT;
-  setsen5xReadTimer(0);
+  sen5x_Power_On();
+  Debug("sen5x powered on, warming up for 30 sec.");
+  if (sen5x_lightup_measurement()) {
+    Error("Error executing sen5x_lightup_measurement()");
+  }
+  PMsamplesState = CHECK_SEN5X;
 }
 
 void sen5x_statemachine(uint8_t delayfactor) {
@@ -339,13 +348,8 @@ void sen5x_statemachine(uint8_t delayfactor) {
       sen5xReadTimer = HAL_GetTick() + (3141592 / delayfactor); //some more less then an hour a message
       break;
     case LIGHT_OUT:
-//      Debug(" state is LIGHT_OUT");
-      sen5x_Power_On();
-      Debug("sen5x powered on, warming up for 30 sec.");
-      if (sen5x_lightup_measurement()) {
-        Error("Error executing sen5x_lightup_measurement()");
-      }
-      PMsamplesState = CHECK_SEN5X;
+      Debug(" state is LIGHT_OUT");
+      set_light_on_state();
       sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s with microphone enabled
       break;
     case CHECK_SEN5X:
