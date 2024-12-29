@@ -412,6 +412,7 @@ void sen5x_statemachine() {
         }
         sen5xSamples = 0;
         sen5x_Power_Off();
+        sen5xReadTimer = HAL_GetTick() + 100;
         PMsamplesState = LIGHT_OUT;
       }
       else {
