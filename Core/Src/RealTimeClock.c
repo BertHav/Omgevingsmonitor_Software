@@ -292,7 +292,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   }
   // restart the SGP40 with a soft reset to enter idle mode
   SGP_SoftReset();
-  Info("Battery voltage %.2fV", ReadBatteryVoltage());
+  Info("Battery voltage %.02fV", ReadBatteryVoltage());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);
@@ -307,7 +307,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
     showTime();
     set_light_on_state();
     if (!userToggle) {
-      RTC_SetWakeUpTimer(SEN5X_START_UP_TIME); // go sleep for 30 seconds
+      RTC_SetWakeUpTimer(SEN5X_START_UP_TIME); // go sleep for 27 + 3s measurement time is approx 30 seconds
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
       HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
       SystemClock_Config();

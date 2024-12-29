@@ -31,6 +31,7 @@ static uint8_t SGP_ReadBuffer[SGP_SERIAL_NUMBER_RESPONSE_LENGTH] = {0};
 
 static uint8_t SGP_AmountOfSamplesDone = 0;
 static uint8_t SGP_TotalSamples = 1;
+static uint8_t sgp40samplecounter = 0;
 static uint32_t SGP_HeatUpTime = SGP_SENSOR_HEATUP_TIME;
 static uint32_t SGP_MeasurementDutyCycle = SGP_SENSOR_DUTYCYCLE;
 static uint32_t SGP_IdleTime = SGP_SENSOR_IDLE_TIME;
@@ -103,7 +104,7 @@ void SGP_TurnHeaterOff(void) {
 
 bool SGP_GetMeasurementValues(int32_t *vocIndex) {
   if (SGP_HeatedUp() && !HeatUpIsDone && !SGP_MsgSent) {
-    Debug("SGP is heated up");
+//    Debug("SGP is heated up");
     HeatUpIsDone = true;
     // SGP is heated up, we ignore the output and start another measurement.
     if(HT_MeasurementReceived){
@@ -117,12 +118,12 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
     SGP_MsgSent = true;
   }
   if (HeatUpIsDone && SGP_MeasurementReady() && !MeasurementIsReady) {
-    Debug("SGP sample[%i] is ready", SGP_AmountOfSamplesDone + 1);
+//    Debug("SGP40 sample[%i] is ready", SGP_AmountOfSamplesDone + 1);
     MeasurementIsReady = true;
     // Measurement is ready to be read, also turning the heater off.
     ReadRegister(SGP_I2C_ADDRESS, SGP_ReadBuffer, SGP_MEASURE_BUFFER_RESPONSE_LENGTH);
     if (!CheckCRC(SGP_ReadBuffer, SGP_MEASURE_BUFFER_RESPONSE_LENGTH, SGP_MEASURE_BUFFER_RESPONSE_LENGTH)) {
-      Error("SGP measurements CRC check failed.");
+      Error("SGP40 measurements CRC check failed.");
       Info("SGP_Measure buffer structure:");
       for (uint8_t i = 0; i < SGP_MEASURE_BUFFER_RESPONSE_LENGTH; i++) {
         Debug("SGP_Measurement buffer[%d]: %d", i, SGP_ReadBuffer[i]);
@@ -134,16 +135,24 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
     SGP_AmountOfSamplesDone++;
     if (SGP_AmountOfSamplesDone >= SGP_TotalSamples) {
       uint16_t rawSignal = ((SGP_ReadBuffer[1] << 8) | (SGP_ReadBuffer[0]));
-      Debug("rawSignal value: %d", rawSignal);
       int32_t tempVocIndex = 0;
       GasIndexAlgorithm_process(&params, rawSignal, &tempVocIndex);
-//      Debug("vocIndex value: %d", tempVocIndex);
+      sgp40samplecounter++;
+      if (sgp40samplecounter == 1) {
+        Debug("SGP40 rawSignal value: %d", rawSignal);
+        Debug("SGP40 vocIndex value: %d", tempVocIndex);
+      }
+      else {
+        if (sgp40samplecounter == 11) {
+          sgp40samplecounter = 0;
+        }
+      }
       *vocIndex = tempVocIndex;
       if(*vocIndex > 0 && *vocIndex <= 100){
-      Green = (1.0-(*vocIndex/100.0))*TimeValue;
-      Blue = (*vocIndex/100.0)*TimeValue;
-      Red = TimeValue;
-      SetVocLED(Red, Green, Blue);
+        Green = (1.0-(*vocIndex/100.0))*TimeValue;
+        Blue = (*vocIndex/100.0)*TimeValue;
+        Red = TimeValue;
+        SetVocLED(Red, Green, Blue);
       }
       if(*vocIndex > 100){
         Green = (((*vocIndex-100.0)/400.0))*TimeValue;
@@ -319,10 +328,9 @@ SGP40State SGP_Upkeep(void) {
 
   case SGP_STATE_PROCESS_RESULTS:
 //    Debug("Processing results.");
-    ResetMeasurementIndicator();
-    Debug("VOC index value: %d", vocIndex);
     setVOC(vocIndex);
-    SGP40TimeStamp = HAL_GetTick() + (powerCheck()==USB_PLUGGED_IN?10000:1000);  // about every 10 seconds
+    SGP40TimeStamp = HAL_GetTick() + 1000;  // about every 1 seconds
+    ResetMeasurementIndicator();
     SGPState = SGP_STATE_WAIT;
     break;
 
@@ -337,7 +345,6 @@ SGP40State SGP_Upkeep(void) {
     SGPState = SGP_STATE_INIT;
     break;
   }
-
   return SGPState;
 }
 

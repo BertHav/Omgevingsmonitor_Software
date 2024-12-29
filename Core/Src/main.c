@@ -367,18 +367,10 @@ void EnabledConnectedDevices() {
 }
 
 void DisableConnectedDevices() {
-  if (SensorProbe.HT_Present) {
     Sensor.HT_measurementEnabled = false;
-  }
-  if (SensorProbe.VOC_Present) {
     Sensor.VOC_measurementEnabled = false;
-  }
-  if (SensorProbe.PM_Present) {
     Sensor.PM_measurementEnabled = false;
-  }
-  if (SensorProbe.MIC_Present) {
     Sensor.MIC_measurementEnabled = false;
-  }
 }
 
 /* USER CODE END 0 */
@@ -498,16 +490,11 @@ int main(void)
         mic_Status = Mic_Upkeep();
       }
       if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && Sensor.PM_measurementEnabled) {
-        if  (charge > BATTERY_LOW) {
-          sen5x_statemachine(0);
-        }
-        else {
-          if (charge == USB_PLUGGED_IN) {
-            sen5x_statemachine(USB_PLUGGED_IN);
-          }
-          else  {
-            Info("Battery level insufficient for sen5x operation");
-          }
+        sen5x_statemachine();
+      }
+      else {
+        if (Sensor.PM_measurementEnabled) {
+          Info("Battery level insufficient for sen5x operation");
         }
       }
       ESP_Status = ESP_Upkeep();

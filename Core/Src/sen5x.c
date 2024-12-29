@@ -54,7 +54,7 @@ void sen5x_Power_On(void) {
   Debug("executing sen5x_Power_On");
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
   sen5x_On = true;
-  HAL_Delay(200);
+  HAL_Delay(55);
   return;
 }
 
@@ -77,7 +77,6 @@ int16_t probe_sen5x(void) {
   unsigned char product_name[32];
   uint8_t product_name_size = 32;
   sen5x_Power_On();  // switch buck converter
-
   error = sen5x_device_reset();
   if (error) {
       Error("Error executing sen5x_device_reset(): %i", error);
@@ -157,7 +156,7 @@ int16_t sen5x_lightup_measurement(void) {
 // Start Measurement
   int16_t error = 0;
 //  Debug("entering sen5x_lightup_measurement");
-  error = sen5x_start_measurement();
+  error = sen5x_start_measurement(); // start full measurement mode
   if (error) {
       Error("Error executing sen5x_lightup_measurement(): %i", error);
   }
@@ -210,31 +209,36 @@ int16_t sen5x_measurement(void) {
   // Read Measurement
   int16_t error = 0;
 //  Debug("entering sen5x_measurement");
-    if (sen5x_read_measurement(&sen5x_data)) {
-      Error("Error executing sen5x_read_measured_values(): %i", error);
-    }
-    else {
-      if (sen5xSamples == 0) {
-      return 0; // first sample reads zero's
-    }
-    printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
-    printf("Mass concentration pm2p5: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm2p5 / 10.0f);
-    printf("Mass concentration pm4p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm4p0 / 10.0f);
-    printf("Mass concentration pm10p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm10p0 / 10.0f);
-    if (sen5x_data.ambient_humidity != 0x7fff) {
-      printf("Ambient humidity: %.1f %%RH\r\n", sen5x_data.ambient_humidity / 100.0f);
-    }
-    if (sen5x_data.ambient_temperature != 0x7fff) {
-      printf("Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
-    }
-    if (sen5x_data.voc_index != 0x7fff) {
-      Debug("raw VOC index: %d", sen5x_data.voc_index);
-      printf("VOC index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
-    }
-    if (sen5x_data.nox_index != 0x7fff) {
-      Debug("raw NOx value %d", sen5x_data.nox_index);
-      printf("NOx index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
-    }
+  if (sen5x_read_measurement(&sen5x_data)) {
+    Error("Error executing sen5x_read_measured_values(): %i", error);
+    return error;
+  }
+  if (sen5xSamples != 1) {
+    return 0; // first sample reads zero's
+  }
+  if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
+      printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
+  }
+  if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
+        printf("Mass concentration pm2p5: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm2p5 / 10.0f);
+  }
+  if (sen5x_data.mass_concentration_pm4p0 != 0xFFFF) {
+        printf("Mass concentration pm4p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm4p0 / 10.0f);
+  }
+  if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
+        printf("Mass concentration pm10p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm10p0 / 10.0f);
+  }
+  if (sen5x_data.ambient_humidity != 0x7fff) {
+        printf("Ambient humidity: %.1f %%RH\r\n", sen5x_data.ambient_humidity / 100.0f);
+  }
+  if (sen5x_data.ambient_temperature != 0x7fff) {
+        printf("Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
+  }
+  if (sen5x_data.voc_index != 0x7fff) {
+        printf("sen55 VOC index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
+  }
+  if (sen5x_data.nox_index != 0x7fff) {
+        printf("sen55 NOx index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
   }
   return error;
 }
@@ -302,7 +306,7 @@ bool sen5x_check_for_errors(void){
     return 0;
   }
   if (device_status == 0) {
-    Debug("sen5x operates normal");
+//    Debug("sen5x operates normal");
     return 0;
   }
   if (device_status & SEN5X_FAN_SPEED_ERROR) {
@@ -335,33 +339,27 @@ void set_light_on_state(void) {
     sen5xReadTimer = HAL_GetTick();
     Debug("sen5x already powered");
   }
-  if (sen5x_lightup_measurement()) {
+  if (sen5x_lightup_measurement()) {  // start full measurement mode
     Error("Error executing sen5x_lightup_measurement()");
   }
   PMsamplesState = CHECK_SEN5X;
 }
 
-void sen5x_statemachine(uint8_t delayfactor) {
+void sen5x_statemachine() {
   bool data_ready = false;
-  if (delayfactor == USB_PLUGGED_IN) {
-    delayfactor =100; // if operated on USB read about every 30 seconds
-  }
-  else {
-    delayfactor = 1; // otherwise 1 time an hour
-  }
   if (TimestampIsReached(sen5xReadTimer)) {
     switch (PMsamplesState) {
     case S5X_DISABLED:
       Error("sen5x device is disabled due to too many errors");
-      sen5xReadTimer = HAL_GetTick() + (3141592 / delayfactor); //some more less then an hour a message
+      sen5xReadTimer = HAL_GetTick() + 3141592; //some more less then an hour a message when continue operated.
       break;
     case LIGHT_OUT:
-      Debug(" state is LIGHT_OUT");
-      sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s with microphone enabled
+//      Debug("state is LIGHT_OUT");
+      sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s when started up
       set_light_on_state();
       break;
     case CHECK_SEN5X:
-      Debug(" state is CHECK_SEN5X");
+//      Debug("state is CHECK_SEN5X");
       PMsamplesState = LIGHT_ON;
       if (sen5xErrors > 5) {
         PMsamplesState = S5X_DISABLED;
@@ -381,45 +379,45 @@ void sen5x_statemachine(uint8_t delayfactor) {
       }
       break;
     case LIGHT_ON:
-      Debug(" state is LIGHT_ON");
+//      Debug("state is LIGHT_ON");
       sen5x_read_data_ready(&data_ready);  // is new data ready?
       if (data_ready) {
         if (sen5x_measurement()) {
           Error("Error executing sen5x_measurement()");
         }
         if (sen5xSamples >= 1) { // take 2 samples, show 1 sample
-          if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
             PMsamplesState = CLEAN_FAN;
-          }
-          else {
-            PMsamplesState = SAMPLES_TAKEN;
-          }
         }
         sen5xSamples++;
+        if (sen5xSamples == 32) { // about two times a minute
+          sen5xSamples = 1;  // enable display on serial
+        }
       }
-      sen5xReadTimer = HAL_GetTick() + 1000;
       break;
     case CLEAN_FAN:
       // start the cleaning procedure once a week
-      sen5x_start_fan_cleaning();
-      Info("executing fan cleaning");
-      sen5xReadTimer = HAL_GetTick() + 11000;
-      fanCleaningDone = true;
+      if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
+        sen5x_start_fan_cleaning();
+        Info("executing fan cleaning");
+        sen5xReadTimer = HAL_GetTick() + 10000;
+        fanCleaningDone = true;
+      }
       PMsamplesState = SAMPLES_TAKEN;
       break;
-
     case SAMPLES_TAKEN:
-      Debug(" state is SAMPLES_TAKEN");
-      sen5xSamples = 0;
-      if (sen5x_extinguish_measurement()) {
-        Error("Error executing sen5x_extinguish_measurement()");
-      }
+//      Debug(" state is SAMPLES_TAKEN");
       if (!usbPluggedIn) {
+        if (sen5x_extinguish_measurement()) {
+          Error("Error executing sen5x_extinguish_measurement()");
+        }
+        sen5xSamples = 0;
         sen5x_Power_Off();
+        PMsamplesState = LIGHT_OUT;
       }
-      sen5xReadTimer = HAL_GetTick() + (3141592 / delayfactor); //some more less then an hour
-      Debug("Added ticks for sen5x: %d", (3141592 / delayfactor));
-      PMsamplesState = LIGHT_OUT;
+      else {
+        PMsamplesState = CHECK_SEN5X;
+      }
+      sen5xReadTimer = HAL_GetTick() + 1000; //some more less then an hour
     }
   }
 }

@@ -63,7 +63,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint16_t count);
 int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint16_t count);
 void sensirion_i2c_hal_sleep_usec(uint32_t useconds);
 void set_light_on_state(void);
-void sen5x_statemachine(uint8_t delayfactor);
+void sen5x_statemachine(void);
 
 
 #endif /* INC_SEN5X_H_ */
