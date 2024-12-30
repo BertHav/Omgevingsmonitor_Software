@@ -12,8 +12,6 @@
 #include "utils.h"
 #include <sgp40.h>
 #include "I2CSensors.h"
-//#include "humidTemp.h"
-//#include "gasSensor.h"
 #include "wsenHIDS.h"
 
 static I2C_HandleTypeDef* SensorI2C = NULL;

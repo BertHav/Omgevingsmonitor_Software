@@ -200,11 +200,13 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
 //  HAL_UART_DMAStop(EspUart);
   RxComplete = false;
+  bool reset = false;
   HAL_StatusTypeDef status = HAL_UART_Receive_DMA(EspUart, reply, length);
   if (status != HAL_OK) {
     Error("Error in HAL_UART_Receive_DMA. errorcode: %d", EspUart->ErrorCode);
     if (status & HAL_UART_ERROR_PE) {
       Error("Parity error in UART to ESP module");
+      reset = true;
     }
     if (status & HAL_UART_ERROR_NE) {
       Error("Noise error in UART to ESP module");
@@ -226,6 +228,19 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
       Error("Invalid Callback error in UART to ESP module");
     }
 #endif
+    if (reset) {
+    // Fire all LEDs to red independent of usertoggle or power status and reboot
+      TIM2 -> CCR1 = 4000;
+      TIM2 -> CCR3 = 0;
+      TIM2 -> CCR4 = 0;
+      TIM3 -> CCR1 = 4000;
+      TIM3 -> CCR2 = 0;
+      TIM3 -> CCR3 = 0;
+
+      HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false);
+      HAL_Delay(2000);
+      HAL_NVIC_SystemReset();
+    }
     RxComplete = true;
     return false;
   }
@@ -389,11 +404,13 @@ void StartProg(){
     tempBuf[i] = (char)buffer[i];
   }
   tempBuf[len] = '\0';
+  if (GetVerboseLevel() > VERBOSE_ALL) {
 #ifdef LONGMESSAGES
   printf("Receive ParseBuffer: %s", tempBuf );
 #else
   Debug("Receive ParseBuffer: %s", tempBuf );
 #endif
+  }
   char * ParsePoint = 0;
   const char OK[] = AT_RESPONSE_OK;
   const char ERROR[] = AT_RESPONSE_ERROR;
@@ -729,7 +746,7 @@ Receive_Status DMA_ProcessBuffer(uint8_t expectation) {
                   status = ParseBuffer(&RxBuffer[0], pos, expectation);
               }
           }
-          Debug("DMA ESP RxBuffer OldPos: %d, pos: %d", OldPos, pos);
+//          Debug("DMA ESP RxBuffer OldPos: %d, pos: %d", OldPos, pos);
           OldPos = pos;
         }
       }
@@ -985,13 +1002,13 @@ ESP_States ESP_Upkeep(void) {
   bool ATSend = false;
   static uint32_t timeoutTimer = 0;
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
-  if (EspState != oldEspState) {
+
+  if ((EspState != oldEspState) && (GetVerboseLevel() > VERBOSE_ALL)) {
     oldEspState = EspState;
     if (!((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
       Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
     }
   }
-
   switch (EspState) {
     case ESP_STATE_OFF:
       // Turning off the ESP
@@ -1120,7 +1137,7 @@ ESP_States ESP_Upkeep(void) {
             ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
-            Debug("ESP to many retransmits, terminated after %lu ms", (stop-start));
+            Error("ESP to many retransmits, terminated after %lu ms", (stop-start));
             EspState = ESP_STATE_DEINIT;
           }
         }
@@ -1131,7 +1148,6 @@ ESP_States ESP_Upkeep(void) {
           ESPTimeStamp = HAL_GetTick() + 10;
         }
         if(ATReceived == RECEIVE_STATUS_TIMEOUT){
-//====
           timeoutcntr++;
           if (timeoutcntr == ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
@@ -1139,12 +1155,11 @@ ESP_States ESP_Upkeep(void) {
             ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
-            Debug("ESP to many timeouts, terminated after %lu ms", (stop-start));
+            Error("ESP to many timeouts, terminated after %lu ms", (stop-start));
             EspState = ESP_STATE_DEINIT;
             ATCommand = AT_END;
             ATExpectation = RECEIVE_EXPECTATION_OK;
           }
-//====
           if(ATCommand != AT_SENDDATA){
             EspState = ESP_STATE_SEND;
           }
@@ -1183,20 +1198,20 @@ ESP_States ESP_Upkeep(void) {
           ResetESPIndicator();
           clearDMABuffer();
           stop = HAL_GetTick();
-          Debug("Message send in %lu ms", (stop-start));
+          Info("Message send in %lu ms", (stop-start));
           showTime();
           ESPTransmitDone = true;
           EspState = ESP_STATE_DEINIT;
         }
         else if (Mode == AT_MODE_GETTIME) {
             setTime = false;
-            ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP; // every 4 hour
-            Debug("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
+            ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP; // every  hour
+            Info("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
             ESPTimeStamp = savedESPTimeStamp;
             ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
-            Debug("Message time update in %lu ms", (stop-start));
+            Info("Message time update in %lu ms", (stop-start));
             EspState = ESP_STATE_DEINIT;
             Mode = AT_MODE_SEND;
           }
@@ -1235,7 +1250,7 @@ ESP_States ESP_Upkeep(void) {
         }
         if(Mode == AT_MODE_RECONFIG){
           EspState = ESP_STATE_CONFIG;
-          Debug("Do nothing until reset");
+          Info("Do nothing until reset");
         }
         if(Mode == AT_MODE_TEST){
           EspState = ESP_STATE_MODE_SELECT;
@@ -1249,25 +1264,25 @@ ESP_States ESP_Upkeep(void) {
          EspState = ESP_STATE_INIT;
          savedESPTimeStamp = ESPTimeStamp;
          setTime = true;
-         Debug("setTime to true");
+ //        Debug("setTime to true");
         }
       }
       break;
 
     case ESP_STATE_CONFIG:
-//      Debug("Do nothing until reset");
+      Info("Do nothing until reset");
       Process_PC_Config(GetUsbRxPointer());
       break;
 
     case ESP_STATE_ERROR:
       // Handle error state
-      Debug("ESP Error occurred");
+      Error("ESP Error occurred");
       EspState = ESP_STATE_INIT;
       break;
 
     default:
       // Handle unexpected state
-      Debug("Something unknown went wrong with the ESP_STATE");
+      Error("Something unknown went wrong with the ESP_STATE");
       EspState = ESP_STATE_ERROR;
       break;
   }

@@ -24,7 +24,7 @@ typedef enum {
 bool TimestampIsReached(uint32_t timestamp);
 void CreateLine(VerboseLevel verboseLevel, char* tag, char* format, ...);
 void SetVerboseLevel(VerboseLevel level);
-//uint32_t GetCurrentHalTicks(void);
+uint8_t GetVerboseLevel();
 void BinaryReleaseInfo(void);
 void errorHandler(const char * func, const uint32_t line, const char * file);
 

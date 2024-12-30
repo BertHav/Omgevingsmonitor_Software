@@ -70,11 +70,13 @@ int _write(int fd, const void *buf, size_t count) {
   return count;
 }
 
-void SetVerboseLevel(VerboseLevel level) { CurrentVerboseLevel = level; }
+void SetVerboseLevel(VerboseLevel level) {
+  CurrentVerboseLevel = level;
+}
 
-//uint32_t GetCurrentHalTicks(void) {
-//  return HAL_GetTick();
-//}
+uint8_t GetVerboseLevel() {
+  return CurrentVerboseLevel; }
+
 
 void BinaryReleaseInfo() {
   Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");

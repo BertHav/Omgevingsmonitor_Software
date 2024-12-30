@@ -287,7 +287,7 @@ void Enter_Standby_Mode(void)
 
 void Enter_Stop_Mode(uint16_t sleepTime)
 {
-  if (GetPMSensorPresence()) {
+  if (sen5x_On) {
     sen5x_Power_Off();
   }
   // restart the SGP40 with a soft reset to enter idle mode
