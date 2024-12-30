@@ -266,7 +266,6 @@ int main(void)
 
     if (!usbPluggedIn) {
       if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
-//        Debug("SensorProbe.ESP_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM => %d", SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
         EnabledConnectedDevices();
         Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
         deviceTimeOut = HAL_GetTick() + 3000;

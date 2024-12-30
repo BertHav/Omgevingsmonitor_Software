@@ -230,12 +230,12 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
 #endif
     if (reset) {
     // Fire all LEDs to red independent of usertoggle or power status and reboot
-      TIM2 -> CCR1 = 4000;
-      TIM2 -> CCR3 = 0;
-      TIM2 -> CCR4 = 0;
-      TIM3 -> CCR1 = 4000;
-      TIM3 -> CCR2 = 0;
-      TIM3 -> CCR3 = 0;
+      TIM2 -> CCR1 = 0;
+      TIM2 -> CCR3 = 4000;
+      TIM2 -> CCR4 = 4000;
+      TIM3 -> CCR1 = 0;
+      TIM3 -> CCR2 = 4000;
+      TIM3 -> CCR3 = 4000;
 
       HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false);
       HAL_Delay(2000);
