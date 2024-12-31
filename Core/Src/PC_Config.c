@@ -65,8 +65,8 @@ void ProcessCmd(Receive_MSG msg)
         case HumidConfigCmd:
             WriteUint8ArrayEepromSafe(HumidConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-        case VocRawConfigCmd:
-            WriteUint8ArrayEepromSafe(VocRawConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        case NOxIndexConfigCmd:
+            WriteUint8ArrayEepromSafe(NOxIndexConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case VocIndexConfigCmd:
             WriteUint8ArrayEepromSafe(VocIndexConfigAddr, msg.Payload, msg.PayloadLength, IdSize);

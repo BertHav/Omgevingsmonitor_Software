@@ -56,9 +56,10 @@ float batteryCharge = 0.0;
 float solarCharge = 0.0;
 uint16_t VOCIndex = 0;
 static float dBA = 0.0;
-float airPM2 = 0.0;
-float airPM10 = 0.0;
-static char message[1024];
+static float airPM2 = 0.0;
+static float airPM10 = 0.0;
+static float airNOx = 0.0;
+static char message[1152];
 static const char APIBeurs[] = "\"https://deomgevingsmonitor.nl//api/set_device_data.php\"";
 static const char API[] = "\"https://api.opensensemap.org/boxes/";
 static AT_Commands ATCommandArray[10];
@@ -151,9 +152,10 @@ void setMic(float dB){
   dBA = dB;
 }
 
-void setPMs(uint16_t PM2, uint16_t PM10) {
+void setPMs(uint16_t PM2, uint16_t PM10, uint16_t nox) {
   airPM2 = PM2 / 10.0f;
   airPM10 = PM10 / 10.0f;
+  airNOx = nox / 10.0f;
 }
 
 void SetConfigMode(){
@@ -281,6 +283,7 @@ uint16_t CreateMessage(bool onBeurs){
   static uint8_t vocConfig[IdSize];
   static uint8_t batteryConfig[IdSize];
   static uint8_t solarConfig[IdSize];
+  static uint8_t noxConfig[IdSize];
   static uint8_t PM2Config[IdSize];
   static uint8_t PM10Config[IdSize];
   static uint8_t nameConfig[CustomNameMaxLength];
@@ -290,6 +293,7 @@ uint16_t CreateMessage(bool onBeurs){
   ReadUint8ArrayEEprom(VocIndexConfigAddr, vocConfig, IdSize);
   ReadUint8ArrayEEprom(BatVoltConfigAddr, batteryConfig, IdSize);
   ReadUint8ArrayEEprom(SolVoltConfigAddr, solarConfig, IdSize);
+  ReadUint8ArrayEEprom(NOxIndexConfigAddr, noxConfig, IdSize);
   ReadUint8ArrayEEprom(PM2ConfigAddr, PM2Config, IdSize);
   ReadUint8ArrayEEprom(PM10ConfigAddr, PM10Config, IdSize);
   if(checkName()){
@@ -300,9 +304,10 @@ uint16_t CreateMessage(bool onBeurs){
   }
   //(char*)nameConfig
   //get name etc from EEprom
+  Debug("sensorid voor opensensmaps nox: %d", noxConfig);
   setCharges();
 #ifdef LONGDATAGRAM
-  memset(message, '\0', 1024);
+  memset(message, '\0', 1152);
   uint16_t index = 0;
   sprintf(&message[index], "[");
   index = strlen(message);
@@ -330,6 +335,10 @@ uint16_t CreateMessage(bool onBeurs){
 
     uint8ArrayToString(Buffer, solarConfig);
     sprintf(&message[index], "{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"},", uid[2], (char*)nameConfig, Buffer, solarCharge);
+    index = strlen(message);
+
+    uint8ArrayToString(Buffer, noxConfig);
+    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, airNOx);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM2Config);
@@ -404,7 +413,7 @@ void StartProg(){
     tempBuf[i] = (char)buffer[i];
   }
   tempBuf[len] = '\0';
-  if (GetVerboseLevel() > VERBOSE_ALL) {
+  if (GetVerboseLevel() == VERBOSE_ALL) {
 #ifdef LONGMESSAGES
   printf("Receive ParseBuffer: %s", tempBuf );
 #else
@@ -1003,7 +1012,7 @@ ESP_States ESP_Upkeep(void) {
   static uint32_t timeoutTimer = 0;
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
 
-  if ((EspState != oldEspState) && (GetVerboseLevel() > VERBOSE_ALL)) {
+  if ((EspState != oldEspState) && (GetVerboseLevel() == VERBOSE_ALL)) {
     oldEspState = EspState;
     if (!((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
       Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);

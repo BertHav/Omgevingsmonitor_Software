@@ -12,7 +12,7 @@
 #define BoxConfigAddr EEPromStartAddr + (IdSize * 0)
 #define TempConfigAddr EEPromStartAddr + (IdSize * 1)
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
-#define VocRawConfigAddr EEPromStartAddr + (IdSize * 3)
+#define NOxIndexConfigAddr EEPromStartAddr + (IdSize * 3)
 #define VocIndexConfigAddr EEPromStartAddr + (IdSize * 4)
 #define dBaConfigAddr EEPromStartAddr + (IdSize * 5)
 #define dBAConfigAddr EEPromStartAddr + (IdSize * 6)

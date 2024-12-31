@@ -201,7 +201,7 @@ int16_t sen5x_read_measurement(SEN5X_DateTypeDef* sen5x_data) {
   sen5x_data->ambient_temperature = ambient_temperature;
   sen5x_data->voc_index = voc_index;
   sen5x_data->nox_index = nox_index;
-  setPMs(mass_concentration_pm2p5, mass_concentration_pm10p0);
+  setPMs(mass_concentration_pm2p5, mass_concentration_pm10p0, nox_index);
   return 0;
 }
 
