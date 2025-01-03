@@ -317,6 +317,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   showTime();
   ResetDBACalculator();  // reset the DBA average calculation
   ResetSGP40samplecounter();
+  setsen5xSamplecounter(0);
 //  setESPTimeStamp(3000);
   setESPTimeStamp(2500);
   setSGP40TimeStamp(0);

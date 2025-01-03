@@ -1167,9 +1167,12 @@ ESP_States ESP_Upkeep(void) {
             clearDMABuffer();
             stop = HAL_GetTick();
             Error("ESP to many timeouts, terminated after %lu ms", (stop-start));
+            // TODO hier gaat iets fout, de verzending herstart niet meer
+            // in log alleen nog D [01039053] EspState: 4 ATcmd: 20 Mode: 2 ATExp: 0
             EspState = ESP_STATE_DEINIT;
-            ATCommand = AT_END;
-            ATExpectation = RECEIVE_EXPECTATION_OK;
+            // mogelijke oplossing door deze twee regels te verwijderen
+            // ATCommand = AT_END;
+            // ATExpectation = RECEIVE_EXPECTATION_OK;
           }
           if(ATCommand != AT_SENDDATA){
             EspState = ESP_STATE_SEND;

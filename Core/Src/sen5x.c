@@ -20,7 +20,9 @@
 
 bool fanCleaningDone = false;
 bool sen5x_On = false;
+bool VOCNOx = false;
 static bool sen5x_Enable = false;
+unsigned char product_name[8];
 uint32_t sen5xReadTimer = 0;
 uint8_t sen5xSamples = 0;
 uint8_t sen5xErrors = 0;
@@ -29,6 +31,10 @@ SEN5X_DateTypeDef sen5x_data;
 
 void setsen5xReadTimer(uint32_t delayms) {
   sen5xReadTimer = HAL_GetTick() + delayms;
+}
+
+void setsen5xSamplecounter(uint8_t samples) {
+  sen5xSamples = 0;
 }
 
 bool sen5x_enable(uint32_t sleepTime) {
@@ -74,7 +80,6 @@ int16_t probe_sen5x(void) {
   int16_t error = 0;
   unsigned char serial_number[32];
   uint8_t serial_number_size = 32;
-  unsigned char product_name[32];
   uint8_t product_name_size = 32;
   sen5x_Power_On();  // switch buck converter
   error = sen5x_device_reset();
@@ -160,6 +165,10 @@ int16_t sen5x_lightup_measurement(void) {
   if (error) {
       Error("Error executing sen5x_lightup_measurement(): %i", error);
   }
+  else {
+    showTime();
+    Info("sen5x_start_measurement excuted");
+  }
   return error;
 }
 
@@ -170,6 +179,10 @@ int16_t sen5x_extinguish_measurement(void) {
   error = sen5x_stop_measurement();
   if (error) {
     Error("Error executing sen5x_stop_measurement(): %i", error);
+  }
+  else {
+    showTime();
+    Info("sen5x_stop_measurement executed");
   }
   return error;
 }
@@ -205,17 +218,13 @@ int16_t sen5x_read_measurement(SEN5X_DateTypeDef* sen5x_data) {
   return 0;
 }
 
-int16_t sen5x_measurement(void) {
+void sen5x_printvalues(void) {
   // Read Measurement
-  int16_t error = 0;
-//  Debug("entering sen5x_measurement");
-  if (sen5x_read_measurement(&sen5x_data)) {
-    Error("Error executing sen5x_read_measured_values(): %i", error);
-    return error;
-  }
-  if (sen5xSamples != 2) {
-    return 0; // first two sample reads are not reliable
-  }
+//  Debug("entering sen5x_printvalues");
+//  Info("sen5x_printvalues entered for sample %d", sen5xSamples);
+//  if (sen5xSamples != 3) {
+//    return; // first two sample reads are not reliable
+//  }
   if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
       printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
   }
@@ -240,7 +249,6 @@ int16_t sen5x_measurement(void) {
   if (sen5x_data.nox_index != 0x7fff) {
         printf("sen55 NOx index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
   }
-  return error;
 }
 
 /**
@@ -380,20 +388,25 @@ void sen5x_statemachine() {
       break;
     case LIGHT_ON:
 //      Debug("state is LIGHT_ON");
-      sen5x_read_data_ready(&data_ready);  // is new data ready?
+      sen5x_read_data_ready(&data_ready);  // is new data ready in the sensor module?
       if (data_ready) {
-//        Debug("SEN5x dataready at tick %d", HAL_GetTick());
-//        showTime();
-        if (sen5x_measurement()) { // print the values
-          Error("Error executing sen5x_measurement()");
-        }
-        if (sen5xSamples > 1) { // take 3 samples, show 1 sample before we continue in the state machine
-            PMsamplesState = CLEAN_FAN;
+        if (sen5x_read_measurement(&sen5x_data)) {
+          Error("Error executing sen5x_read_measured_values()");
         }
         sen5xSamples++;
-        if (sen5xSamples == 32) { // about two times a minute
+        if (sen5xSamples == 31) { // about two times a minute
           sen5xSamples = 0;  // enable display on serial
         }
+        if (sen5xSamples == 2) { // take 2 samples, show 1 sample before we continue in the state machine
+#ifndef STLINK_V3PWR
+          sen5x_printvalues(); // print the values
+#else
+          Info("!!==No values, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
+#endif
+        }
+      }
+      if (usbPluggedIn || (sen5xSamples > 1)) {
+        PMsamplesState = CLEAN_FAN;
       }
       break;
     case CLEAN_FAN:
@@ -402,7 +415,7 @@ void sen5x_statemachine() {
       if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
         sen5x_start_fan_cleaning();
         Info("executing fan cleaning");
-        sen5xReadTimer = HAL_GetTick() + 10000;
+        sen5xReadTimer = HAL_GetTick() + 10000;  // fan cleaning takes 10 seconds
         fanCleaningDone = true;
       }
       PMsamplesState = SAMPLES_TAKEN;

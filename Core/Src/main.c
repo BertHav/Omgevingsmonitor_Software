@@ -250,7 +250,7 @@ int main(void)
       batteryReadTimer  = HAL_GetTick() + 50000;
         showTime();
     }
-/*
+#ifndef STLINK_V3PWR
     //==== disable for power measurements in test condition
         stlinkpwr = false;
         if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
@@ -265,7 +265,7 @@ int main(void)
           batteryEmpty = false;
         }
     //====
-*/
+#endif
     if (testDone && !ESP_Programming && !batteryEmpty) {
       if (SGPstate != SGP_STATE_START_MEASUREMENTS && SGPstate != SGP_STATE_WAIT_FOR_COMPLETION && Sensor.HT_measurementEnabled) {
         HIDSstate = HIDS_Upkeep();

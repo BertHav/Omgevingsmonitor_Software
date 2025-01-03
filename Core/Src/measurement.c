@@ -129,7 +129,7 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
   else {
     sen5x_Power_Off();      // switch off buck converter
     Debug("PM sensor not detected/connected.");
-    SensorProbe.MIC_Present = false;
+    SensorProbe.PM_Present = false;
     Sensor.PM_measurementEnabled = false;
   }
   Info("SensorProbe.HT_Present: %s", SensorProbe.HT_Present?"yes":"no");

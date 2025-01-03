@@ -7,6 +7,7 @@
 #include "statusCheck.h"
 #include "RealTimeClock.h"
 #include "rtc.h"
+#include "sen5x.h"
 
 bool configSet = false;
 bool usbPluggedIn = false;
@@ -14,6 +15,7 @@ bool userToggle = false;
 static bool init = true;
 static bool buttonHeld = false;
 uint32_t ConfigStamp;
+uint32_t UserbuttonStamp;
 uint32_t PowerStamp = 0;
 static float batteryCharge = 0.0;
 
@@ -183,6 +185,30 @@ void configCheck(){
       EnabledConnectedDevices();
     }
     buttonHeld = true;
+    UserbuttonStamp = HAL_GetTick() + 2000;
+  }
+  if (!BootButton_Pressed() && buttonHeld&& TimestampIsReached(UserbuttonStamp)) {
+    if (GetPMSensorPresence() && (product_name[4] == '5')) {
+      uint16_t color;
+      VOCNOx = !VOCNOx;
+      if (VOCNOx)  color = 0;
+        else color = 4000;
+      Info("VOC and NOx measurement %s", VOCNOx?"enabled":"disabled");
+      for (uint8_t i=0; i<2; i++) {
+        TIM3 -> CCR1 = 0;
+        TIM3 -> CCR2 = color;
+        TIM3 -> CCR3 = color;
+        HAL_Delay(400);
+        TIM3 -> CCR1 = 4000;
+        TIM3 -> CCR2 = 4000;
+        TIM3 -> CCR3 = 4000;
+        HAL_Delay(400);
+      }
+    }
+      while (UserButton_Pressed()){
+
+      }
+    buttonHeld = false;
   }
   if(!BootButton_Pressed() && !UserButton_Pressed()){
     buttonHeld = false;
@@ -220,7 +246,6 @@ Battery_Status Battery_Upkeep(){
   status = powerCheck();
   powerDisplay(status);  // output LEDs are okay
   return status;
-
 }
 
 void setuserToggle(void) {
