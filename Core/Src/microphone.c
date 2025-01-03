@@ -30,6 +30,9 @@ static uint32_t MICTimeStamp;
 
 SoundData_t soundData = {0};
 
+void ResetdBAmax() {
+  dBAmax = 0.0;
+}
 void setMICTimeStamp(uint32_t ticks) {
   MICTimeStamp = HAL_GetTick() + ticks;
 }
@@ -51,7 +54,7 @@ void MIC_Print(void) {
     denominator = NUMBER_OF_SAMPLES;
     samplebufferfilled = true;
   }
-  dBAmax = 0.0;
+//  dBAmax = 0.0;
   dBAsum = 0.0;
   for(uint8_t i=0; i < denominator; i++){
     dBAsum += dBASamples[i];
@@ -59,7 +62,8 @@ void MIC_Print(void) {
       dBAmax = dBASamples[i];
   }
   dBAAverage = dBAsum/(float)denominator;
-  setMic(dBAAverage);
+//  setMic(dBAAverage);
+  setMic(dBAmax);
   }
   print("SPL_dBA: %.1f, SPL_peak_mPa: %s, dBA peak: %.1f, dBA average: %.1f\r\n", dBA,mPabuffer, dBAmax, dBAAverage);
 

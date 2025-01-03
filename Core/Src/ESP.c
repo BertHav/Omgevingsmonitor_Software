@@ -3,6 +3,7 @@
  *
  *  Created on: Jun 28, 2024
  *      Author: Joris Blankestijn
+ *              Bert Havinga nov-dec
  */
 
 #include "ESP.h"
@@ -10,16 +11,17 @@
 #include <stdio.h>
 #include "EEprom.h"
 #include "Config.h"
+#include "microphone.h"
 #include "PowerUtils.h"
+#include "RealTimeClock.h"
+#include "sen5x.h"
+#include "main.h"
+#include <stdint.h>
 #ifdef PUBLIC
 #include "cred_pub.h"
 #else
 #include "cred.h"
 #endif
-#include "RealTimeClock.h"
-#include "sen5x.h"
-#include "main.h"
-#include <stdint.h>
 
 static UART_HandleTypeDef* EspUart = NULL;
 extern DMA_HandleTypeDef hdma_usart4_rx;
@@ -1208,13 +1210,14 @@ ESP_States ESP_Upkeep(void) {
           clearDMABuffer();
           stop = HAL_GetTick();
           Info("Message send in %lu ms", (stop-start));
+          ResetdBAmax();
           showTime();
           ESPTransmitDone = true;
           EspState = ESP_STATE_DEINIT;
         }
         else if (Mode == AT_MODE_GETTIME) {
             setTime = false;
-            ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP; // every  hour
+            ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP;
             Info("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
             ESPTimeStamp = savedESPTimeStamp;
             ResetESPIndicator();

@@ -40,6 +40,8 @@ void Device_Test();
 void SetESPMeasurementDone();
 bool IsPMSensorEnabled();
 bool GetPMSensorPresence();
+void SetPMSensorStatus(bool setting);
+void SetVOCSensorStatus(bool setting);
 void DisableConnectedDevices();
 void EnabledConnectedDevices();
 void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart);

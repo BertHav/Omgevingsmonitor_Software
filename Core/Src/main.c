@@ -70,6 +70,7 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
+  static bool stlinkpwr = true;
   uint8_t SGPstate;
   uint8_t HIDSstate;
   uint8_t MICstate;
@@ -237,7 +238,6 @@ int main(void)
   if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn)) {
     errorHandler(__func__, __LINE__, __FILE__);
   }
-
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
   deviceTimeOut = HAL_GetTick() + 5000;
   /* USER CODE END 2 */
@@ -250,10 +250,12 @@ int main(void)
       batteryReadTimer  = HAL_GetTick() + 50000;
         showTime();
     }
-
+/*
     //==== disable for power measurements in test condition
+        stlinkpwr = false;
         if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
           FlashLEDs();
+          Sensor.PM_measurementEnabled = false;
         }
         if(charge == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
           batteryEmpty = true;
@@ -263,15 +265,8 @@ int main(void)
           batteryEmpty = false;
         }
     //====
-
-    if (!usbPluggedIn) {
-      if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
-        EnabledConnectedDevices();
-        Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
-        deviceTimeOut = HAL_GetTick() + 3000;
-      }
-    }
-    if(testDone && !ESP_Programming && !batteryEmpty){
+*/
+    if (testDone && !ESP_Programming && !batteryEmpty) {
       if (SGPstate != SGP_STATE_START_MEASUREMENTS && SGPstate != SGP_STATE_WAIT_FOR_COMPLETION && Sensor.HT_measurementEnabled) {
         HIDSstate = HIDS_Upkeep();
       }
@@ -281,13 +276,11 @@ int main(void)
       if (Sensor.MIC_measurementEnabled) {
         MICstate = Mic_Upkeep();
       }
-      if(((charge > BATTERY_LOW) || (charge == USB_PLUGGED_IN)) && Sensor.PM_measurementEnabled) {
+      if ( (usbPluggedIn || (charge == BATTERY_FULL) || (charge == BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
         sen5x_statemachine();
       }
-      else {
-        if (Sensor.PM_measurementEnabled) {
-          Info("Battery level insufficient for sen5x operation");
-        }
+      else if (((charge == BATTERY_LOW) || (charge == BATTERY_CRITICAL)) && !stlinkpwr && Sensor.PM_measurementEnabled) {
+        Info("Battery level insufficient for sen5x operation");
       }
       ESPstate = ESP_Upkeep();
     }
@@ -295,6 +288,12 @@ int main(void)
       Device_Test();  // for device with startup time
     }
     configCheck();
+    if (!usbPluggedIn) {
+      if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
+        EnabledConnectedDevices();
+        Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+      }
+    }
 
     /* USER CODE END WHILE */
 
@@ -421,6 +420,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   UNUSED(GPIO_Pin);
   if (GPIO_Pin == BOOT0_Pin) {
     setuserToggle();
+    if (GetPMSensorPresence()) {
+      Sensor.PM_measurementEnabled = true;
+      setsen5xReadTimer(100);
+    }
+
   }
 }
 
@@ -434,10 +438,11 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  Error("Trapped in Error_Handler, wait for reset");
   __disable_irq();
   while (1)
   {
+    Error("Trapped in Error_Handler, wait for reset");
+    HAL_Delay(2500);
   }
   /* USER CODE END Error_Handler_Debug */
 }

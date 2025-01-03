@@ -290,8 +290,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   if (sen5x_On) {
     sen5x_Power_Off();
   }
-  // restart the SGP40 with a soft reset to enter idle mode
-  SGP_SoftReset();
   Info("Battery voltage %.02fV", ReadBatteryVoltage());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
@@ -311,19 +309,21 @@ void Enter_Stop_Mode(uint16_t sleepTime)
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
       HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
       SystemClock_Config();
-      setsen5xReadTimer(2000);
-
+//      setsen5xReadTimer(2000);
+      setsen5xReadTimer(0);
     }
   }
   HAL_ResumeTick(); // Enable SysTick after wake-up
   showTime();
   ResetDBACalculator();  // reset the DBA average calculation
-//  setMeasStamp(300);
-//  ESPTransmitDone = false;
-  setESPTimeStamp(3000);
+  ResetSGP40samplecounter();
+//  setESPTimeStamp(3000);
+  setESPTimeStamp(2500);
   setSGP40TimeStamp(0);
   setHIDSTimeStamp(0);
   setMICTimeStamp(0);
+  ESPTransmitDone = false;
+  deviceTimeOut = HAL_GetTick() + 2300;
 }
 
 void InitClock(RTC_HandleTypeDef* h_hrtc){

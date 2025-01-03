@@ -30,7 +30,7 @@
 //#define ESP_AT_COMMANDS_COUNT 4
 #define ESP_WIFI_RETRY_TIME 500
 #define ESP_WIFI_WAIT_RESPONSE_TIME_FACTOR 20
-#define ESP_UNTIL_NEXT_SEND 300000
+#define ESP_UNTIL_NEXT_SEND 240000  // about every 5 minutes
 #define ESP_UNTIL_NEXT_NTP 1087198  //about every 24 hours
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""

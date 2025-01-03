@@ -10,6 +10,7 @@
 #include "wsenHIDS.h"
 #include "main.h"
 #include "statusCheck.h"
+#include "RealTimeClock.h"
 #include <sgp40.h>
 
 
@@ -64,6 +65,14 @@ static void WriteRegister(uint8_t address, uint8_t *buffer, uint8_t nrBytes) {
   if (WriteFunction != NULL) {
     WriteFunction(address, buffer, nrBytes);
   }
+}
+
+void setSGP40TimeStamp(uint32_t ticks) {
+  SGP40TimeStamp = HAL_GetTick() + ticks;
+}
+
+void ResetSGP40samplecounter() {
+  sgp40samplecounter = 0;
 }
 
 void SGP_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
@@ -293,7 +302,7 @@ void SGP_SoftReset(void) {
   Worth mentioning. */
   // Danny: Its not odd, its a general reset command which is a standard syntaxis. So do not use blind.
   // This command could take from 0.1 to 1ms.
-  Debug("SGP40 brougt to idle");
+  Debug("SGP40 brought to idle");
   SGP_TurnHeaterOff();
   HAL_Delay(10);
   WriteRegister(SGP_I2C_ADDRESS, SoftResetBuffer, SGP_SHORT_COMMAND_BUFFER_LENGTH);
@@ -318,7 +327,7 @@ SGP40State SGP_Upkeep(void) {
     SGP_StartMeasurement();
     SetMeasurementIndicator();
     SGPState = SGP_STATE_WAIT_FOR_COMPLETION;
-   break;
+    break;
 
   case SGP_STATE_WAIT_FOR_COMPLETION:
     if(SGP_GetMeasurementValues(&vocIndex)) {
@@ -327,15 +336,23 @@ SGP40State SGP_Upkeep(void) {
     break;
 
   case SGP_STATE_PROCESS_RESULTS:
-//    Debug("Processing results.");
+//    Debug("Processing results in SGP_STATE_PROCESS_RESULTS.");
     setVOC(vocIndex);
-    SGP40TimeStamp = HAL_GetTick() + 1000;  // about every 1 seconds
-    ResetMeasurementIndicator();
-    SGPState = SGP_STATE_WAIT;
+    SGPState = SGP_WAIT_STATE_MODE;
     break;
-
+  case SGP_WAIT_STATE_MODE:
+    SGPState = SGP_STATE_WAIT;
+    if ((sgp40samplecounter == 1) && (!usbPluggedIn)) {
+      // restart the SGP40 with a soft reset to enter idle mode
+      SGP_SoftReset();
+      SetVOCSensorStatus(false);
+    }
+    SGP40TimeStamp = HAL_GetTick() + 800;  // about every 1 seconds
+    ResetMeasurementIndicator();
+  break;
   case SGP_STATE_WAIT:
     if(TimestampIsReached(SGP40TimeStamp)){
+//      Debug("in SGP_STATE_WAIT");
       SGPState = SGP_STATE_INIT;
     }
     break;
@@ -346,8 +363,4 @@ SGP40State SGP_Upkeep(void) {
     break;
   }
   return SGPState;
-}
-
-void setSGP40TimeStamp(uint32_t ticks) {
-  SGP40TimeStamp = HAL_GetTick() + ticks;
 }

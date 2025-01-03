@@ -15,6 +15,7 @@
 #include "RealTimeClock.h"
 #include "statusCheck.h"
 #include "ESP.h"
+#include "measurement.h"
 
 
 bool fanCleaningDone = false;
@@ -36,15 +37,14 @@ bool sen5x_enable(uint32_t sleepTime) {
     sen5x_Enable = !sen5x_Enable;
     if (sen5x_Enable) {
       setsen5xReadTimer(0);
-      Debug("SEN5X status of sen5x_Enable %d", sen5x_Enable);
     }
     else {
-      Debug("This cycle the sen5x is disabled");
+      Info("This cycle the sen5x is disabled");
       setsen5xReadTimer(HAL_GetTick() +( 3 * (sleepTime*1000))); //The ticker starts after 3*880, effective this turn the sen5x device will not start
     }
   }
   else {
-    Debug("sen5x measurement is disabled");
+    Info("sen5x measurement is disabled");
   }
   PMsamplesState = LIGHT_OUT; // just to be sure if USB_power is disconnected during measurement cycle
   return sen5x_Enable;
@@ -213,8 +213,8 @@ int16_t sen5x_measurement(void) {
     Error("Error executing sen5x_read_measured_values(): %i", error);
     return error;
   }
-  if (sen5xSamples != 1) {
-    return 0; // first sample reads zero's
+  if (sen5xSamples != 2) {
+    return 0; // first two sample reads are not reliable
   }
   if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
       printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
@@ -382,20 +382,23 @@ void sen5x_statemachine() {
 //      Debug("state is LIGHT_ON");
       sen5x_read_data_ready(&data_ready);  // is new data ready?
       if (data_ready) {
-        if (sen5x_measurement()) {
+//        Debug("SEN5x dataready at tick %d", HAL_GetTick());
+//        showTime();
+        if (sen5x_measurement()) { // print the values
           Error("Error executing sen5x_measurement()");
         }
-        if (sen5xSamples >= 1) { // take 2 samples, show 1 sample
+        if (sen5xSamples > 1) { // take 3 samples, show 1 sample before we continue in the state machine
             PMsamplesState = CLEAN_FAN;
         }
         sen5xSamples++;
         if (sen5xSamples == 32) { // about two times a minute
-          sen5xSamples = 1;  // enable display on serial
+          sen5xSamples = 0;  // enable display on serial
         }
       }
       break;
     case CLEAN_FAN:
       // start the cleaning procedure once a week
+//      Debug(" state is CLEAN_FAN");
       if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
         sen5x_start_fan_cleaning();
         Info("executing fan cleaning");
@@ -412,13 +415,13 @@ void sen5x_statemachine() {
         }
         sen5xSamples = 0;
         sen5x_Power_Off();
-        sen5xReadTimer = HAL_GetTick() + 100;
+        SetPMSensorStatus(false);
         PMsamplesState = LIGHT_OUT;
       }
       else {
         PMsamplesState = CHECK_SEN5X;
       }
-      sen5xReadTimer = HAL_GetTick() + 1000; //some more less then an hour
+      sen5xReadTimer = HAL_GetTick() + 1000;
     }
   }
 }

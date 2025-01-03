@@ -42,6 +42,7 @@ typedef enum {
     SGP_STATE_PROCESS_RESULTS,
     SGP_STATE_WAIT_FOR_READY,
     SGP_STATE_OFF,
+    SGP_WAIT_STATE_MODE,
     SGP_STATE_WAIT
 } SGP40State;
 
@@ -55,4 +56,5 @@ void SGP_SoftReset(void);
 void SGP_GetHT(float* temperature, float* humidity);
 SGP40State SGP_Upkeep(void);
 void setSGP40TimeStamp(uint32_t ticks);
+void ResetSGP40samplecounter();
 #endif /* INC_SGP40_H_ */

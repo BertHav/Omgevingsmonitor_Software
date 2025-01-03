@@ -20,7 +20,7 @@
 #define SEN5X_FAN_BLOCKED_ERROR 0x00000010
 #define SEN5X_NO_RESPONSE       0X80000000
 
-#define SEN5X_START_UP_TIME 27
+#define SEN5X_START_UP_TIME 28 // with third sample is 30 sec
 
 typedef enum {
   S5X_DISABLED,
