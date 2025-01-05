@@ -19,11 +19,11 @@
 #define LED_ON 3000
 typedef enum {
   BATTERY_CRITICAL,
-  USB_PLUGGED_IN,
   BATTERY_LOW,
   BATTERY_GOOD,
-  BATTERY_FULL
-}Battery_Status;
+  BATTERY_FULL,
+  USB_PLUGGED_IN
+  }Battery_Status;
 
 extern bool usbPluggedIn;
 extern bool userToggle;
@@ -43,5 +43,7 @@ void SetMICIndicator();
 void ResetMICIndicator();
 void SetESPIndicator();
 void ResetESPIndicator();
+void SetPMIndicator();
+void ResetPMIndicator();
 void GoToSleep(uint16_t sleepTime);
 #endif /* INC_STATUSCHECK_H_ */

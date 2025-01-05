@@ -70,6 +70,7 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
+  static bool priorUSBpluggedIn = false;
   static bool stlinkpwr = true;
   uint8_t SGPstate;
   uint8_t HIDSstate;
@@ -240,6 +241,7 @@ int main(void)
   }
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
   deviceTimeOut = HAL_GetTick() + 5000;
+  priorUSBpluggedIn = !Check_USB_PowerOn(); // force the status of the SGP40
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -250,6 +252,7 @@ int main(void)
       batteryReadTimer  = HAL_GetTick() + 50000;
         showTime();
     }
+    configCheck();
 #ifndef STLINK_V3PWR
     //==== disable for power measurements in test condition
         stlinkpwr = false;
@@ -267,6 +270,17 @@ int main(void)
     //====
 #endif
     if (testDone && !ESP_Programming && !batteryEmpty) {
+      if (priorUSBpluggedIn != usbPluggedIn) {
+        Debug("USB power state change detected");
+        if (IsSGPPresent() && !usbPluggedIn) {
+//        if (IsSGPPresent() && ((product_name[4] == '4') || (product_name[4] == '5')) && !usbPluggedIn) {
+          SetVOCSensorDIS_ENA(true);
+        }
+        if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
+          SetVOCSensorDIS_ENA(false);
+        }
+        priorUSBpluggedIn = usbPluggedIn;
+      }
       if (SGPstate != SGP_STATE_START_MEASUREMENTS && SGPstate != SGP_STATE_WAIT_FOR_COMPLETION && Sensor.HT_measurementEnabled) {
         HIDSstate = HIDS_Upkeep();
       }
@@ -276,18 +290,26 @@ int main(void)
       if (Sensor.MIC_measurementEnabled) {
         MICstate = Mic_Upkeep();
       }
-      if ( (usbPluggedIn || (charge == BATTERY_FULL) || (charge == BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
+      if ( ((charge >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
+        if (!sen5x_Get_sen5x_enable_state()&& usbPluggedIn ) {
+          Debug("sen5x_enable called from line 287 main.c");
+          sen5x_enable(0);
+        }
         sen5x_statemachine();
       }
-      else if (((charge == BATTERY_LOW) || (charge == BATTERY_CRITICAL)) && !stlinkpwr && Sensor.PM_measurementEnabled) {
+      else if ((charge <= BATTERY_LOW) && !stlinkpwr && Sensor.PM_measurementEnabled) {
         Info("Battery level insufficient for sen5x operation");
+        Sensor.PM_measurementEnabled = false;
+        VOCNOx = false;
+        if (sen5x_On) {
+          sen5x_Power_Off();
+        }
       }
       ESPstate = ESP_Upkeep();
     }
     if(!testDone && !ESP_Programming && !batteryEmpty){
       Device_Test();  // for device with startup time
     }
-    configCheck();
     if (!usbPluggedIn) {
       if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
         EnabledConnectedDevices();

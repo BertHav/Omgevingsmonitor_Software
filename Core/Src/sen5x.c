@@ -23,11 +23,19 @@ bool sen5x_On = false;
 bool VOCNOx = false;
 static bool sen5x_Enable = false;
 unsigned char product_name[8];
-uint32_t sen5xReadTimer = 0;
 uint8_t sen5xSamples = 0;
 uint8_t sen5xErrors = 0;
+static uint16_t pm2p5max;
+static uint16_t pm10p0max;
+static uint16_t s5xvocimax;
+static uint16_t s5xnoximax;
+uint32_t sen5xReadTimer = 0;
 sen5x_states PMsamplesState = LIGHT_OUT;
 SEN5X_DateTypeDef sen5x_data;
+
+bool sen5x_Get_sen5x_enable_state() {
+  return sen5x_Enable;
+}
 
 void setsen5xReadTimer(uint32_t delayms) {
   sen5xReadTimer = HAL_GetTick() + delayms;
@@ -46,7 +54,8 @@ bool sen5x_enable(uint32_t sleepTime) {
     }
     else {
       Info("This cycle the sen5x is disabled");
-      setsen5xReadTimer(HAL_GetTick() +( 3 * (sleepTime*1000))); //The ticker starts after 3*880, effective this turn the sen5x device will not start
+      //The ticker starts after 880*100, is about one and a half minute effective this turn the sen5x device will not start
+      setsen5xReadTimer(HAL_GetTick() + (sleepTime*100));
     }
   }
   else {
@@ -61,14 +70,17 @@ void sen5x_Power_On(void) {
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
   sen5x_On = true;
   HAL_Delay(55);
-  return;
 }
 
 void sen5x_Power_Off(void) {
-  Debug("executing sen5x_Power_Off");
-  HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
-  sen5x_On = false;
-  return;
+  if (VOCNOx) {
+    Debug("VOC and NOx measurement enabled, no power off");
+  }
+  else {
+    Debug("executing sen5x_Power_Off");
+    HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
+    sen5x_On = false;
+  }
 }
 
 void reset_fanCleaningDone(void) {
@@ -161,13 +173,20 @@ int16_t sen5x_lightup_measurement(void) {
 // Start Measurement
   int16_t error = 0;
 //  Debug("entering sen5x_lightup_measurement");
-  error = sen5x_start_measurement(); // start full measurement mode
+  if (VOCNOx) {
+    Info("Continous measurement without PM is active");
+    error =sen5x_start_measurement_without_pm();
+  }
+  else {
+    Info("Measurement with PM is active");
+    error = sen5x_start_measurement(); // start full measurement mode
+  }
   if (error) {
-      Error("Error executing sen5x_lightup_measurement(): %i", error);
+    Error("Error executing sen5x_lightup_measurement(): %i", error);
   }
   else {
     showTime();
-    Info("sen5x_start_measurement excuted");
+    Info("sen5x_start_measurement executed");
   }
   return error;
 }
@@ -176,13 +195,21 @@ int16_t sen5x_extinguish_measurement(void) {
 // Stop Measurement
 //  Debug("entering sen5x_extinguish_measurement");
   int16_t error = 0;
-  error = sen5x_stop_measurement();
-  if (error) {
-    Error("Error executing sen5x_stop_measurement(): %i", error);
+  if (VOCNOx) {
+    Info("Continious VOC & NOx is active, sensor not powered off");
+    Info("PM measurement is disabled");
+    error =sen5x_start_measurement_without_pm();
+    if (error) {
+      Error("Error executing switching to measurement without PM code: %i", error);
+    }
   }
   else {
+    error = sen5x_stop_measurement();
     showTime();
     Info("sen5x_stop_measurement executed");
+    if (error) {
+      Error("Error executing sen5x_stop_measurement(): %i", error);
+    }
   }
   return error;
 }
@@ -214,7 +241,7 @@ int16_t sen5x_read_measurement(SEN5X_DateTypeDef* sen5x_data) {
   sen5x_data->ambient_temperature = ambient_temperature;
   sen5x_data->voc_index = voc_index;
   sen5x_data->nox_index = nox_index;
-  setPMs(mass_concentration_pm2p5, mass_concentration_pm10p0, nox_index);
+//  setPMs(mass_concentration_pm2p5, mass_concentration_pm10p0, nox_index);
   return 0;
 }
 
@@ -238,10 +265,10 @@ void sen5x_printvalues(void) {
         printf("Mass concentration pm10p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm10p0 / 10.0f);
   }
   if (sen5x_data.ambient_humidity != 0x7fff) {
-        printf("Ambient humidity: %.1f %%RH\r\n", sen5x_data.ambient_humidity / 100.0f);
+        printf("sen5x Ambient humidity: %.1f %%RH\r\n", sen5x_data.ambient_humidity / 100.0f);
   }
   if (sen5x_data.ambient_temperature != 0x7fff) {
-        printf("Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
+        printf("sen5x Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
   }
   if (sen5x_data.voc_index != 0x7fff) {
         printf("sen55 VOC index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
@@ -251,6 +278,26 @@ void sen5x_printvalues(void) {
   }
 }
 
+void sen5xStoreMax() {
+  if ((sen5x_data.mass_concentration_pm2p5 != 0xFFFF) && (sen5x_data.mass_concentration_pm2p5 > pm2p5max)) {
+    pm2p5max = sen5x_data.mass_concentration_pm2p5;
+  }
+  if ((sen5x_data.mass_concentration_pm10p0 != 0xFFFF) && (sen5x_data.mass_concentration_pm10p0 > pm10p0max)) {
+    pm10p0max = sen5x_data.mass_concentration_pm10p0;
+  }
+  if ((sen5x_data.voc_index != 0x7fff) && (sen5x_data.voc_index > s5xvocimax)) {
+    s5xvocimax = sen5x_data.voc_index;
+  }
+  if ((sen5x_data.nox_index != 0x7fff) && (sen5x_data.nox_index > s5xnoximax)) {
+    s5xnoximax = sen5x_data.nox_index;
+  }
+  if (((product_name[4] == '4') || (product_name[4] == '5'))) {
+    setPMs(pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
+  }
+  else {
+    setPMsen50(pm2p5max, pm10p0max);
+  }
+}
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
 */
@@ -347,7 +394,7 @@ void set_light_on_state(void) {
     sen5xReadTimer = HAL_GetTick();
     Debug("sen5x already powered");
   }
-  if (sen5x_lightup_measurement()) {  // start full measurement mode
+  if (sen5x_lightup_measurement()) {  // start selected measurement mode
     Error("Error executing sen5x_lightup_measurement()");
   }
   PMsamplesState = CHECK_SEN5X;
@@ -355,6 +402,7 @@ void set_light_on_state(void) {
 
 void sen5x_statemachine() {
   bool data_ready = false;
+//  Debug("sen5xReadTimer has value %d", sen5xReadTimer);
   if (TimestampIsReached(sen5xReadTimer)) {
     switch (PMsamplesState) {
     case S5X_DISABLED:
@@ -390,18 +438,25 @@ void sen5x_statemachine() {
 //      Debug("state is LIGHT_ON");
       sen5x_read_data_ready(&data_ready);  // is new data ready in the sensor module?
       if (data_ready) {
+        SetPMIndicator();
         if (sen5x_read_measurement(&sen5x_data)) {
           Error("Error executing sen5x_read_measured_values()");
         }
         sen5xSamples++;
+        sen5xStoreMax();
         if (sen5xSamples == 31) { // about two times a minute
           sen5xSamples = 0;  // enable display on serial
+        }
+        if (sen5xSamples > 1) {
+          sen5xStoreMax();
         }
         if (sen5xSamples == 2) { // take 2 samples, show 1 sample before we continue in the state machine
 #ifndef STLINK_V3PWR
           sen5x_printvalues(); // print the values
 #else
-          Info("!!==No values, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
+          Info("!!==Values are bogus, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
+          sen5x_printvalues(); // print the values
+          Info("!!==Values are bogus, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
 #endif
         }
       }
@@ -434,6 +489,7 @@ void sen5x_statemachine() {
       else {
         PMsamplesState = CHECK_SEN5X;
       }
+      ResetPMIndicator();
       sen5xReadTimer = HAL_GetTick() + 1000;
     }
   }

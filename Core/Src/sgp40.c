@@ -81,6 +81,16 @@ void SGP_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   GasIndexAlgorithm_init(&params, GasIndexAlgorithm_ALGORITHM_TYPE_VOC);
 }
 
+void SetSGP40_GasIndexAlgorithm_Sampling_Interval() {
+  if (usbPluggedIn) {
+    params.mSamplingInterval = 1.0f;
+  }
+  else {
+    params.mSamplingInterval = 900.0f;
+  }
+//  Debug("SGP40 GasIndexAlgorithm_Sampling_Interval is: %f", params.mSamplingInterval);
+}
+
 void SGP_StartMeasurement(void) {
   if(HT_MeasurementReceived){
     WriteRegister(SGP_I2C_ADDRESS, MeasureRawWithCompBuffer, SGP_LONG_COMMAND_BUFFER_LENGTH);
@@ -353,6 +363,7 @@ SGP40State SGP_Upkeep(void) {
   case SGP_STATE_WAIT:
     if(TimestampIsReached(SGP40TimeStamp)){
 //      Debug("in SGP_STATE_WAIT");
+      SetSGP40_GasIndexAlgorithm_Sampling_Interval(); // set the correct sample interval
       SGPState = SGP_STATE_INIT;
     }
     break;

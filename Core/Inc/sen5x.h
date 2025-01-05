@@ -52,6 +52,7 @@ extern bool VOCNOx;
 extern sen5x_states PMsamplesState;
 extern unsigned char product_name[8];
 
+bool sen5x_Get_sen5x_enable_state();
 bool sen5x_enable(uint32_t sleepTime);
 void setsen5xReadTimer(uint32_t delayms);
 void setsen5xSamplecounter(uint8_t samples);

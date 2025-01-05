@@ -154,9 +154,15 @@ void setMic(float dB){
   dBA = dB;
 }
 
-void setPMs(uint16_t PM2, uint16_t PM10, uint16_t nox) {
+void setPMsen50(uint16_t PM2, uint16_t PM10) {
   airPM2 = PM2 / 10.0f;
   airPM10 = PM10 / 10.0f;
+}
+
+void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox) {
+  airPM2 = PM2 / 10.0f;
+  airPM10 = PM10 / 10.0f;
+  VOCIndex = voc / 10.0f;
   airNOx = nox / 10.0f;
 }
 
@@ -1160,6 +1166,7 @@ ESP_States ESP_Upkeep(void) {
         }
         if(ATReceived == RECEIVE_STATUS_TIMEOUT){
           timeoutcntr++;
+          Error("In ESP_STATE_WAIT_FOR_REPLY: RECEIVE_STATUS_TIMEOUT reached");
           if (timeoutcntr == ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
             ESPTransmitDone = true;

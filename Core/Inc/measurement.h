@@ -30,6 +30,7 @@ typedef struct {
   bool PM_Present;
   bool MIC_Present;
   bool ESP_Present;
+  bool SGP_Enabled;
 }DevicePresent;
 
 extern EnabledMeasurements Sensor;
@@ -38,6 +39,8 @@ extern DevicePresent SensorProbe;
 bool AllDevicesReady();
 void Device_Test();
 void SetESPMeasurementDone();
+bool IsSGPPresent();
+void SetVOCSensorDIS_ENA(bool setting);
 bool IsPMSensorEnabled();
 bool GetPMSensorPresence();
 void SetPMSensorStatus(bool setting);

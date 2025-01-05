@@ -31,7 +31,7 @@
 #define ESP_WIFI_RETRY_TIME 500
 #define ESP_WIFI_WAIT_RESPONSE_TIME_FACTOR 20
 #define ESP_UNTIL_NEXT_SEND 240000  // about every 5 minutes
-#define ESP_UNTIL_NEXT_NTP 1087198  //about every 24 hours
+#define ESP_UNTIL_NEXT_NTP 75398223  //about every 24 hours
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""
 #define ESP_SEND_HUMID "\"humid\""
@@ -162,7 +162,8 @@ void ESP_WakeTest();
 void setVOC(uint16_t voc);
 void setHIDS(float temp, float humid);
 void setMic(float dB);
-void setPMs(uint16_t PM2, uint16_t PM10, uint16_t nox);
+void setPMsen50(uint16_t PM2, uint16_t PM10);
+void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox);
 void SetConfigMode();
 void ESP_GetHT(float temp, float humid);
 void forceNTPupdate();

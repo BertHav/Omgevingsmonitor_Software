@@ -35,6 +35,7 @@ void testInit(){
   SensorProbe.PM_Present = false;
   SensorProbe.MIC_Present = false;
   SensorProbe.ESP_Present = false;
+  SensorProbe.SGP_Enabled = false;
 }
 
 bool GetPMSensorPresence(){
@@ -44,6 +45,22 @@ bool GetPMSensorPresence(){
 bool IsHTSensorEnabled() {
   return Sensor.HT_measurementEnabled;
 }
+
+bool IsSGPSensorEnabled() {
+  return SensorProbe.SGP_Enabled;
+}
+
+bool IsSGPPresent() {
+  return SensorProbe.VOC_Present;
+}
+
+void SetVOCSensorDIS_ENA(bool setting) {
+  SensorProbe.SGP_Enabled = setting;
+//  SensorProbe.VOC_Present = setting;
+  Sensor.VOC_measurementEnabled = setting;
+  Debug("on-board SGP40 %s", setting?"enabled":"disabled");
+}
+
 
 bool IsVOCSensorEnabled() {
   return Sensor.VOC_measurementEnabled;
@@ -96,6 +113,7 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
      Sensor.VOC_measurementEnabled = false;
   }
   else{
+    SensorProbe.SGP_Enabled = true;
     SensorProbe.VOC_Present = true;
     Debug("SGP sensor initialised.");
   }
@@ -125,6 +143,12 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     Debug("PM sensor initialised.");
     SensorProbe.PM_Present = true; // not present
     Sensor.PM_measurementEnabled = true;
+    if (((product_name[4] == '4') || (product_name[4] == '5'))) {
+      Info("For power saving the SGP40 is disabled, VOCi measurement is done by sen54/sen55");
+      Sensor.VOC_measurementEnabled = false;
+      SensorProbe.SGP_Enabled = false;
+      SGP_SoftReset();
+    }
   }
   else {
     sen5x_Power_Off();      // switch off buck converter
@@ -164,7 +188,7 @@ void Device_Test(){
   if((SensorProbe.ESP_Present && SensorProbe.MIC_Present) || TimestampIsReached(deviceTimeOut)){
     Info("Test completed");
     Info("ESP function: %s", SensorProbe.ESP_Present?"passed": "failed");
-    Info("MIC function:%s", SensorProbe.MIC_Present?"passed": "failed");
+    Info("MIC function: %s", SensorProbe.MIC_Present?"passed": "failed");
     SetTestDone();
   }
 }
@@ -174,7 +198,7 @@ bool AllDevicesReady() {
     if (HIDSstate == HIDS_STATE_WAIT) {
       Sensor.HT_measurementEnabled = false;
     }
-    if (SGPstate == SGP_STATE_WAIT) {
+    if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {
       Sensor.VOC_measurementEnabled = false;
     }
     if (PMsamplesState == LIGHT_OUT) {
@@ -195,7 +219,7 @@ void EnabledConnectedDevices() {
   if (SensorProbe.HT_Present) {
     Sensor.HT_measurementEnabled = true;
   }
-  if (SensorProbe.VOC_Present) {
+  if ((SensorProbe.VOC_Present) && (SensorProbe.SGP_Enabled)) {
     Sensor.VOC_measurementEnabled = true;
   }
   if (SensorProbe.PM_Present) {

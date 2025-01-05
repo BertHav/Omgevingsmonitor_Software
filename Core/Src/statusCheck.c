@@ -127,6 +127,22 @@ void ResetESPIndicator(){
   }
 }
 
+void SetPMIndicator() {
+  if(usbPluggedIn||userToggle){
+    TIM2 -> CCR4 = LED_ON;
+    TIM2 -> CCR1 = LED_ON;
+    TIM2 -> CCR3 = LED_ON;
+  }
+}
+
+void ResetPMIndicator() {
+  if(usbPluggedIn||userToggle){
+    TIM2 -> CCR4 = LED_OFF;
+    TIM2 -> CCR1 = LED_OFF;
+    TIM2 -> CCR3 = LED_OFF;
+  }
+}
+
 // Sets all LEDs Off
 void SetLEDsOff(void){
   SetStatusLED(LED_OFF,LED_OFF,LED_OFF);
@@ -188,12 +204,12 @@ void configCheck(){
     UserbuttonStamp = HAL_GetTick() + 2000;
   }
   if (!BootButton_Pressed() && buttonHeld&& TimestampIsReached(UserbuttonStamp)) {
-    if (GetPMSensorPresence() && (product_name[4] == '5')) {
+    if (GetPMSensorPresence() && ((product_name[4] == '4') || (product_name[4] == '5'))) {
       uint16_t color;
       VOCNOx = !VOCNOx;
       if (VOCNOx)  color = 0;
         else color = 4000;
-      Info("VOC and NOx measurement %s", VOCNOx?"enabled":"disabled");
+      Info("VOC and NOx only measurement %s", VOCNOx?"enabled":"disabled");
       for (uint8_t i=0; i<2; i++) {
         TIM3 -> CCR1 = 0;
         TIM3 -> CCR2 = color;
@@ -204,10 +220,18 @@ void configCheck(){
         TIM3 -> CCR3 = 4000;
         HAL_Delay(400);
       }
-    }
-      while (UserButton_Pressed()){
-
+      Debug("userToggle flipped back to prior status");
+      userToggle = !userToggle;
+      Info("userToggle status is %s", userToggle?"enabled":"disabled");
+      if (usbPluggedIn) {
+        set_light_on_state();  // in case of battery operation the mode is picked up by the state machine
       }
+    }
+    else {
+      Info("sen54 or sen55 not present or disabled in system");
+    }
+    while (UserButton_Pressed()){
+    }
     buttonHeld = false;
   }
   if(!BootButton_Pressed() && !UserButton_Pressed()){
