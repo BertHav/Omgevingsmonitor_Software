@@ -64,7 +64,7 @@ main-build: MJSGadget\ -\ dB\ meter.elf secondary-outputs
 
 # Tool invocations
 MJSGadget\ -\ dB\ meter.elf MJSGadget\ -\ dB\ meter.map: $(OBJS) $(USER_OBJS) C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget\ -\ dB\ meter\STM32L072RZTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "MJSGadget - dB meter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\STM32L072RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MJSGadget - dB meter.map" -Wl,--gc-sections -static -L"C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "MJSGadget - dB meter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\STM32L072RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MJSGadget - dB meter.map" -Wl,--gc-sections -static -L"C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

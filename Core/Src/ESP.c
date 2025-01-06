@@ -1148,7 +1148,7 @@ ESP_States ESP_Upkeep(void) {
           }
           EspState = ESP_STATE_SEND;
           errorcntr++;
-          if (errorcntr == ESP_MAX_RETRANSMITIONS) {
+          if (errorcntr >= ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
             ESPTransmitDone = true;
             ResetESPIndicator();
@@ -1167,7 +1167,7 @@ ESP_States ESP_Upkeep(void) {
         if(ATReceived == RECEIVE_STATUS_TIMEOUT){
           timeoutcntr++;
           Error("In ESP_STATE_WAIT_FOR_REPLY: RECEIVE_STATUS_TIMEOUT reached");
-          if (timeoutcntr == ESP_MAX_RETRANSMITIONS) {
+          if (timeoutcntr >= ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
             ESPTransmitDone = true;
             ResetESPIndicator();
@@ -1253,6 +1253,7 @@ ESP_States ESP_Upkeep(void) {
       EspState = ESP_STATE_RESET;
       HAL_Delay(1);
       errorcntr = 0;
+      timeoutcntr = 0;
       break;
 
     case ESP_STATE_RESET:

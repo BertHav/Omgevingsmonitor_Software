@@ -37,19 +37,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00022908  00000000  00000000  000694ce  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00041995  00000000  00000000  0008bdd6  2**0
+ 17 .debug_line   00041998  00000000  00000000  0008bdd6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000a04e0  00000000  00000000  000cd76b  2**0
+ 18 .debug_str    000a04e1  00000000  00000000  000cd76e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      000000b1  00000000  00000000  0016dc4b  2**0
+ 19 .comment      000000b1  00000000  00000000  0016dc4f  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000ae3c  00000000  00000000  0016dcfc  2**2
+ 20 .debug_frame  0000ae3c  00000000  00000000  0016dd00  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000006d  00000000  00000000  00178b38  2**0
+ 21 .debug_line_str 0000006d  00000000  00000000  00178b3c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_loc    0000257c  00000000  00000000  00178ba5  2**0
+ 22 .debug_loc    0000257c  00000000  00000000  00178ba9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 23 .debug_ranges 00000088  00000000  00000000  0017b121  2**0
+ 23 .debug_ranges 00000088  00000000  00000000  0017b125  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -11338,9 +11338,9 @@ ESP_States ESP_Upkeep(void) {
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
 
   if ((EspState != oldEspState) && (GetVerboseLevel() == VERBOSE_ALL)) {
- 80054ac:	4be3      	ldr	r3, [pc, #908]	@ (800583c <ESP_Upkeep+0x39c>)
+ 80054ac:	4be2      	ldr	r3, [pc, #904]	@ (8005838 <ESP_Upkeep+0x398>)
  80054ae:	781a      	ldrb	r2, [r3, #0]
- 80054b0:	4be3      	ldr	r3, [pc, #908]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80054b0:	4be2      	ldr	r3, [pc, #904]	@ (800583c <ESP_Upkeep+0x39c>)
  80054b2:	781b      	ldrb	r3, [r3, #0]
  80054b4:	429a      	cmp	r2, r3
  80054b6:	d024      	beq.n	8005502 <ESP_Upkeep+0x62>
@@ -11349,33 +11349,33 @@ ESP_States ESP_Upkeep(void) {
  80054be:	2b03      	cmp	r3, #3
  80054c0:	d11f      	bne.n	8005502 <ESP_Upkeep+0x62>
     oldEspState = EspState;
- 80054c2:	4bde      	ldr	r3, [pc, #888]	@ (800583c <ESP_Upkeep+0x39c>)
+ 80054c2:	4bdd      	ldr	r3, [pc, #884]	@ (8005838 <ESP_Upkeep+0x398>)
  80054c4:	781a      	ldrb	r2, [r3, #0]
- 80054c6:	4bde      	ldr	r3, [pc, #888]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80054c6:	4bdd      	ldr	r3, [pc, #884]	@ (800583c <ESP_Upkeep+0x39c>)
  80054c8:	701a      	strb	r2, [r3, #0]
     if (!((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
- 80054ca:	4bdd      	ldr	r3, [pc, #884]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80054ca:	4bdc      	ldr	r3, [pc, #880]	@ (800583c <ESP_Upkeep+0x39c>)
  80054cc:	781b      	ldrb	r3, [r3, #0]
  80054ce:	2b03      	cmp	r3, #3
  80054d0:	d103      	bne.n	80054da <ESP_Upkeep+0x3a>
- 80054d2:	4bdc      	ldr	r3, [pc, #880]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 80054d2:	4bdb      	ldr	r3, [pc, #876]	@ (8005840 <ESP_Upkeep+0x3a0>)
  80054d4:	781b      	ldrb	r3, [r3, #0]
  80054d6:	2b0e      	cmp	r3, #14
  80054d8:	d013      	beq.n	8005502 <ESP_Upkeep+0x62>
       Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
- 80054da:	4bd9      	ldr	r3, [pc, #868]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80054da:	4bd8      	ldr	r3, [pc, #864]	@ (800583c <ESP_Upkeep+0x39c>)
  80054dc:	781b      	ldrb	r3, [r3, #0]
  80054de:	001d      	movs	r5, r3
- 80054e0:	4bd8      	ldr	r3, [pc, #864]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 80054e0:	4bd7      	ldr	r3, [pc, #860]	@ (8005840 <ESP_Upkeep+0x3a0>)
  80054e2:	781b      	ldrb	r3, [r3, #0]
  80054e4:	0018      	movs	r0, r3
- 80054e6:	4bd8      	ldr	r3, [pc, #864]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 80054e6:	4bd7      	ldr	r3, [pc, #860]	@ (8005844 <ESP_Upkeep+0x3a4>)
  80054e8:	781b      	ldrb	r3, [r3, #0]
  80054ea:	001c      	movs	r4, r3
- 80054ec:	4bd7      	ldr	r3, [pc, #860]	@ (800584c <ESP_Upkeep+0x3ac>)
+ 80054ec:	4bd6      	ldr	r3, [pc, #856]	@ (8005848 <ESP_Upkeep+0x3a8>)
  80054ee:	781b      	ldrb	r3, [r3, #0]
- 80054f0:	4ad7      	ldr	r2, [pc, #860]	@ (8005850 <ESP_Upkeep+0x3b0>)
- 80054f2:	49d8      	ldr	r1, [pc, #864]	@ (8005854 <ESP_Upkeep+0x3b4>)
+ 80054f0:	4ad6      	ldr	r2, [pc, #856]	@ (800584c <ESP_Upkeep+0x3ac>)
+ 80054f2:	49d7      	ldr	r1, [pc, #860]	@ (8005850 <ESP_Upkeep+0x3b0>)
  80054f4:	9302      	str	r3, [sp, #8]
  80054f6:	9401      	str	r4, [sp, #4]
  80054f8:	9000      	str	r0, [sp, #0]
@@ -11385,13 +11385,13 @@ ESP_States ESP_Upkeep(void) {
     }
   }
   switch (EspState) {
- 8005502:	4bce      	ldr	r3, [pc, #824]	@ (800583c <ESP_Upkeep+0x39c>)
+ 8005502:	4bcd      	ldr	r3, [pc, #820]	@ (8005838 <ESP_Upkeep+0x398>)
  8005504:	781b      	ldrb	r3, [r3, #0]
  8005506:	2b0f      	cmp	r3, #15
  8005508:	d901      	bls.n	800550e <ESP_Upkeep+0x6e>
- 800550a:	f000 fc10 	bl	8005d2e <ESP_Upkeep+0x88e>
+ 800550a:	f000 fc04 	bl	8005d16 <ESP_Upkeep+0x876>
  800550e:	009a      	lsls	r2, r3, #2
- 8005510:	4bd1      	ldr	r3, [pc, #836]	@ (8005858 <ESP_Upkeep+0x3b8>)
+ 8005510:	4bd0      	ldr	r3, [pc, #832]	@ (8005854 <ESP_Upkeep+0x3b4>)
  8005512:	18d3      	adds	r3, r2, r3
  8005514:	681b      	ldr	r3, [r3, #0]
  8005516:	469f      	mov	pc, r3
@@ -11401,18 +11401,18 @@ ESP_States ESP_Upkeep(void) {
 
 //      EspTurnedOn = false;
       EspState = ESP_STATE_IDLE;
- 8005518:	4bc8      	ldr	r3, [pc, #800]	@ (800583c <ESP_Upkeep+0x39c>)
+ 8005518:	4bc7      	ldr	r3, [pc, #796]	@ (8005838 <ESP_Upkeep+0x398>)
  800551a:	2201      	movs	r2, #1
  800551c:	701a      	strb	r2, [r3, #0]
       break;
- 800551e:	f000 fc1f 	bl	8005d60 <ESP_Upkeep+0x8c0>
+ 800551e:	f000 fc13 	bl	8005d48 <ESP_Upkeep+0x8a8>
     case ESP_STATE_IDLE:
       // Waiting for wake up call.
       break;
 
     case ESP_STATE_INIT:
       if(!EspTurnedOn){
- 8005522:	4bce      	ldr	r3, [pc, #824]	@ (800585c <ESP_Upkeep+0x3bc>)
+ 8005522:	4bcd      	ldr	r3, [pc, #820]	@ (8005858 <ESP_Upkeep+0x3b8>)
  8005524:	781b      	ldrb	r3, [r3, #0]
  8005526:	2201      	movs	r2, #1
  8005528:	4053      	eors	r3, r2
@@ -11422,7 +11422,7 @@ ESP_States ESP_Upkeep(void) {
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
  8005530:	2380      	movs	r3, #128	@ 0x80
  8005532:	011b      	lsls	r3, r3, #4
- 8005534:	48ca      	ldr	r0, [pc, #808]	@ (8005860 <ESP_Upkeep+0x3c0>)
+ 8005534:	48c9      	ldr	r0, [pc, #804]	@ (800585c <ESP_Upkeep+0x3bc>)
  8005536:	2200      	movs	r2, #0
  8005538:	0019      	movs	r1, r3
  800553a:	f00a fde2 	bl	8010102 <HAL_GPIO_WritePin>
@@ -11432,7 +11432,7 @@ ESP_States ESP_Upkeep(void) {
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_SET);
  8005544:	2380      	movs	r3, #128	@ 0x80
  8005546:	011b      	lsls	r3, r3, #4
- 8005548:	48c5      	ldr	r0, [pc, #788]	@ (8005860 <ESP_Upkeep+0x3c0>)
+ 8005548:	48c4      	ldr	r0, [pc, #784]	@ (800585c <ESP_Upkeep+0x3bc>)
  800554a:	2201      	movs	r2, #1
  800554c:	0019      	movs	r1, r3
  800554e:	f00a fdd8 	bl	8010102 <HAL_GPIO_WritePin>
@@ -11441,7 +11441,7 @@ ESP_States ESP_Upkeep(void) {
  8005554:	f009 fb4e 	bl	800ebf4 <HAL_Delay>
         // Reset ESP, so we're sure that we're in the right state.
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
- 8005558:	4bc2      	ldr	r3, [pc, #776]	@ (8005864 <ESP_Upkeep+0x3c4>)
+ 8005558:	4bc1      	ldr	r3, [pc, #772]	@ (8005860 <ESP_Upkeep+0x3c0>)
  800555a:	2200      	movs	r2, #0
  800555c:	2101      	movs	r1, #1
  800555e:	0018      	movs	r0, r3
@@ -11450,7 +11450,7 @@ ESP_States ESP_Upkeep(void) {
  8005564:	2001      	movs	r0, #1
  8005566:	f009 fb45 	bl	800ebf4 <HAL_Delay>
         HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 1);
- 800556a:	4bbe      	ldr	r3, [pc, #760]	@ (8005864 <ESP_Upkeep+0x3c4>)
+ 800556a:	4bbd      	ldr	r3, [pc, #756]	@ (8005860 <ESP_Upkeep+0x3c0>)
  800556c:	2201      	movs	r2, #1
  800556e:	2102      	movs	r1, #2
  8005570:	0018      	movs	r0, r3
@@ -11459,7 +11459,7 @@ ESP_States ESP_Upkeep(void) {
  8005576:	2001      	movs	r0, #1
  8005578:	f009 fb3c 	bl	800ebf4 <HAL_Delay>
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
- 800557c:	4bb9      	ldr	r3, [pc, #740]	@ (8005864 <ESP_Upkeep+0x3c4>)
+ 800557c:	4bb8      	ldr	r3, [pc, #736]	@ (8005860 <ESP_Upkeep+0x3c0>)
  800557e:	2201      	movs	r2, #1
  8005580:	2101      	movs	r1, #1
  8005582:	0018      	movs	r0, r3
@@ -11470,10 +11470,10 @@ ESP_States ESP_Upkeep(void) {
  800558e:	22af      	movs	r2, #175	@ 0xaf
  8005590:	0092      	lsls	r2, r2, #2
  8005592:	189a      	adds	r2, r3, r2
- 8005594:	4bb4      	ldr	r3, [pc, #720]	@ (8005868 <ESP_Upkeep+0x3c8>)
+ 8005594:	4bb3      	ldr	r3, [pc, #716]	@ (8005864 <ESP_Upkeep+0x3c4>)
  8005596:	601a      	str	r2, [r3, #0]
         EspTurnedOn = true;
- 8005598:	4bb0      	ldr	r3, [pc, #704]	@ (800585c <ESP_Upkeep+0x3bc>)
+ 8005598:	4baf      	ldr	r3, [pc, #700]	@ (8005858 <ESP_Upkeep+0x3b8>)
  800559a:	2201      	movs	r2, #1
  800559c:	701a      	strb	r2, [r3, #0]
       }
@@ -11482,15 +11482,15 @@ ESP_States ESP_Upkeep(void) {
       if(ESP_Receive(RxBuffer, ESP_MAX_BUFFER_SIZE)) {
  800559e:	2380      	movs	r3, #128	@ 0x80
  80055a0:	005a      	lsls	r2, r3, #1
- 80055a2:	4bb2      	ldr	r3, [pc, #712]	@ (800586c <ESP_Upkeep+0x3cc>)
+ 80055a2:	4bb1      	ldr	r3, [pc, #708]	@ (8005868 <ESP_Upkeep+0x3c8>)
  80055a4:	0011      	movs	r1, r2
  80055a6:	0018      	movs	r0, r3
  80055a8:	f7fe fad8 	bl	8003b5c <ESP_Receive>
  80055ac:	1e03      	subs	r3, r0, #0
  80055ae:	d101      	bne.n	80055b4 <ESP_Upkeep+0x114>
- 80055b0:	f000 fbc9 	bl	8005d46 <ESP_Upkeep+0x8a6>
+ 80055b0:	f000 fbbd 	bl	8005d2e <ESP_Upkeep+0x88e>
         EspState = ESP_STATE_WAIT_AWAKE;
- 80055b4:	4ba1      	ldr	r3, [pc, #644]	@ (800583c <ESP_Upkeep+0x39c>)
+ 80055b4:	4ba0      	ldr	r3, [pc, #640]	@ (8005838 <ESP_Upkeep+0x398>)
  80055b6:	220f      	movs	r2, #15
  80055b8:	701a      	strb	r2, [r3, #0]
         timeoutTimer = HAL_GetTick() + 2000;
@@ -11499,11 +11499,11 @@ ESP_States ESP_Upkeep(void) {
  80055c0:	22fa      	movs	r2, #250	@ 0xfa
  80055c2:	00d2      	lsls	r2, r2, #3
  80055c4:	189a      	adds	r2, r3, r2
- 80055c6:	4baa      	ldr	r3, [pc, #680]	@ (8005870 <ESP_Upkeep+0x3d0>)
+ 80055c6:	4ba9      	ldr	r3, [pc, #676]	@ (800586c <ESP_Upkeep+0x3cc>)
  80055c8:	601a      	str	r2, [r3, #0]
       }
       break;
- 80055ca:	f000 fbbc 	bl	8005d46 <ESP_Upkeep+0x8a6>
+ 80055ca:	f000 fbb0 	bl	8005d2e <ESP_Upkeep+0x88e>
 
     case ESP_STATE_WAIT_AWAKE:
         ATReceived = DMA_ProcessBuffer(RECEIVE_EXPECTATION_READY);
@@ -11511,10 +11511,10 @@ ESP_States ESP_Upkeep(void) {
  80055d0:	f7ff fb46 	bl	8004c60 <DMA_ProcessBuffer>
  80055d4:	0003      	movs	r3, r0
  80055d6:	001a      	movs	r2, r3
- 80055d8:	4ba6      	ldr	r3, [pc, #664]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80055d8:	4ba5      	ldr	r3, [pc, #660]	@ (8005870 <ESP_Upkeep+0x3d0>)
  80055da:	701a      	strb	r2, [r3, #0]
         bool proceed = ATCompare(ATReceived, RECEIVE_EXPECTATION_READY);
- 80055dc:	4ba5      	ldr	r3, [pc, #660]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80055dc:	4ba4      	ldr	r3, [pc, #656]	@ (8005870 <ESP_Upkeep+0x3d0>)
  80055de:	781b      	ldrb	r3, [r3, #0]
  80055e0:	1dbc      	adds	r4, r7, #6
  80055e2:	2101      	movs	r1, #1
@@ -11527,1103 +11527,1105 @@ ESP_States ESP_Upkeep(void) {
  80055f0:	781b      	ldrb	r3, [r3, #0]
  80055f2:	2b00      	cmp	r3, #0
  80055f4:	d108      	bne.n	8005608 <ESP_Upkeep+0x168>
- 80055f6:	4b9e      	ldr	r3, [pc, #632]	@ (8005870 <ESP_Upkeep+0x3d0>)
+ 80055f6:	4b9d      	ldr	r3, [pc, #628]	@ (800586c <ESP_Upkeep+0x3cc>)
  80055f8:	681b      	ldr	r3, [r3, #0]
  80055fa:	0018      	movs	r0, r3
  80055fc:	f008 fe44 	bl	800e288 <TimestampIsReached>
  8005600:	1e03      	subs	r3, r0, #0
  8005602:	d101      	bne.n	8005608 <ESP_Upkeep+0x168>
- 8005604:	f000 fba1 	bl	8005d4a <ESP_Upkeep+0x8aa>
+ 8005604:	f000 fb95 	bl	8005d32 <ESP_Upkeep+0x892>
           EspState = ESP_STATE_MODE_SELECT;
- 8005608:	4b8c      	ldr	r3, [pc, #560]	@ (800583c <ESP_Upkeep+0x39c>)
+ 8005608:	4b8b      	ldr	r3, [pc, #556]	@ (8005838 <ESP_Upkeep+0x398>)
  800560a:	220b      	movs	r2, #11
  800560c:	701a      	strb	r2, [r3, #0]
         }
         break;
- 800560e:	f000 fb9c 	bl	8005d4a <ESP_Upkeep+0x8aa>
+ 800560e:	e390      	b.n	8005d32 <ESP_Upkeep+0x892>
 
     case ESP_STATE_MODE_SELECT:
       memset(ATCommandArray, AT_END, 9);
- 8005612:	4b99      	ldr	r3, [pc, #612]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 8005614:	2209      	movs	r2, #9
- 8005616:	2114      	movs	r1, #20
- 8005618:	0018      	movs	r0, r3
- 800561a:	f01a fd39 	bl	8020090 <memset>
+ 8005610:	4b98      	ldr	r3, [pc, #608]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005612:	2209      	movs	r2, #9
+ 8005614:	2114      	movs	r1, #20
+ 8005616:	0018      	movs	r0, r3
+ 8005618:	f01a fd3a 	bl	8020090 <memset>
       if(!InitIsDone || WifiReset){
- 800561e:	4b97      	ldr	r3, [pc, #604]	@ (800587c <ESP_Upkeep+0x3dc>)
- 8005620:	781b      	ldrb	r3, [r3, #0]
- 8005622:	2201      	movs	r2, #1
- 8005624:	4053      	eors	r3, r2
- 8005626:	b2db      	uxtb	r3, r3
- 8005628:	2b00      	cmp	r3, #0
- 800562a:	d103      	bne.n	8005634 <ESP_Upkeep+0x194>
- 800562c:	4b94      	ldr	r3, [pc, #592]	@ (8005880 <ESP_Upkeep+0x3e0>)
- 800562e:	781b      	ldrb	r3, [r3, #0]
- 8005630:	2b00      	cmp	r3, #0
- 8005632:	d01a      	beq.n	800566a <ESP_Upkeep+0x1ca>
+ 800561c:	4b96      	ldr	r3, [pc, #600]	@ (8005878 <ESP_Upkeep+0x3d8>)
+ 800561e:	781b      	ldrb	r3, [r3, #0]
+ 8005620:	2201      	movs	r2, #1
+ 8005622:	4053      	eors	r3, r2
+ 8005624:	b2db      	uxtb	r3, r3
+ 8005626:	2b00      	cmp	r3, #0
+ 8005628:	d103      	bne.n	8005632 <ESP_Upkeep+0x192>
+ 800562a:	4b94      	ldr	r3, [pc, #592]	@ (800587c <ESP_Upkeep+0x3dc>)
+ 800562c:	781b      	ldrb	r3, [r3, #0]
+ 800562e:	2b00      	cmp	r3, #0
+ 8005630:	d01a      	beq.n	8005668 <ESP_Upkeep+0x1c8>
         memcpy(ATCommandArray, AT_INIT, 7);
- 8005634:	4b90      	ldr	r3, [pc, #576]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 8005636:	4a93      	ldr	r2, [pc, #588]	@ (8005884 <ESP_Upkeep+0x3e4>)
- 8005638:	6811      	ldr	r1, [r2, #0]
- 800563a:	6019      	str	r1, [r3, #0]
- 800563c:	8891      	ldrh	r1, [r2, #4]
- 800563e:	8099      	strh	r1, [r3, #4]
- 8005640:	7992      	ldrb	r2, [r2, #6]
- 8005642:	719a      	strb	r2, [r3, #6]
+ 8005632:	4b90      	ldr	r3, [pc, #576]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005634:	4a92      	ldr	r2, [pc, #584]	@ (8005880 <ESP_Upkeep+0x3e0>)
+ 8005636:	6811      	ldr	r1, [r2, #0]
+ 8005638:	6019      	str	r1, [r3, #0]
+ 800563a:	8891      	ldrh	r1, [r2, #4]
+ 800563c:	8099      	strh	r1, [r3, #4]
+ 800563e:	7992      	ldrb	r2, [r2, #6]
+ 8005640:	719a      	strb	r2, [r3, #6]
         EspState = ESP_STATE_SEND;
- 8005644:	4b7d      	ldr	r3, [pc, #500]	@ (800583c <ESP_Upkeep+0x39c>)
- 8005646:	2204      	movs	r2, #4
- 8005648:	701a      	strb	r2, [r3, #0]
+ 8005642:	4b7d      	ldr	r3, [pc, #500]	@ (8005838 <ESP_Upkeep+0x398>)
+ 8005644:	2204      	movs	r2, #4
+ 8005646:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 800564a:	4b8f      	ldr	r3, [pc, #572]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 800564c:	2200      	movs	r2, #0
- 800564e:	701a      	strb	r2, [r3, #0]
+ 8005648:	4b8e      	ldr	r3, [pc, #568]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 800564a:	2200      	movs	r2, #0
+ 800564c:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_INIT;
- 8005650:	4b7d      	ldr	r3, [pc, #500]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 8005652:	2200      	movs	r2, #0
- 8005654:	701a      	strb	r2, [r3, #0]
+ 800564e:	4b7d      	ldr	r3, [pc, #500]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 8005650:	2200      	movs	r2, #0
+ 8005652:	701a      	strb	r2, [r3, #0]
         ATCommand = ATCommandArray[ATCounter];
- 8005656:	4b8c      	ldr	r3, [pc, #560]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005658:	781b      	ldrb	r3, [r3, #0]
- 800565a:	001a      	movs	r2, r3
- 800565c:	4b86      	ldr	r3, [pc, #536]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 800565e:	5c9a      	ldrb	r2, [r3, r2]
- 8005660:	4b78      	ldr	r3, [pc, #480]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 8005662:	701a      	strb	r2, [r3, #0]
+ 8005654:	4b8b      	ldr	r3, [pc, #556]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 8005656:	781b      	ldrb	r3, [r3, #0]
+ 8005658:	001a      	movs	r2, r3
+ 800565a:	4b86      	ldr	r3, [pc, #536]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 800565c:	5c9a      	ldrb	r2, [r3, r2]
+ 800565e:	4b78      	ldr	r3, [pc, #480]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 8005660:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 8005664:	4b79      	ldr	r3, [pc, #484]	@ (800584c <ESP_Upkeep+0x3ac>)
- 8005666:	2200      	movs	r2, #0
- 8005668:	701a      	strb	r2, [r3, #0]
+ 8005662:	4b79      	ldr	r3, [pc, #484]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 8005664:	2200      	movs	r2, #0
+ 8005666:	701a      	strb	r2, [r3, #0]
       }
       if(InitIsDone && !ConnectionMade){
- 800566a:	4b84      	ldr	r3, [pc, #528]	@ (800587c <ESP_Upkeep+0x3dc>)
- 800566c:	781b      	ldrb	r3, [r3, #0]
- 800566e:	2b00      	cmp	r3, #0
- 8005670:	d01f      	beq.n	80056b2 <ESP_Upkeep+0x212>
- 8005672:	4b86      	ldr	r3, [pc, #536]	@ (800588c <ESP_Upkeep+0x3ec>)
- 8005674:	781b      	ldrb	r3, [r3, #0]
- 8005676:	2201      	movs	r2, #1
- 8005678:	4053      	eors	r3, r2
- 800567a:	b2db      	uxtb	r3, r3
- 800567c:	2b00      	cmp	r3, #0
- 800567e:	d018      	beq.n	80056b2 <ESP_Upkeep+0x212>
+ 8005668:	4b83      	ldr	r3, [pc, #524]	@ (8005878 <ESP_Upkeep+0x3d8>)
+ 800566a:	781b      	ldrb	r3, [r3, #0]
+ 800566c:	2b00      	cmp	r3, #0
+ 800566e:	d01f      	beq.n	80056b0 <ESP_Upkeep+0x210>
+ 8005670:	4b85      	ldr	r3, [pc, #532]	@ (8005888 <ESP_Upkeep+0x3e8>)
+ 8005672:	781b      	ldrb	r3, [r3, #0]
+ 8005674:	2201      	movs	r2, #1
+ 8005676:	4053      	eors	r3, r2
+ 8005678:	b2db      	uxtb	r3, r3
+ 800567a:	2b00      	cmp	r3, #0
+ 800567c:	d018      	beq.n	80056b0 <ESP_Upkeep+0x210>
         memcpy(ATCommandArray, AT_WIFI_CONFIG, 6);
- 8005680:	4b7d      	ldr	r3, [pc, #500]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 8005682:	4a83      	ldr	r2, [pc, #524]	@ (8005890 <ESP_Upkeep+0x3f0>)
- 8005684:	6811      	ldr	r1, [r2, #0]
- 8005686:	6019      	str	r1, [r3, #0]
- 8005688:	8892      	ldrh	r2, [r2, #4]
- 800568a:	809a      	strh	r2, [r3, #4]
+ 800567e:	4b7d      	ldr	r3, [pc, #500]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005680:	4a82      	ldr	r2, [pc, #520]	@ (800588c <ESP_Upkeep+0x3ec>)
+ 8005682:	6811      	ldr	r1, [r2, #0]
+ 8005684:	6019      	str	r1, [r3, #0]
+ 8005686:	8892      	ldrh	r2, [r2, #4]
+ 8005688:	809a      	strh	r2, [r3, #4]
         EspState = ESP_STATE_SEND;
- 800568c:	4b6b      	ldr	r3, [pc, #428]	@ (800583c <ESP_Upkeep+0x39c>)
- 800568e:	2204      	movs	r2, #4
- 8005690:	701a      	strb	r2, [r3, #0]
+ 800568a:	4b6b      	ldr	r3, [pc, #428]	@ (8005838 <ESP_Upkeep+0x398>)
+ 800568c:	2204      	movs	r2, #4
+ 800568e:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 8005692:	4b7d      	ldr	r3, [pc, #500]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005694:	2200      	movs	r2, #0
- 8005696:	701a      	strb	r2, [r3, #0]
+ 8005690:	4b7c      	ldr	r3, [pc, #496]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 8005692:	2200      	movs	r2, #0
+ 8005694:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_CONFIG;
- 8005698:	4b6b      	ldr	r3, [pc, #428]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 800569a:	2201      	movs	r2, #1
- 800569c:	701a      	strb	r2, [r3, #0]
+ 8005696:	4b6b      	ldr	r3, [pc, #428]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 8005698:	2201      	movs	r2, #1
+ 800569a:	701a      	strb	r2, [r3, #0]
         ATCommand = ATCommandArray[ATCounter];
- 800569e:	4b7a      	ldr	r3, [pc, #488]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 80056a0:	781b      	ldrb	r3, [r3, #0]
- 80056a2:	001a      	movs	r2, r3
- 80056a4:	4b74      	ldr	r3, [pc, #464]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 80056a6:	5c9a      	ldrb	r2, [r3, r2]
- 80056a8:	4b66      	ldr	r3, [pc, #408]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 80056aa:	701a      	strb	r2, [r3, #0]
+ 800569c:	4b79      	ldr	r3, [pc, #484]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 800569e:	781b      	ldrb	r3, [r3, #0]
+ 80056a0:	001a      	movs	r2, r3
+ 80056a2:	4b74      	ldr	r3, [pc, #464]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80056a4:	5c9a      	ldrb	r2, [r3, r2]
+ 80056a6:	4b66      	ldr	r3, [pc, #408]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80056a8:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 80056ac:	4b67      	ldr	r3, [pc, #412]	@ (800584c <ESP_Upkeep+0x3ac>)
- 80056ae:	2200      	movs	r2, #0
- 80056b0:	701a      	strb	r2, [r3, #0]
+ 80056aa:	4b67      	ldr	r3, [pc, #412]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 80056ac:	2200      	movs	r2, #0
+ 80056ae:	701a      	strb	r2, [r3, #0]
       }
       if(InitIsDone && ConnectionMade && !beursTest){
- 80056b2:	4b72      	ldr	r3, [pc, #456]	@ (800587c <ESP_Upkeep+0x3dc>)
- 80056b4:	781b      	ldrb	r3, [r3, #0]
- 80056b6:	2b00      	cmp	r3, #0
- 80056b8:	d021      	beq.n	80056fe <ESP_Upkeep+0x25e>
- 80056ba:	4b74      	ldr	r3, [pc, #464]	@ (800588c <ESP_Upkeep+0x3ec>)
- 80056bc:	781b      	ldrb	r3, [r3, #0]
- 80056be:	2b00      	cmp	r3, #0
- 80056c0:	d01d      	beq.n	80056fe <ESP_Upkeep+0x25e>
- 80056c2:	4b74      	ldr	r3, [pc, #464]	@ (8005894 <ESP_Upkeep+0x3f4>)
- 80056c4:	781b      	ldrb	r3, [r3, #0]
- 80056c6:	2201      	movs	r2, #1
- 80056c8:	4053      	eors	r3, r2
- 80056ca:	b2db      	uxtb	r3, r3
- 80056cc:	2b00      	cmp	r3, #0
- 80056ce:	d016      	beq.n	80056fe <ESP_Upkeep+0x25e>
+ 80056b0:	4b71      	ldr	r3, [pc, #452]	@ (8005878 <ESP_Upkeep+0x3d8>)
+ 80056b2:	781b      	ldrb	r3, [r3, #0]
+ 80056b4:	2b00      	cmp	r3, #0
+ 80056b6:	d021      	beq.n	80056fc <ESP_Upkeep+0x25c>
+ 80056b8:	4b73      	ldr	r3, [pc, #460]	@ (8005888 <ESP_Upkeep+0x3e8>)
+ 80056ba:	781b      	ldrb	r3, [r3, #0]
+ 80056bc:	2b00      	cmp	r3, #0
+ 80056be:	d01d      	beq.n	80056fc <ESP_Upkeep+0x25c>
+ 80056c0:	4b73      	ldr	r3, [pc, #460]	@ (8005890 <ESP_Upkeep+0x3f0>)
+ 80056c2:	781b      	ldrb	r3, [r3, #0]
+ 80056c4:	2201      	movs	r2, #1
+ 80056c6:	4053      	eors	r3, r2
+ 80056c8:	b2db      	uxtb	r3, r3
+ 80056ca:	2b00      	cmp	r3, #0
+ 80056cc:	d016      	beq.n	80056fc <ESP_Upkeep+0x25c>
         memcpy(ATCommandArray, AT_BEURSTEST, 2);
- 80056d0:	4b71      	ldr	r3, [pc, #452]	@ (8005898 <ESP_Upkeep+0x3f8>)
- 80056d2:	881a      	ldrh	r2, [r3, #0]
- 80056d4:	4b68      	ldr	r3, [pc, #416]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 80056d6:	801a      	strh	r2, [r3, #0]
+ 80056ce:	4b71      	ldr	r3, [pc, #452]	@ (8005894 <ESP_Upkeep+0x3f4>)
+ 80056d0:	881a      	ldrh	r2, [r3, #0]
+ 80056d2:	4b68      	ldr	r3, [pc, #416]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80056d4:	801a      	strh	r2, [r3, #0]
         EspState = ESP_STATE_SEND;
- 80056d8:	4b58      	ldr	r3, [pc, #352]	@ (800583c <ESP_Upkeep+0x39c>)
- 80056da:	2204      	movs	r2, #4
- 80056dc:	701a      	strb	r2, [r3, #0]
+ 80056d6:	4b58      	ldr	r3, [pc, #352]	@ (8005838 <ESP_Upkeep+0x398>)
+ 80056d8:	2204      	movs	r2, #4
+ 80056da:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 80056de:	4b6a      	ldr	r3, [pc, #424]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 80056e0:	2200      	movs	r2, #0
- 80056e2:	701a      	strb	r2, [r3, #0]
+ 80056dc:	4b69      	ldr	r3, [pc, #420]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 80056de:	2200      	movs	r2, #0
+ 80056e0:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_TEST;
- 80056e4:	4b58      	ldr	r3, [pc, #352]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 80056e6:	2204      	movs	r2, #4
- 80056e8:	701a      	strb	r2, [r3, #0]
+ 80056e2:	4b58      	ldr	r3, [pc, #352]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 80056e4:	2204      	movs	r2, #4
+ 80056e6:	701a      	strb	r2, [r3, #0]
         ATCommand = ATCommandArray[ATCounter];
- 80056ea:	4b67      	ldr	r3, [pc, #412]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 80056ec:	781b      	ldrb	r3, [r3, #0]
- 80056ee:	001a      	movs	r2, r3
- 80056f0:	4b61      	ldr	r3, [pc, #388]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 80056f2:	5c9a      	ldrb	r2, [r3, r2]
- 80056f4:	4b53      	ldr	r3, [pc, #332]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 80056f6:	701a      	strb	r2, [r3, #0]
+ 80056e8:	4b66      	ldr	r3, [pc, #408]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 80056ea:	781b      	ldrb	r3, [r3, #0]
+ 80056ec:	001a      	movs	r2, r3
+ 80056ee:	4b61      	ldr	r3, [pc, #388]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80056f0:	5c9a      	ldrb	r2, [r3, r2]
+ 80056f2:	4b53      	ldr	r3, [pc, #332]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80056f4:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 80056f8:	4b54      	ldr	r3, [pc, #336]	@ (800584c <ESP_Upkeep+0x3ac>)
- 80056fa:	2200      	movs	r2, #0
- 80056fc:	701a      	strb	r2, [r3, #0]
+ 80056f6:	4b54      	ldr	r3, [pc, #336]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 80056f8:	2200      	movs	r2, #0
+ 80056fa:	701a      	strb	r2, [r3, #0]
       }
       if(InitIsDone && ConnectionMade && beursTest && !setTime){
- 80056fe:	4b5f      	ldr	r3, [pc, #380]	@ (800587c <ESP_Upkeep+0x3dc>)
- 8005700:	781b      	ldrb	r3, [r3, #0]
- 8005702:	2b00      	cmp	r3, #0
- 8005704:	d02e      	beq.n	8005764 <ESP_Upkeep+0x2c4>
- 8005706:	4b61      	ldr	r3, [pc, #388]	@ (800588c <ESP_Upkeep+0x3ec>)
- 8005708:	781b      	ldrb	r3, [r3, #0]
- 800570a:	2b00      	cmp	r3, #0
- 800570c:	d02a      	beq.n	8005764 <ESP_Upkeep+0x2c4>
- 800570e:	4b61      	ldr	r3, [pc, #388]	@ (8005894 <ESP_Upkeep+0x3f4>)
- 8005710:	781b      	ldrb	r3, [r3, #0]
- 8005712:	2b00      	cmp	r3, #0
- 8005714:	d026      	beq.n	8005764 <ESP_Upkeep+0x2c4>
- 8005716:	4b61      	ldr	r3, [pc, #388]	@ (800589c <ESP_Upkeep+0x3fc>)
- 8005718:	781b      	ldrb	r3, [r3, #0]
- 800571a:	2201      	movs	r2, #1
- 800571c:	4053      	eors	r3, r2
- 800571e:	b2db      	uxtb	r3, r3
- 8005720:	2b00      	cmp	r3, #0
- 8005722:	d01f      	beq.n	8005764 <ESP_Upkeep+0x2c4>
+ 80056fc:	4b5e      	ldr	r3, [pc, #376]	@ (8005878 <ESP_Upkeep+0x3d8>)
+ 80056fe:	781b      	ldrb	r3, [r3, #0]
+ 8005700:	2b00      	cmp	r3, #0
+ 8005702:	d02e      	beq.n	8005762 <ESP_Upkeep+0x2c2>
+ 8005704:	4b60      	ldr	r3, [pc, #384]	@ (8005888 <ESP_Upkeep+0x3e8>)
+ 8005706:	781b      	ldrb	r3, [r3, #0]
+ 8005708:	2b00      	cmp	r3, #0
+ 800570a:	d02a      	beq.n	8005762 <ESP_Upkeep+0x2c2>
+ 800570c:	4b60      	ldr	r3, [pc, #384]	@ (8005890 <ESP_Upkeep+0x3f0>)
+ 800570e:	781b      	ldrb	r3, [r3, #0]
+ 8005710:	2b00      	cmp	r3, #0
+ 8005712:	d026      	beq.n	8005762 <ESP_Upkeep+0x2c2>
+ 8005714:	4b60      	ldr	r3, [pc, #384]	@ (8005898 <ESP_Upkeep+0x3f8>)
+ 8005716:	781b      	ldrb	r3, [r3, #0]
+ 8005718:	2201      	movs	r2, #1
+ 800571a:	4053      	eors	r3, r2
+ 800571c:	b2db      	uxtb	r3, r3
+ 800571e:	2b00      	cmp	r3, #0
+ 8005720:	d01f      	beq.n	8005762 <ESP_Upkeep+0x2c2>
         memcpy(ATCommandArray, AT_SEND, 3);
- 8005724:	4b54      	ldr	r3, [pc, #336]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 8005726:	4a5e      	ldr	r2, [pc, #376]	@ (80058a0 <ESP_Upkeep+0x400>)
- 8005728:	8811      	ldrh	r1, [r2, #0]
- 800572a:	8019      	strh	r1, [r3, #0]
- 800572c:	7892      	ldrb	r2, [r2, #2]
- 800572e:	709a      	strb	r2, [r3, #2]
+ 8005722:	4b54      	ldr	r3, [pc, #336]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005724:	4a5d      	ldr	r2, [pc, #372]	@ (800589c <ESP_Upkeep+0x3fc>)
+ 8005726:	8811      	ldrh	r1, [r2, #0]
+ 8005728:	8019      	strh	r1, [r3, #0]
+ 800572a:	7892      	ldrb	r2, [r2, #2]
+ 800572c:	709a      	strb	r2, [r3, #2]
         EspState = ESP_STATE_SEND;
- 8005730:	4b42      	ldr	r3, [pc, #264]	@ (800583c <ESP_Upkeep+0x39c>)
- 8005732:	2204      	movs	r2, #4
- 8005734:	701a      	strb	r2, [r3, #0]
+ 800572e:	4b42      	ldr	r3, [pc, #264]	@ (8005838 <ESP_Upkeep+0x398>)
+ 8005730:	2204      	movs	r2, #4
+ 8005732:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 8005736:	4b54      	ldr	r3, [pc, #336]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005738:	2200      	movs	r2, #0
- 800573a:	701a      	strb	r2, [r3, #0]
+ 8005734:	4b53      	ldr	r3, [pc, #332]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 8005736:	2200      	movs	r2, #0
+ 8005738:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_SEND;
- 800573c:	4b42      	ldr	r3, [pc, #264]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 800573e:	2202      	movs	r2, #2
- 8005740:	701a      	strb	r2, [r3, #0]
+ 800573a:	4b42      	ldr	r3, [pc, #264]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 800573c:	2202      	movs	r2, #2
+ 800573e:	701a      	strb	r2, [r3, #0]
         start = HAL_GetTick();
- 8005742:	f009 fa4d 	bl	800ebe0 <HAL_GetTick>
- 8005746:	0002      	movs	r2, r0
- 8005748:	4b56      	ldr	r3, [pc, #344]	@ (80058a4 <ESP_Upkeep+0x404>)
- 800574a:	601a      	str	r2, [r3, #0]
+ 8005740:	f009 fa4e 	bl	800ebe0 <HAL_GetTick>
+ 8005744:	0002      	movs	r2, r0
+ 8005746:	4b56      	ldr	r3, [pc, #344]	@ (80058a0 <ESP_Upkeep+0x400>)
+ 8005748:	601a      	str	r2, [r3, #0]
         SetESPIndicator();
- 800574c:	f007 fe20 	bl	800d390 <SetESPIndicator>
+ 800574a:	f007 fe21 	bl	800d390 <SetESPIndicator>
         ATCommand = ATCommandArray[ATCounter];
- 8005750:	4b4d      	ldr	r3, [pc, #308]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005752:	781b      	ldrb	r3, [r3, #0]
- 8005754:	001a      	movs	r2, r3
- 8005756:	4b48      	ldr	r3, [pc, #288]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 8005758:	5c9a      	ldrb	r2, [r3, r2]
- 800575a:	4b3a      	ldr	r3, [pc, #232]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 800575c:	701a      	strb	r2, [r3, #0]
+ 800574e:	4b4d      	ldr	r3, [pc, #308]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 8005750:	781b      	ldrb	r3, [r3, #0]
+ 8005752:	001a      	movs	r2, r3
+ 8005754:	4b47      	ldr	r3, [pc, #284]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005756:	5c9a      	ldrb	r2, [r3, r2]
+ 8005758:	4b39      	ldr	r3, [pc, #228]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 800575a:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 800575e:	4b3b      	ldr	r3, [pc, #236]	@ (800584c <ESP_Upkeep+0x3ac>)
- 8005760:	2200      	movs	r2, #0
- 8005762:	701a      	strb	r2, [r3, #0]
+ 800575c:	4b3a      	ldr	r3, [pc, #232]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 800575e:	2200      	movs	r2, #0
+ 8005760:	701a      	strb	r2, [r3, #0]
       }
       if(ReconfigSet){
- 8005764:	4b50      	ldr	r3, [pc, #320]	@ (80058a8 <ESP_Upkeep+0x408>)
- 8005766:	781b      	ldrb	r3, [r3, #0]
- 8005768:	2b00      	cmp	r3, #0
- 800576a:	d022      	beq.n	80057b2 <ESP_Upkeep+0x312>
+ 8005762:	4b50      	ldr	r3, [pc, #320]	@ (80058a4 <ESP_Upkeep+0x404>)
+ 8005764:	781b      	ldrb	r3, [r3, #0]
+ 8005766:	2b00      	cmp	r3, #0
+ 8005768:	d022      	beq.n	80057b0 <ESP_Upkeep+0x310>
         memcpy(ATCommandArray, AT_WIFI_RECONFIG, 5);
- 800576c:	4b42      	ldr	r3, [pc, #264]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 800576e:	4a4f      	ldr	r2, [pc, #316]	@ (80058ac <ESP_Upkeep+0x40c>)
- 8005770:	6811      	ldr	r1, [r2, #0]
- 8005772:	6019      	str	r1, [r3, #0]
- 8005774:	7912      	ldrb	r2, [r2, #4]
- 8005776:	711a      	strb	r2, [r3, #4]
+ 800576a:	4b42      	ldr	r3, [pc, #264]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 800576c:	4a4e      	ldr	r2, [pc, #312]	@ (80058a8 <ESP_Upkeep+0x408>)
+ 800576e:	6811      	ldr	r1, [r2, #0]
+ 8005770:	6019      	str	r1, [r3, #0]
+ 8005772:	7912      	ldrb	r2, [r2, #4]
+ 8005774:	711a      	strb	r2, [r3, #4]
         Debug("Reconfig mode voor local wifi config selected");
- 8005778:	4a4d      	ldr	r2, [pc, #308]	@ (80058b0 <ESP_Upkeep+0x410>)
- 800577a:	4b36      	ldr	r3, [pc, #216]	@ (8005854 <ESP_Upkeep+0x3b4>)
- 800577c:	0019      	movs	r1, r3
- 800577e:	2003      	movs	r0, #3
- 8005780:	f008 fdd8 	bl	800e334 <CreateLine>
+ 8005776:	4a4d      	ldr	r2, [pc, #308]	@ (80058ac <ESP_Upkeep+0x40c>)
+ 8005778:	4b35      	ldr	r3, [pc, #212]	@ (8005850 <ESP_Upkeep+0x3b0>)
+ 800577a:	0019      	movs	r1, r3
+ 800577c:	2003      	movs	r0, #3
+ 800577e:	f008 fdd9 	bl	800e334 <CreateLine>
         DisableConnectedDevices();
- 8005784:	f003 f884 	bl	8008890 <DisableConnectedDevices>
+ 8005782:	f003 f885 	bl	8008890 <DisableConnectedDevices>
         EspState = ESP_STATE_SEND;
- 8005788:	4b2c      	ldr	r3, [pc, #176]	@ (800583c <ESP_Upkeep+0x39c>)
- 800578a:	2204      	movs	r2, #4
- 800578c:	701a      	strb	r2, [r3, #0]
+ 8005786:	4b2c      	ldr	r3, [pc, #176]	@ (8005838 <ESP_Upkeep+0x398>)
+ 8005788:	2204      	movs	r2, #4
+ 800578a:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 800578e:	4b3e      	ldr	r3, [pc, #248]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005790:	2200      	movs	r2, #0
- 8005792:	701a      	strb	r2, [r3, #0]
+ 800578c:	4b3d      	ldr	r3, [pc, #244]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 800578e:	2200      	movs	r2, #0
+ 8005790:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_RECONFIG;
- 8005794:	4b2c      	ldr	r3, [pc, #176]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 8005796:	2203      	movs	r2, #3
- 8005798:	701a      	strb	r2, [r3, #0]
+ 8005792:	4b2c      	ldr	r3, [pc, #176]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 8005794:	2203      	movs	r2, #3
+ 8005796:	701a      	strb	r2, [r3, #0]
         SetESPIndicator();
- 800579a:	f007 fdf9 	bl	800d390 <SetESPIndicator>
+ 8005798:	f007 fdfa 	bl	800d390 <SetESPIndicator>
         ATCommand = ATCommandArray[ATCounter];
- 800579e:	4b3a      	ldr	r3, [pc, #232]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 80057a0:	781b      	ldrb	r3, [r3, #0]
- 80057a2:	001a      	movs	r2, r3
- 80057a4:	4b34      	ldr	r3, [pc, #208]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 80057a6:	5c9a      	ldrb	r2, [r3, r2]
- 80057a8:	4b26      	ldr	r3, [pc, #152]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 80057aa:	701a      	strb	r2, [r3, #0]
+ 800579c:	4b39      	ldr	r3, [pc, #228]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 800579e:	781b      	ldrb	r3, [r3, #0]
+ 80057a0:	001a      	movs	r2, r3
+ 80057a2:	4b34      	ldr	r3, [pc, #208]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80057a4:	5c9a      	ldrb	r2, [r3, r2]
+ 80057a6:	4b26      	ldr	r3, [pc, #152]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 80057a8:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 80057ac:	4b27      	ldr	r3, [pc, #156]	@ (800584c <ESP_Upkeep+0x3ac>)
- 80057ae:	2200      	movs	r2, #0
- 80057b0:	701a      	strb	r2, [r3, #0]
+ 80057aa:	4b27      	ldr	r3, [pc, #156]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 80057ac:	2200      	movs	r2, #0
+ 80057ae:	701a      	strb	r2, [r3, #0]
       }
       if(InitIsDone && ConnectionMade && beursTest && setTime){
- 80057b2:	4b32      	ldr	r3, [pc, #200]	@ (800587c <ESP_Upkeep+0x3dc>)
- 80057b4:	781b      	ldrb	r3, [r3, #0]
- 80057b6:	2b00      	cmp	r3, #0
- 80057b8:	d100      	bne.n	80057bc <ESP_Upkeep+0x31c>
- 80057ba:	e2c8      	b.n	8005d4e <ESP_Upkeep+0x8ae>
- 80057bc:	4b33      	ldr	r3, [pc, #204]	@ (800588c <ESP_Upkeep+0x3ec>)
- 80057be:	781b      	ldrb	r3, [r3, #0]
- 80057c0:	2b00      	cmp	r3, #0
- 80057c2:	d100      	bne.n	80057c6 <ESP_Upkeep+0x326>
- 80057c4:	e2c3      	b.n	8005d4e <ESP_Upkeep+0x8ae>
- 80057c6:	4b33      	ldr	r3, [pc, #204]	@ (8005894 <ESP_Upkeep+0x3f4>)
- 80057c8:	781b      	ldrb	r3, [r3, #0]
- 80057ca:	2b00      	cmp	r3, #0
- 80057cc:	d100      	bne.n	80057d0 <ESP_Upkeep+0x330>
- 80057ce:	e2be      	b.n	8005d4e <ESP_Upkeep+0x8ae>
- 80057d0:	4b32      	ldr	r3, [pc, #200]	@ (800589c <ESP_Upkeep+0x3fc>)
- 80057d2:	781b      	ldrb	r3, [r3, #0]
- 80057d4:	2b00      	cmp	r3, #0
- 80057d6:	d100      	bne.n	80057da <ESP_Upkeep+0x33a>
- 80057d8:	e2b9      	b.n	8005d4e <ESP_Upkeep+0x8ae>
+ 80057b0:	4b31      	ldr	r3, [pc, #196]	@ (8005878 <ESP_Upkeep+0x3d8>)
+ 80057b2:	781b      	ldrb	r3, [r3, #0]
+ 80057b4:	2b00      	cmp	r3, #0
+ 80057b6:	d100      	bne.n	80057ba <ESP_Upkeep+0x31a>
+ 80057b8:	e2bd      	b.n	8005d36 <ESP_Upkeep+0x896>
+ 80057ba:	4b33      	ldr	r3, [pc, #204]	@ (8005888 <ESP_Upkeep+0x3e8>)
+ 80057bc:	781b      	ldrb	r3, [r3, #0]
+ 80057be:	2b00      	cmp	r3, #0
+ 80057c0:	d100      	bne.n	80057c4 <ESP_Upkeep+0x324>
+ 80057c2:	e2b8      	b.n	8005d36 <ESP_Upkeep+0x896>
+ 80057c4:	4b32      	ldr	r3, [pc, #200]	@ (8005890 <ESP_Upkeep+0x3f0>)
+ 80057c6:	781b      	ldrb	r3, [r3, #0]
+ 80057c8:	2b00      	cmp	r3, #0
+ 80057ca:	d100      	bne.n	80057ce <ESP_Upkeep+0x32e>
+ 80057cc:	e2b3      	b.n	8005d36 <ESP_Upkeep+0x896>
+ 80057ce:	4b32      	ldr	r3, [pc, #200]	@ (8005898 <ESP_Upkeep+0x3f8>)
+ 80057d0:	781b      	ldrb	r3, [r3, #0]
+ 80057d2:	2b00      	cmp	r3, #0
+ 80057d4:	d100      	bne.n	80057d8 <ESP_Upkeep+0x338>
+ 80057d6:	e2ae      	b.n	8005d36 <ESP_Upkeep+0x896>
         memcpy(ATCommandArray, AT_SNTP, 4);
- 80057da:	4b36      	ldr	r3, [pc, #216]	@ (80058b4 <ESP_Upkeep+0x414>)
- 80057dc:	681a      	ldr	r2, [r3, #0]
- 80057de:	4b26      	ldr	r3, [pc, #152]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 80057e0:	601a      	str	r2, [r3, #0]
+ 80057d8:	4b35      	ldr	r3, [pc, #212]	@ (80058b0 <ESP_Upkeep+0x410>)
+ 80057da:	681a      	ldr	r2, [r3, #0]
+ 80057dc:	4b25      	ldr	r3, [pc, #148]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 80057de:	601a      	str	r2, [r3, #0]
         EspState = ESP_STATE_SEND;
- 80057e2:	4b16      	ldr	r3, [pc, #88]	@ (800583c <ESP_Upkeep+0x39c>)
- 80057e4:	2204      	movs	r2, #4
- 80057e6:	701a      	strb	r2, [r3, #0]
+ 80057e0:	4b15      	ldr	r3, [pc, #84]	@ (8005838 <ESP_Upkeep+0x398>)
+ 80057e2:	2204      	movs	r2, #4
+ 80057e4:	701a      	strb	r2, [r3, #0]
         ATCounter = 0;
- 80057e8:	4b27      	ldr	r3, [pc, #156]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 80057ea:	2200      	movs	r2, #0
- 80057ec:	701a      	strb	r2, [r3, #0]
+ 80057e6:	4b27      	ldr	r3, [pc, #156]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 80057e8:	2200      	movs	r2, #0
+ 80057ea:	701a      	strb	r2, [r3, #0]
         Mode = AT_MODE_GETTIME;
- 80057ee:	4b16      	ldr	r3, [pc, #88]	@ (8005848 <ESP_Upkeep+0x3a8>)
- 80057f0:	2205      	movs	r2, #5
- 80057f2:	701a      	strb	r2, [r3, #0]
+ 80057ec:	4b15      	ldr	r3, [pc, #84]	@ (8005844 <ESP_Upkeep+0x3a4>)
+ 80057ee:	2205      	movs	r2, #5
+ 80057f0:	701a      	strb	r2, [r3, #0]
         start = HAL_GetTick();
- 80057f4:	f009 f9f4 	bl	800ebe0 <HAL_GetTick>
- 80057f8:	0002      	movs	r2, r0
- 80057fa:	4b2a      	ldr	r3, [pc, #168]	@ (80058a4 <ESP_Upkeep+0x404>)
- 80057fc:	601a      	str	r2, [r3, #0]
+ 80057f2:	f009 f9f5 	bl	800ebe0 <HAL_GetTick>
+ 80057f6:	0002      	movs	r2, r0
+ 80057f8:	4b29      	ldr	r3, [pc, #164]	@ (80058a0 <ESP_Upkeep+0x400>)
+ 80057fa:	601a      	str	r2, [r3, #0]
         SetESPIndicator();
- 80057fe:	f007 fdc7 	bl	800d390 <SetESPIndicator>
+ 80057fc:	f007 fdc8 	bl	800d390 <SetESPIndicator>
         ATCommand = ATCommandArray[ATCounter];
- 8005802:	4b21      	ldr	r3, [pc, #132]	@ (8005888 <ESP_Upkeep+0x3e8>)
- 8005804:	781b      	ldrb	r3, [r3, #0]
- 8005806:	001a      	movs	r2, r3
- 8005808:	4b1b      	ldr	r3, [pc, #108]	@ (8005878 <ESP_Upkeep+0x3d8>)
- 800580a:	5c9a      	ldrb	r2, [r3, r2]
- 800580c:	4b0d      	ldr	r3, [pc, #52]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 800580e:	701a      	strb	r2, [r3, #0]
+ 8005800:	4b20      	ldr	r3, [pc, #128]	@ (8005884 <ESP_Upkeep+0x3e4>)
+ 8005802:	781b      	ldrb	r3, [r3, #0]
+ 8005804:	001a      	movs	r2, r3
+ 8005806:	4b1b      	ldr	r3, [pc, #108]	@ (8005874 <ESP_Upkeep+0x3d4>)
+ 8005808:	5c9a      	ldrb	r2, [r3, r2]
+ 800580a:	4b0d      	ldr	r3, [pc, #52]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 800580c:	701a      	strb	r2, [r3, #0]
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 8005810:	4b0e      	ldr	r3, [pc, #56]	@ (800584c <ESP_Upkeep+0x3ac>)
- 8005812:	2200      	movs	r2, #0
- 8005814:	701a      	strb	r2, [r3, #0]
+ 800580e:	4b0e      	ldr	r3, [pc, #56]	@ (8005848 <ESP_Upkeep+0x3a8>)
+ 8005810:	2200      	movs	r2, #0
+ 8005812:	701a      	strb	r2, [r3, #0]
       }
     break;
- 8005816:	e29a      	b.n	8005d4e <ESP_Upkeep+0x8ae>
+ 8005814:	e28f      	b.n	8005d36 <ESP_Upkeep+0x896>
 
     case ESP_STATE_SEND:
         ATSend = AT_Send(ATCommand);
- 8005818:	4b0a      	ldr	r3, [pc, #40]	@ (8005844 <ESP_Upkeep+0x3a4>)
- 800581a:	781b      	ldrb	r3, [r3, #0]
- 800581c:	1dfc      	adds	r4, r7, #7
- 800581e:	0018      	movs	r0, r3
- 8005820:	f7ff fb60 	bl	8004ee4 <AT_Send>
- 8005824:	0003      	movs	r3, r0
- 8005826:	7023      	strb	r3, [r4, #0]
+ 8005816:	4b0a      	ldr	r3, [pc, #40]	@ (8005840 <ESP_Upkeep+0x3a0>)
+ 8005818:	781b      	ldrb	r3, [r3, #0]
+ 800581a:	1dfc      	adds	r4, r7, #7
+ 800581c:	0018      	movs	r0, r3
+ 800581e:	f7ff fb61 	bl	8004ee4 <AT_Send>
+ 8005822:	0003      	movs	r3, r0
+ 8005824:	7023      	strb	r3, [r4, #0]
         if(ATSend){
- 8005828:	1dfb      	adds	r3, r7, #7
- 800582a:	781b      	ldrb	r3, [r3, #0]
- 800582c:	2b00      	cmp	r3, #0
- 800582e:	d100      	bne.n	8005832 <ESP_Upkeep+0x392>
- 8005830:	e28f      	b.n	8005d52 <ESP_Upkeep+0x8b2>
+ 8005826:	1dfb      	adds	r3, r7, #7
+ 8005828:	781b      	ldrb	r3, [r3, #0]
+ 800582a:	2b00      	cmp	r3, #0
+ 800582c:	d100      	bne.n	8005830 <ESP_Upkeep+0x390>
+ 800582e:	e284      	b.n	8005d3a <ESP_Upkeep+0x89a>
           EspState = ESP_STATE_WAIT_FOR_REPLY;
- 8005832:	4b02      	ldr	r3, [pc, #8]	@ (800583c <ESP_Upkeep+0x39c>)
- 8005834:	2203      	movs	r2, #3
- 8005836:	701a      	strb	r2, [r3, #0]
+ 8005830:	4b01      	ldr	r3, [pc, #4]	@ (8005838 <ESP_Upkeep+0x398>)
+ 8005832:	2203      	movs	r2, #3
+ 8005834:	701a      	strb	r2, [r3, #0]
         }
     break;
- 8005838:	e28b      	b.n	8005d52 <ESP_Upkeep+0x8b2>
- 800583a:	46c0      	nop			@ (mov r8, r8)
- 800583c:	20000028 	.word	0x20000028
- 8005840:	20000002 	.word	0x20000002
- 8005844:	20000a2a 	.word	0x20000a2a
- 8005848:	20000a2b 	.word	0x20000a2b
- 800584c:	20000a29 	.word	0x20000a29
- 8005850:	08023930 	.word	0x08023930
- 8005854:	08022ff8 	.word	0x08022ff8
- 8005858:	08025250 	.word	0x08025250
- 800585c:	2000054c 	.word	0x2000054c
- 8005860:	50000800 	.word	0x50000800
- 8005864:	50001c00 	.word	0x50001c00
- 8005868:	20000a1c 	.word	0x20000a1c
- 800586c:	2000044c 	.word	0x2000044c
- 8005870:	20000b3c 	.word	0x20000b3c
- 8005874:	2000002a 	.word	0x2000002a
- 8005878:	20000a0c 	.word	0x20000a0c
- 800587c:	2000054d 	.word	0x2000054d
- 8005880:	2000054e 	.word	0x2000054e
- 8005884:	20000004 	.word	0x20000004
- 8005888:	20000a16 	.word	0x20000a16
- 800588c:	20000550 	.word	0x20000550
- 8005890:	20000014 	.word	0x20000014
- 8005894:	20000551 	.word	0x20000551
- 8005898:	20000010 	.word	0x20000010
- 800589c:	20000001 	.word	0x20000001
- 80058a0:	2000000c 	.word	0x2000000c
- 80058a4:	20000560 	.word	0x20000560
- 80058a8:	2000054f 	.word	0x2000054f
- 80058ac:	2000001c 	.word	0x2000001c
- 80058b0:	0802395c 	.word	0x0802395c
- 80058b4:	20000024 	.word	0x20000024
+ 8005836:	e280      	b.n	8005d3a <ESP_Upkeep+0x89a>
+ 8005838:	20000028 	.word	0x20000028
+ 800583c:	20000002 	.word	0x20000002
+ 8005840:	20000a2a 	.word	0x20000a2a
+ 8005844:	20000a2b 	.word	0x20000a2b
+ 8005848:	20000a29 	.word	0x20000a29
+ 800584c:	08023930 	.word	0x08023930
+ 8005850:	08022ff8 	.word	0x08022ff8
+ 8005854:	08025250 	.word	0x08025250
+ 8005858:	2000054c 	.word	0x2000054c
+ 800585c:	50000800 	.word	0x50000800
+ 8005860:	50001c00 	.word	0x50001c00
+ 8005864:	20000a1c 	.word	0x20000a1c
+ 8005868:	2000044c 	.word	0x2000044c
+ 800586c:	20000b3c 	.word	0x20000b3c
+ 8005870:	2000002a 	.word	0x2000002a
+ 8005874:	20000a0c 	.word	0x20000a0c
+ 8005878:	2000054d 	.word	0x2000054d
+ 800587c:	2000054e 	.word	0x2000054e
+ 8005880:	20000004 	.word	0x20000004
+ 8005884:	20000a16 	.word	0x20000a16
+ 8005888:	20000550 	.word	0x20000550
+ 800588c:	20000014 	.word	0x20000014
+ 8005890:	20000551 	.word	0x20000551
+ 8005894:	20000010 	.word	0x20000010
+ 8005898:	20000001 	.word	0x20000001
+ 800589c:	2000000c 	.word	0x2000000c
+ 80058a0:	20000560 	.word	0x20000560
+ 80058a4:	2000054f 	.word	0x2000054f
+ 80058a8:	2000001c 	.word	0x2000001c
+ 80058ac:	0802395c 	.word	0x0802395c
+ 80058b0:	20000024 	.word	0x20000024
 
     case ESP_STATE_WAIT_FOR_REPLY:
       if(TimestampIsReached(ESPTimeStamp)){
- 80058b8:	4be1      	ldr	r3, [pc, #900]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 80058ba:	681b      	ldr	r3, [r3, #0]
- 80058bc:	0018      	movs	r0, r3
- 80058be:	f008 fce3 	bl	800e288 <TimestampIsReached>
- 80058c2:	1e03      	subs	r3, r0, #0
- 80058c4:	d100      	bne.n	80058c8 <ESP_Upkeep+0x428>
- 80058c6:	e246      	b.n	8005d56 <ESP_Upkeep+0x8b6>
+ 80058b4:	4bc0      	ldr	r3, [pc, #768]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 80058b6:	681b      	ldr	r3, [r3, #0]
+ 80058b8:	0018      	movs	r0, r3
+ 80058ba:	f008 fce5 	bl	800e288 <TimestampIsReached>
+ 80058be:	1e03      	subs	r3, r0, #0
+ 80058c0:	d100      	bne.n	80058c4 <ESP_Upkeep+0x424>
+ 80058c2:	e23c      	b.n	8005d3e <ESP_Upkeep+0x89e>
         ATReceived = DMA_ProcessBuffer(ATExpectation);
- 80058c8:	4bde      	ldr	r3, [pc, #888]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 80058ca:	781b      	ldrb	r3, [r3, #0]
- 80058cc:	0018      	movs	r0, r3
- 80058ce:	f7ff f9c7 	bl	8004c60 <DMA_ProcessBuffer>
- 80058d2:	0003      	movs	r3, r0
- 80058d4:	001a      	movs	r2, r3
- 80058d6:	4bdc      	ldr	r3, [pc, #880]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 80058d8:	701a      	strb	r2, [r3, #0]
+ 80058c4:	4bbd      	ldr	r3, [pc, #756]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 80058c6:	781b      	ldrb	r3, [r3, #0]
+ 80058c8:	0018      	movs	r0, r3
+ 80058ca:	f7ff f9c9 	bl	8004c60 <DMA_ProcessBuffer>
+ 80058ce:	0003      	movs	r3, r0
+ 80058d0:	001a      	movs	r2, r3
+ 80058d2:	4bbb      	ldr	r3, [pc, #748]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 80058d4:	701a      	strb	r2, [r3, #0]
         bool proceed = ATCompare(ATReceived, ATExpectation);
- 80058da:	4bdb      	ldr	r3, [pc, #876]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 80058dc:	781a      	ldrb	r2, [r3, #0]
- 80058de:	4bd9      	ldr	r3, [pc, #868]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 80058e0:	781b      	ldrb	r3, [r3, #0]
- 80058e2:	1d7c      	adds	r4, r7, #5
- 80058e4:	0019      	movs	r1, r3
- 80058e6:	0010      	movs	r0, r2
- 80058e8:	f7ff faba 	bl	8004e60 <ATCompare>
- 80058ec:	0003      	movs	r3, r0
- 80058ee:	7023      	strb	r3, [r4, #0]
+ 80058d6:	4bba      	ldr	r3, [pc, #744]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 80058d8:	781a      	ldrb	r2, [r3, #0]
+ 80058da:	4bb8      	ldr	r3, [pc, #736]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 80058dc:	781b      	ldrb	r3, [r3, #0]
+ 80058de:	1d7c      	adds	r4, r7, #5
+ 80058e0:	0019      	movs	r1, r3
+ 80058e2:	0010      	movs	r0, r2
+ 80058e4:	f7ff fabc 	bl	8004e60 <ATCompare>
+ 80058e8:	0003      	movs	r3, r0
+ 80058ea:	7023      	strb	r3, [r4, #0]
         if(ATReceived == RECEIVE_STATUS_ERROR){
- 80058f0:	4bd5      	ldr	r3, [pc, #852]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 80058f2:	781b      	ldrb	r3, [r3, #0]
- 80058f4:	2b01      	cmp	r3, #1
- 80058f6:	d139      	bne.n	800596c <ESP_Upkeep+0x4cc>
+ 80058ec:	4bb4      	ldr	r3, [pc, #720]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 80058ee:	781b      	ldrb	r3, [r3, #0]
+ 80058f0:	2b01      	cmp	r3, #1
+ 80058f2:	d139      	bne.n	8005968 <ESP_Upkeep+0x4c8>
           if(ATCommand == AT_SENDDATA){
- 80058f8:	4bd4      	ldr	r3, [pc, #848]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 80058fa:	781b      	ldrb	r3, [r3, #0]
- 80058fc:	2b0f      	cmp	r3, #15
- 80058fe:	d108      	bne.n	8005912 <ESP_Upkeep+0x472>
+ 80058f4:	4bb3      	ldr	r3, [pc, #716]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 80058f6:	781b      	ldrb	r3, [r3, #0]
+ 80058f8:	2b0f      	cmp	r3, #15
+ 80058fa:	d108      	bne.n	800590e <ESP_Upkeep+0x46e>
             ATCommand = AT_HTTPCPOST;
- 8005900:	4bd2      	ldr	r3, [pc, #840]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005902:	220e      	movs	r2, #14
- 8005904:	701a      	strb	r2, [r3, #0]
+ 80058fc:	4bb1      	ldr	r3, [pc, #708]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 80058fe:	220e      	movs	r2, #14
+ 8005900:	701a      	strb	r2, [r3, #0]
             ATExpectation = RECEIVE_EXPECTATION_START;
- 8005906:	4bcf      	ldr	r3, [pc, #828]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005908:	2202      	movs	r2, #2
- 800590a:	701a      	strb	r2, [r3, #0]
+ 8005902:	4bae      	ldr	r3, [pc, #696]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005904:	2202      	movs	r2, #2
+ 8005906:	701a      	strb	r2, [r3, #0]
             ATCounter = 1;
- 800590c:	4bd0      	ldr	r3, [pc, #832]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 800590e:	2201      	movs	r2, #1
- 8005910:	701a      	strb	r2, [r3, #0]
+ 8005908:	4baf      	ldr	r3, [pc, #700]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 800590a:	2201      	movs	r2, #1
+ 800590c:	701a      	strb	r2, [r3, #0]
           }
           EspState = ESP_STATE_SEND;
- 8005912:	4bd0      	ldr	r3, [pc, #832]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005914:	2204      	movs	r2, #4
- 8005916:	701a      	strb	r2, [r3, #0]
+ 800590e:	4baf      	ldr	r3, [pc, #700]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005910:	2204      	movs	r2, #4
+ 8005912:	701a      	strb	r2, [r3, #0]
           errorcntr++;
- 8005918:	4bcf      	ldr	r3, [pc, #828]	@ (8005c58 <ESP_Upkeep+0x7b8>)
- 800591a:	781b      	ldrb	r3, [r3, #0]
- 800591c:	3301      	adds	r3, #1
- 800591e:	b2da      	uxtb	r2, r3
- 8005920:	4bcd      	ldr	r3, [pc, #820]	@ (8005c58 <ESP_Upkeep+0x7b8>)
- 8005922:	701a      	strb	r2, [r3, #0]
-          if (errorcntr == ESP_MAX_RETRANSMITIONS) {
- 8005924:	4bcc      	ldr	r3, [pc, #816]	@ (8005c58 <ESP_Upkeep+0x7b8>)
- 8005926:	781b      	ldrb	r3, [r3, #0]
- 8005928:	2b03      	cmp	r3, #3
- 800592a:	d11f      	bne.n	800596c <ESP_Upkeep+0x4cc>
+ 8005914:	4bae      	ldr	r3, [pc, #696]	@ (8005bd0 <ESP_Upkeep+0x730>)
+ 8005916:	781b      	ldrb	r3, [r3, #0]
+ 8005918:	3301      	adds	r3, #1
+ 800591a:	b2da      	uxtb	r2, r3
+ 800591c:	4bac      	ldr	r3, [pc, #688]	@ (8005bd0 <ESP_Upkeep+0x730>)
+ 800591e:	701a      	strb	r2, [r3, #0]
+          if (errorcntr >= ESP_MAX_RETRANSMITIONS) {
+ 8005920:	4bab      	ldr	r3, [pc, #684]	@ (8005bd0 <ESP_Upkeep+0x730>)
+ 8005922:	781b      	ldrb	r3, [r3, #0]
+ 8005924:	2b02      	cmp	r3, #2
+ 8005926:	d91f      	bls.n	8005968 <ESP_Upkeep+0x4c8>
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
- 800592c:	f009 f958 	bl	800ebe0 <HAL_GetTick>
- 8005930:	0003      	movs	r3, r0
- 8005932:	4aca      	ldr	r2, [pc, #808]	@ (8005c5c <ESP_Upkeep+0x7bc>)
- 8005934:	189a      	adds	r2, r3, r2
- 8005936:	4bc2      	ldr	r3, [pc, #776]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005938:	601a      	str	r2, [r3, #0]
+ 8005928:	f009 f95a 	bl	800ebe0 <HAL_GetTick>
+ 800592c:	0003      	movs	r3, r0
+ 800592e:	4aa9      	ldr	r2, [pc, #676]	@ (8005bd4 <ESP_Upkeep+0x734>)
+ 8005930:	189a      	adds	r2, r3, r2
+ 8005932:	4ba1      	ldr	r3, [pc, #644]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 8005934:	601a      	str	r2, [r3, #0]
             ESPTransmitDone = true;
- 800593a:	4bc9      	ldr	r3, [pc, #804]	@ (8005c60 <ESP_Upkeep+0x7c0>)
- 800593c:	2201      	movs	r2, #1
- 800593e:	701a      	strb	r2, [r3, #0]
+ 8005936:	4ba8      	ldr	r3, [pc, #672]	@ (8005bd8 <ESP_Upkeep+0x738>)
+ 8005938:	2201      	movs	r2, #1
+ 800593a:	701a      	strb	r2, [r3, #0]
             ResetESPIndicator();
- 8005940:	f007 fd3e 	bl	800d3c0 <ResetESPIndicator>
+ 800593c:	f007 fd40 	bl	800d3c0 <ResetESPIndicator>
             clearDMABuffer();
- 8005944:	f7ff fa7e 	bl	8004e44 <clearDMABuffer>
+ 8005940:	f7ff fa80 	bl	8004e44 <clearDMABuffer>
             stop = HAL_GetTick();
- 8005948:	f009 f94a 	bl	800ebe0 <HAL_GetTick>
- 800594c:	0002      	movs	r2, r0
- 800594e:	4bc5      	ldr	r3, [pc, #788]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005950:	601a      	str	r2, [r3, #0]
+ 8005944:	f009 f94c 	bl	800ebe0 <HAL_GetTick>
+ 8005948:	0002      	movs	r2, r0
+ 800594a:	4ba4      	ldr	r3, [pc, #656]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 800594c:	601a      	str	r2, [r3, #0]
             Error("ESP to many retransmits, terminated after %lu ms", (stop-start));
- 8005952:	4bc4      	ldr	r3, [pc, #784]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005954:	681a      	ldr	r2, [r3, #0]
- 8005956:	4bc4      	ldr	r3, [pc, #784]	@ (8005c68 <ESP_Upkeep+0x7c8>)
- 8005958:	681b      	ldr	r3, [r3, #0]
- 800595a:	1ad3      	subs	r3, r2, r3
- 800595c:	4ac3      	ldr	r2, [pc, #780]	@ (8005c6c <ESP_Upkeep+0x7cc>)
- 800595e:	49c4      	ldr	r1, [pc, #784]	@ (8005c70 <ESP_Upkeep+0x7d0>)
- 8005960:	2001      	movs	r0, #1
- 8005962:	f008 fce7 	bl	800e334 <CreateLine>
+ 800594e:	4ba3      	ldr	r3, [pc, #652]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 8005950:	681a      	ldr	r2, [r3, #0]
+ 8005952:	4ba3      	ldr	r3, [pc, #652]	@ (8005be0 <ESP_Upkeep+0x740>)
+ 8005954:	681b      	ldr	r3, [r3, #0]
+ 8005956:	1ad3      	subs	r3, r2, r3
+ 8005958:	4aa2      	ldr	r2, [pc, #648]	@ (8005be4 <ESP_Upkeep+0x744>)
+ 800595a:	49a3      	ldr	r1, [pc, #652]	@ (8005be8 <ESP_Upkeep+0x748>)
+ 800595c:	2001      	movs	r0, #1
+ 800595e:	f008 fce9 	bl	800e334 <CreateLine>
             EspState = ESP_STATE_DEINIT;
- 8005966:	4bbb      	ldr	r3, [pc, #748]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005968:	220d      	movs	r2, #13
- 800596a:	701a      	strb	r2, [r3, #0]
+ 8005962:	4b9a      	ldr	r3, [pc, #616]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005964:	220d      	movs	r2, #13
+ 8005966:	701a      	strb	r2, [r3, #0]
           }
         }
         if(ATReceived == RECEIVE_STATUS_INCOMPLETE){
- 800596c:	4bb6      	ldr	r3, [pc, #728]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 800596e:	781b      	ldrb	r3, [r3, #0]
- 8005970:	2b03      	cmp	r3, #3
- 8005972:	d106      	bne.n	8005982 <ESP_Upkeep+0x4e2>
+ 8005968:	4b95      	ldr	r3, [pc, #596]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 800596a:	781b      	ldrb	r3, [r3, #0]
+ 800596c:	2b03      	cmp	r3, #3
+ 800596e:	d106      	bne.n	800597e <ESP_Upkeep+0x4de>
           ESPTimeStamp = HAL_GetTick() + 10;
- 8005974:	f009 f934 	bl	800ebe0 <HAL_GetTick>
- 8005978:	0003      	movs	r3, r0
- 800597a:	330a      	adds	r3, #10
- 800597c:	001a      	movs	r2, r3
- 800597e:	4bb0      	ldr	r3, [pc, #704]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005980:	601a      	str	r2, [r3, #0]
+ 8005970:	f009 f936 	bl	800ebe0 <HAL_GetTick>
+ 8005974:	0003      	movs	r3, r0
+ 8005976:	330a      	adds	r3, #10
+ 8005978:	001a      	movs	r2, r3
+ 800597a:	4b8f      	ldr	r3, [pc, #572]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 800597c:	601a      	str	r2, [r3, #0]
         }
         if(ATReceived == RECEIVE_STATUS_LOOP){
- 8005982:	4bb1      	ldr	r3, [pc, #708]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 8005984:	781b      	ldrb	r3, [r3, #0]
- 8005986:	2b0a      	cmp	r3, #10
- 8005988:	d106      	bne.n	8005998 <ESP_Upkeep+0x4f8>
+ 800597e:	4b90      	ldr	r3, [pc, #576]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 8005980:	781b      	ldrb	r3, [r3, #0]
+ 8005982:	2b0a      	cmp	r3, #10
+ 8005984:	d106      	bne.n	8005994 <ESP_Upkeep+0x4f4>
           ESPTimeStamp = HAL_GetTick() + 10;
- 800598a:	f009 f929 	bl	800ebe0 <HAL_GetTick>
- 800598e:	0003      	movs	r3, r0
- 8005990:	330a      	adds	r3, #10
- 8005992:	001a      	movs	r2, r3
- 8005994:	4baa      	ldr	r3, [pc, #680]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005996:	601a      	str	r2, [r3, #0]
+ 8005986:	f009 f92b 	bl	800ebe0 <HAL_GetTick>
+ 800598a:	0003      	movs	r3, r0
+ 800598c:	330a      	adds	r3, #10
+ 800598e:	001a      	movs	r2, r3
+ 8005990:	4b89      	ldr	r3, [pc, #548]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 8005992:	601a      	str	r2, [r3, #0]
         }
         if(ATReceived == RECEIVE_STATUS_TIMEOUT){
- 8005998:	4bab      	ldr	r3, [pc, #684]	@ (8005c48 <ESP_Upkeep+0x7a8>)
- 800599a:	781b      	ldrb	r3, [r3, #0]
- 800599c:	2b06      	cmp	r3, #6
- 800599e:	d146      	bne.n	8005a2e <ESP_Upkeep+0x58e>
+ 8005994:	4b8a      	ldr	r3, [pc, #552]	@ (8005bc0 <ESP_Upkeep+0x720>)
+ 8005996:	781b      	ldrb	r3, [r3, #0]
+ 8005998:	2b06      	cmp	r3, #6
+ 800599a:	d146      	bne.n	8005a2a <ESP_Upkeep+0x58a>
           timeoutcntr++;
- 80059a0:	4bb4      	ldr	r3, [pc, #720]	@ (8005c74 <ESP_Upkeep+0x7d4>)
- 80059a2:	781b      	ldrb	r3, [r3, #0]
- 80059a4:	3301      	adds	r3, #1
- 80059a6:	b2da      	uxtb	r2, r3
- 80059a8:	4bb2      	ldr	r3, [pc, #712]	@ (8005c74 <ESP_Upkeep+0x7d4>)
- 80059aa:	701a      	strb	r2, [r3, #0]
+ 800599c:	4b93      	ldr	r3, [pc, #588]	@ (8005bec <ESP_Upkeep+0x74c>)
+ 800599e:	781b      	ldrb	r3, [r3, #0]
+ 80059a0:	3301      	adds	r3, #1
+ 80059a2:	b2da      	uxtb	r2, r3
+ 80059a4:	4b91      	ldr	r3, [pc, #580]	@ (8005bec <ESP_Upkeep+0x74c>)
+ 80059a6:	701a      	strb	r2, [r3, #0]
           Error("In ESP_STATE_WAIT_FOR_REPLY: RECEIVE_STATUS_TIMEOUT reached");
- 80059ac:	4ab2      	ldr	r2, [pc, #712]	@ (8005c78 <ESP_Upkeep+0x7d8>)
- 80059ae:	4bb0      	ldr	r3, [pc, #704]	@ (8005c70 <ESP_Upkeep+0x7d0>)
- 80059b0:	0019      	movs	r1, r3
- 80059b2:	2001      	movs	r0, #1
- 80059b4:	f008 fcbe 	bl	800e334 <CreateLine>
-          if (timeoutcntr == ESP_MAX_RETRANSMITIONS) {
- 80059b8:	4bae      	ldr	r3, [pc, #696]	@ (8005c74 <ESP_Upkeep+0x7d4>)
- 80059ba:	781b      	ldrb	r3, [r3, #0]
- 80059bc:	2b03      	cmp	r3, #3
- 80059be:	d11f      	bne.n	8005a00 <ESP_Upkeep+0x560>
+ 80059a8:	4a91      	ldr	r2, [pc, #580]	@ (8005bf0 <ESP_Upkeep+0x750>)
+ 80059aa:	4b8f      	ldr	r3, [pc, #572]	@ (8005be8 <ESP_Upkeep+0x748>)
+ 80059ac:	0019      	movs	r1, r3
+ 80059ae:	2001      	movs	r0, #1
+ 80059b0:	f008 fcc0 	bl	800e334 <CreateLine>
+          if (timeoutcntr >= ESP_MAX_RETRANSMITIONS) {
+ 80059b4:	4b8d      	ldr	r3, [pc, #564]	@ (8005bec <ESP_Upkeep+0x74c>)
+ 80059b6:	781b      	ldrb	r3, [r3, #0]
+ 80059b8:	2b02      	cmp	r3, #2
+ 80059ba:	d91f      	bls.n	80059fc <ESP_Upkeep+0x55c>
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
- 80059c0:	f009 f90e 	bl	800ebe0 <HAL_GetTick>
- 80059c4:	0003      	movs	r3, r0
- 80059c6:	4aa5      	ldr	r2, [pc, #660]	@ (8005c5c <ESP_Upkeep+0x7bc>)
- 80059c8:	189a      	adds	r2, r3, r2
- 80059ca:	4b9d      	ldr	r3, [pc, #628]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 80059cc:	601a      	str	r2, [r3, #0]
+ 80059bc:	f009 f910 	bl	800ebe0 <HAL_GetTick>
+ 80059c0:	0003      	movs	r3, r0
+ 80059c2:	4a84      	ldr	r2, [pc, #528]	@ (8005bd4 <ESP_Upkeep+0x734>)
+ 80059c4:	189a      	adds	r2, r3, r2
+ 80059c6:	4b7c      	ldr	r3, [pc, #496]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 80059c8:	601a      	str	r2, [r3, #0]
             ESPTransmitDone = true;
- 80059ce:	4ba4      	ldr	r3, [pc, #656]	@ (8005c60 <ESP_Upkeep+0x7c0>)
- 80059d0:	2201      	movs	r2, #1
- 80059d2:	701a      	strb	r2, [r3, #0]
+ 80059ca:	4b83      	ldr	r3, [pc, #524]	@ (8005bd8 <ESP_Upkeep+0x738>)
+ 80059cc:	2201      	movs	r2, #1
+ 80059ce:	701a      	strb	r2, [r3, #0]
             ResetESPIndicator();
- 80059d4:	f007 fcf4 	bl	800d3c0 <ResetESPIndicator>
+ 80059d0:	f007 fcf6 	bl	800d3c0 <ResetESPIndicator>
             clearDMABuffer();
- 80059d8:	f7ff fa34 	bl	8004e44 <clearDMABuffer>
+ 80059d4:	f7ff fa36 	bl	8004e44 <clearDMABuffer>
             stop = HAL_GetTick();
- 80059dc:	f009 f900 	bl	800ebe0 <HAL_GetTick>
- 80059e0:	0002      	movs	r2, r0
- 80059e2:	4ba0      	ldr	r3, [pc, #640]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 80059e4:	601a      	str	r2, [r3, #0]
+ 80059d8:	f009 f902 	bl	800ebe0 <HAL_GetTick>
+ 80059dc:	0002      	movs	r2, r0
+ 80059de:	4b7f      	ldr	r3, [pc, #508]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 80059e0:	601a      	str	r2, [r3, #0]
             Error("ESP to many timeouts, terminated after %lu ms", (stop-start));
- 80059e6:	4b9f      	ldr	r3, [pc, #636]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 80059e8:	681a      	ldr	r2, [r3, #0]
- 80059ea:	4b9f      	ldr	r3, [pc, #636]	@ (8005c68 <ESP_Upkeep+0x7c8>)
- 80059ec:	681b      	ldr	r3, [r3, #0]
- 80059ee:	1ad3      	subs	r3, r2, r3
- 80059f0:	4aa2      	ldr	r2, [pc, #648]	@ (8005c7c <ESP_Upkeep+0x7dc>)
- 80059f2:	499f      	ldr	r1, [pc, #636]	@ (8005c70 <ESP_Upkeep+0x7d0>)
- 80059f4:	2001      	movs	r0, #1
- 80059f6:	f008 fc9d 	bl	800e334 <CreateLine>
+ 80059e2:	4b7e      	ldr	r3, [pc, #504]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 80059e4:	681a      	ldr	r2, [r3, #0]
+ 80059e6:	4b7e      	ldr	r3, [pc, #504]	@ (8005be0 <ESP_Upkeep+0x740>)
+ 80059e8:	681b      	ldr	r3, [r3, #0]
+ 80059ea:	1ad3      	subs	r3, r2, r3
+ 80059ec:	4a81      	ldr	r2, [pc, #516]	@ (8005bf4 <ESP_Upkeep+0x754>)
+ 80059ee:	497e      	ldr	r1, [pc, #504]	@ (8005be8 <ESP_Upkeep+0x748>)
+ 80059f0:	2001      	movs	r0, #1
+ 80059f2:	f008 fc9f 	bl	800e334 <CreateLine>
             // TODO hier gaat iets fout, de verzending herstart niet meer
             // in log alleen nog D [01039053] EspState: 4 ATcmd: 20 Mode: 2 ATExp: 0
             EspState = ESP_STATE_DEINIT;
- 80059fa:	4b96      	ldr	r3, [pc, #600]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 80059fc:	220d      	movs	r2, #13
- 80059fe:	701a      	strb	r2, [r3, #0]
+ 80059f6:	4b75      	ldr	r3, [pc, #468]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 80059f8:	220d      	movs	r2, #13
+ 80059fa:	701a      	strb	r2, [r3, #0]
             // mogelijke oplossing door deze twee regels te verwijderen
             // ATCommand = AT_END;
             // ATExpectation = RECEIVE_EXPECTATION_OK;
           }
           if(ATCommand != AT_SENDDATA){
- 8005a00:	4b92      	ldr	r3, [pc, #584]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a02:	781b      	ldrb	r3, [r3, #0]
- 8005a04:	2b0f      	cmp	r3, #15
- 8005a06:	d003      	beq.n	8005a10 <ESP_Upkeep+0x570>
+ 80059fc:	4b71      	ldr	r3, [pc, #452]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 80059fe:	781b      	ldrb	r3, [r3, #0]
+ 8005a00:	2b0f      	cmp	r3, #15
+ 8005a02:	d003      	beq.n	8005a0c <ESP_Upkeep+0x56c>
             EspState = ESP_STATE_SEND;
- 8005a08:	4b92      	ldr	r3, [pc, #584]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005a0a:	2204      	movs	r2, #4
- 8005a0c:	701a      	strb	r2, [r3, #0]
- 8005a0e:	e00e      	b.n	8005a2e <ESP_Upkeep+0x58e>
+ 8005a04:	4b71      	ldr	r3, [pc, #452]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005a06:	2204      	movs	r2, #4
+ 8005a08:	701a      	strb	r2, [r3, #0]
+ 8005a0a:	e00e      	b.n	8005a2a <ESP_Upkeep+0x58a>
           }
           else{
             ATCommand = AT_HTTPCPOST;
- 8005a10:	4b8e      	ldr	r3, [pc, #568]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a12:	220e      	movs	r2, #14
- 8005a14:	701a      	strb	r2, [r3, #0]
+ 8005a0c:	4b6d      	ldr	r3, [pc, #436]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a0e:	220e      	movs	r2, #14
+ 8005a10:	701a      	strb	r2, [r3, #0]
             ATCounter -= 1;
- 8005a16:	4b8e      	ldr	r3, [pc, #568]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 8005a18:	781b      	ldrb	r3, [r3, #0]
- 8005a1a:	3b01      	subs	r3, #1
- 8005a1c:	b2da      	uxtb	r2, r3
- 8005a1e:	4b8c      	ldr	r3, [pc, #560]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 8005a20:	701a      	strb	r2, [r3, #0]
+ 8005a12:	4b6d      	ldr	r3, [pc, #436]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 8005a14:	781b      	ldrb	r3, [r3, #0]
+ 8005a16:	3b01      	subs	r3, #1
+ 8005a18:	b2da      	uxtb	r2, r3
+ 8005a1a:	4b6b      	ldr	r3, [pc, #428]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 8005a1c:	701a      	strb	r2, [r3, #0]
             ATExpectation = RECEIVE_EXPECTATION_START;
- 8005a22:	4b88      	ldr	r3, [pc, #544]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005a24:	2202      	movs	r2, #2
- 8005a26:	701a      	strb	r2, [r3, #0]
+ 8005a1e:	4b67      	ldr	r3, [pc, #412]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005a20:	2202      	movs	r2, #2
+ 8005a22:	701a      	strb	r2, [r3, #0]
             EspState = ESP_STATE_SEND;
- 8005a28:	4b8a      	ldr	r3, [pc, #552]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005a2a:	2204      	movs	r2, #4
- 8005a2c:	701a      	strb	r2, [r3, #0]
+ 8005a24:	4b69      	ldr	r3, [pc, #420]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005a26:	2204      	movs	r2, #4
+ 8005a28:	701a      	strb	r2, [r3, #0]
           }
         }
         if(proceed){
- 8005a2e:	1d7b      	adds	r3, r7, #5
- 8005a30:	781b      	ldrb	r3, [r3, #0]
- 8005a32:	2b00      	cmp	r3, #0
- 8005a34:	d100      	bne.n	8005a38 <ESP_Upkeep+0x598>
- 8005a36:	e18e      	b.n	8005d56 <ESP_Upkeep+0x8b6>
+ 8005a2a:	1d7b      	adds	r3, r7, #5
+ 8005a2c:	781b      	ldrb	r3, [r3, #0]
+ 8005a2e:	2b00      	cmp	r3, #0
+ 8005a30:	d100      	bne.n	8005a34 <ESP_Upkeep+0x594>
+ 8005a32:	e184      	b.n	8005d3e <ESP_Upkeep+0x89e>
           EspState = ESP_STATE_NEXT_AT;
- 8005a38:	4b86      	ldr	r3, [pc, #536]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005a3a:	2205      	movs	r2, #5
- 8005a3c:	701a      	strb	r2, [r3, #0]
+ 8005a34:	4b65      	ldr	r3, [pc, #404]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005a36:	2205      	movs	r2, #5
+ 8005a38:	701a      	strb	r2, [r3, #0]
         }
       }
       break;
- 8005a3e:	e18a      	b.n	8005d56 <ESP_Upkeep+0x8b6>
+ 8005a3a:	e180      	b.n	8005d3e <ESP_Upkeep+0x89e>
 
     case ESP_STATE_NEXT_AT:
       ATCounter += 1;
- 8005a40:	4b83      	ldr	r3, [pc, #524]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 8005a42:	781b      	ldrb	r3, [r3, #0]
- 8005a44:	3301      	adds	r3, #1
- 8005a46:	b2da      	uxtb	r2, r3
- 8005a48:	4b81      	ldr	r3, [pc, #516]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 8005a4a:	701a      	strb	r2, [r3, #0]
+ 8005a3c:	4b62      	ldr	r3, [pc, #392]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 8005a3e:	781b      	ldrb	r3, [r3, #0]
+ 8005a40:	3301      	adds	r3, #1
+ 8005a42:	b2da      	uxtb	r2, r3
+ 8005a44:	4b60      	ldr	r3, [pc, #384]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 8005a46:	701a      	strb	r2, [r3, #0]
       ATCommand = ATCommandArray[ATCounter];
- 8005a4c:	4b80      	ldr	r3, [pc, #512]	@ (8005c50 <ESP_Upkeep+0x7b0>)
- 8005a4e:	781b      	ldrb	r3, [r3, #0]
- 8005a50:	001a      	movs	r2, r3
- 8005a52:	4b8b      	ldr	r3, [pc, #556]	@ (8005c80 <ESP_Upkeep+0x7e0>)
- 8005a54:	5c9a      	ldrb	r2, [r3, r2]
- 8005a56:	4b7d      	ldr	r3, [pc, #500]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a58:	701a      	strb	r2, [r3, #0]
+ 8005a48:	4b5f      	ldr	r3, [pc, #380]	@ (8005bc8 <ESP_Upkeep+0x728>)
+ 8005a4a:	781b      	ldrb	r3, [r3, #0]
+ 8005a4c:	001a      	movs	r2, r3
+ 8005a4e:	4b6a      	ldr	r3, [pc, #424]	@ (8005bf8 <ESP_Upkeep+0x758>)
+ 8005a50:	5c9a      	ldrb	r2, [r3, r2]
+ 8005a52:	4b5c      	ldr	r3, [pc, #368]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a54:	701a      	strb	r2, [r3, #0]
       if(ATCommand == AT_RESTORE){
- 8005a5a:	4b7c      	ldr	r3, [pc, #496]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a5c:	781b      	ldrb	r3, [r3, #0]
- 8005a5e:	2b03      	cmp	r3, #3
- 8005a60:	d102      	bne.n	8005a68 <ESP_Upkeep+0x5c8>
+ 8005a56:	4b5b      	ldr	r3, [pc, #364]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a58:	781b      	ldrb	r3, [r3, #0]
+ 8005a5a:	2b03      	cmp	r3, #3
+ 8005a5c:	d102      	bne.n	8005a64 <ESP_Upkeep+0x5c4>
          ATExpectation = RECEIVE_EXPECTATION_READY;
- 8005a62:	4b78      	ldr	r3, [pc, #480]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005a64:	2201      	movs	r2, #1
- 8005a66:	701a      	strb	r2, [r3, #0]
+ 8005a5e:	4b57      	ldr	r3, [pc, #348]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005a60:	2201      	movs	r2, #1
+ 8005a62:	701a      	strb	r2, [r3, #0]
       }
       if(ATCommand == AT_HTTPCPOST){
- 8005a68:	4b78      	ldr	r3, [pc, #480]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a6a:	781b      	ldrb	r3, [r3, #0]
- 8005a6c:	2b0e      	cmp	r3, #14
- 8005a6e:	d102      	bne.n	8005a76 <ESP_Upkeep+0x5d6>
+ 8005a64:	4b57      	ldr	r3, [pc, #348]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a66:	781b      	ldrb	r3, [r3, #0]
+ 8005a68:	2b0e      	cmp	r3, #14
+ 8005a6a:	d102      	bne.n	8005a72 <ESP_Upkeep+0x5d2>
         ATExpectation = RECEIVE_EXPECTATION_START;
- 8005a70:	4b74      	ldr	r3, [pc, #464]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005a72:	2202      	movs	r2, #2
- 8005a74:	701a      	strb	r2, [r3, #0]
+ 8005a6c:	4b53      	ldr	r3, [pc, #332]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005a6e:	2202      	movs	r2, #2
+ 8005a70:	701a      	strb	r2, [r3, #0]
       }
       if(ATCommand != AT_HTTPCPOST && ATCommand != AT_RESTORE){
- 8005a76:	4b75      	ldr	r3, [pc, #468]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a78:	781b      	ldrb	r3, [r3, #0]
- 8005a7a:	2b0e      	cmp	r3, #14
- 8005a7c:	d006      	beq.n	8005a8c <ESP_Upkeep+0x5ec>
- 8005a7e:	4b73      	ldr	r3, [pc, #460]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a80:	781b      	ldrb	r3, [r3, #0]
- 8005a82:	2b03      	cmp	r3, #3
- 8005a84:	d002      	beq.n	8005a8c <ESP_Upkeep+0x5ec>
+ 8005a72:	4b54      	ldr	r3, [pc, #336]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a74:	781b      	ldrb	r3, [r3, #0]
+ 8005a76:	2b0e      	cmp	r3, #14
+ 8005a78:	d006      	beq.n	8005a88 <ESP_Upkeep+0x5e8>
+ 8005a7a:	4b52      	ldr	r3, [pc, #328]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a7c:	781b      	ldrb	r3, [r3, #0]
+ 8005a7e:	2b03      	cmp	r3, #3
+ 8005a80:	d002      	beq.n	8005a88 <ESP_Upkeep+0x5e8>
         ATExpectation = RECEIVE_EXPECTATION_OK;
- 8005a86:	4b6f      	ldr	r3, [pc, #444]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005a88:	2200      	movs	r2, #0
- 8005a8a:	701a      	strb	r2, [r3, #0]
+ 8005a82:	4b4e      	ldr	r3, [pc, #312]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005a84:	2200      	movs	r2, #0
+ 8005a86:	701a      	strb	r2, [r3, #0]
       }
       if(ATCommand == AT_CIPSNTPCFG){
- 8005a8c:	4b6f      	ldr	r3, [pc, #444]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005a8e:	781b      	ldrb	r3, [r3, #0]
- 8005a90:	2b11      	cmp	r3, #17
- 8005a92:	d102      	bne.n	8005a9a <ESP_Upkeep+0x5fa>
+ 8005a88:	4b4e      	ldr	r3, [pc, #312]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a8a:	781b      	ldrb	r3, [r3, #0]
+ 8005a8c:	2b11      	cmp	r3, #17
+ 8005a8e:	d102      	bne.n	8005a96 <ESP_Upkeep+0x5f6>
          ATExpectation = RECEIVE_EXPECTATION_TIME;
- 8005a94:	4b6b      	ldr	r3, [pc, #428]	@ (8005c44 <ESP_Upkeep+0x7a4>)
- 8005a96:	2205      	movs	r2, #5
- 8005a98:	701a      	strb	r2, [r3, #0]
+ 8005a90:	4b4a      	ldr	r3, [pc, #296]	@ (8005bbc <ESP_Upkeep+0x71c>)
+ 8005a92:	2205      	movs	r2, #5
+ 8005a94:	701a      	strb	r2, [r3, #0]
       }
       EspState = ESP_STATE_SEND;
- 8005a9a:	4b6e      	ldr	r3, [pc, #440]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005a9c:	2204      	movs	r2, #4
- 8005a9e:	701a      	strb	r2, [r3, #0]
+ 8005a96:	4b4d      	ldr	r3, [pc, #308]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005a98:	2204      	movs	r2, #4
+ 8005a9a:	701a      	strb	r2, [r3, #0]
       if(ATCommand == AT_END){
- 8005aa0:	4b6a      	ldr	r3, [pc, #424]	@ (8005c4c <ESP_Upkeep+0x7ac>)
- 8005aa2:	781b      	ldrb	r3, [r3, #0]
- 8005aa4:	2b14      	cmp	r3, #20
- 8005aa6:	d000      	beq.n	8005aaa <ESP_Upkeep+0x60a>
- 8005aa8:	e157      	b.n	8005d5a <ESP_Upkeep+0x8ba>
+ 8005a9c:	4b49      	ldr	r3, [pc, #292]	@ (8005bc4 <ESP_Upkeep+0x724>)
+ 8005a9e:	781b      	ldrb	r3, [r3, #0]
+ 8005aa0:	2b14      	cmp	r3, #20
+ 8005aa2:	d000      	beq.n	8005aa6 <ESP_Upkeep+0x606>
+ 8005aa4:	e14d      	b.n	8005d42 <ESP_Upkeep+0x8a2>
         if(Mode == AT_MODE_SEND){
- 8005aaa:	4b76      	ldr	r3, [pc, #472]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005aac:	781b      	ldrb	r3, [r3, #0]
- 8005aae:	2b02      	cmp	r3, #2
- 8005ab0:	d124      	bne.n	8005afc <ESP_Upkeep+0x65c>
+ 8005aa6:	4b55      	ldr	r3, [pc, #340]	@ (8005bfc <ESP_Upkeep+0x75c>)
+ 8005aa8:	781b      	ldrb	r3, [r3, #0]
+ 8005aaa:	2b02      	cmp	r3, #2
+ 8005aac:	d124      	bne.n	8005af8 <ESP_Upkeep+0x658>
           ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
- 8005ab2:	f009 f895 	bl	800ebe0 <HAL_GetTick>
- 8005ab6:	0003      	movs	r3, r0
- 8005ab8:	4a68      	ldr	r2, [pc, #416]	@ (8005c5c <ESP_Upkeep+0x7bc>)
- 8005aba:	189a      	adds	r2, r3, r2
- 8005abc:	4b60      	ldr	r3, [pc, #384]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005abe:	601a      	str	r2, [r3, #0]
+ 8005aae:	f009 f897 	bl	800ebe0 <HAL_GetTick>
+ 8005ab2:	0003      	movs	r3, r0
+ 8005ab4:	4a47      	ldr	r2, [pc, #284]	@ (8005bd4 <ESP_Upkeep+0x734>)
+ 8005ab6:	189a      	adds	r2, r3, r2
+ 8005ab8:	4b3f      	ldr	r3, [pc, #252]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 8005aba:	601a      	str	r2, [r3, #0]
           ResetESPIndicator();
- 8005ac0:	f007 fc7e 	bl	800d3c0 <ResetESPIndicator>
+ 8005abc:	f007 fc80 	bl	800d3c0 <ResetESPIndicator>
           clearDMABuffer();
- 8005ac4:	f7ff f9be 	bl	8004e44 <clearDMABuffer>
+ 8005ac0:	f7ff f9c0 	bl	8004e44 <clearDMABuffer>
           stop = HAL_GetTick();
- 8005ac8:	f009 f88a 	bl	800ebe0 <HAL_GetTick>
- 8005acc:	0002      	movs	r2, r0
- 8005ace:	4b65      	ldr	r3, [pc, #404]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005ad0:	601a      	str	r2, [r3, #0]
+ 8005ac4:	f009 f88c 	bl	800ebe0 <HAL_GetTick>
+ 8005ac8:	0002      	movs	r2, r0
+ 8005aca:	4b44      	ldr	r3, [pc, #272]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 8005acc:	601a      	str	r2, [r3, #0]
           Info("Message send in %lu ms", (stop-start));
- 8005ad2:	4b64      	ldr	r3, [pc, #400]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005ad4:	681a      	ldr	r2, [r3, #0]
- 8005ad6:	4b64      	ldr	r3, [pc, #400]	@ (8005c68 <ESP_Upkeep+0x7c8>)
- 8005ad8:	681b      	ldr	r3, [r3, #0]
- 8005ada:	1ad3      	subs	r3, r2, r3
- 8005adc:	4a6a      	ldr	r2, [pc, #424]	@ (8005c88 <ESP_Upkeep+0x7e8>)
- 8005ade:	496b      	ldr	r1, [pc, #428]	@ (8005c8c <ESP_Upkeep+0x7ec>)
- 8005ae0:	2002      	movs	r0, #2
- 8005ae2:	f008 fc27 	bl	800e334 <CreateLine>
+ 8005ace:	4b43      	ldr	r3, [pc, #268]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 8005ad0:	681a      	ldr	r2, [r3, #0]
+ 8005ad2:	4b43      	ldr	r3, [pc, #268]	@ (8005be0 <ESP_Upkeep+0x740>)
+ 8005ad4:	681b      	ldr	r3, [r3, #0]
+ 8005ad6:	1ad3      	subs	r3, r2, r3
+ 8005ad8:	4a49      	ldr	r2, [pc, #292]	@ (8005c00 <ESP_Upkeep+0x760>)
+ 8005ada:	494a      	ldr	r1, [pc, #296]	@ (8005c04 <ESP_Upkeep+0x764>)
+ 8005adc:	2002      	movs	r0, #2
+ 8005ade:	f008 fc29 	bl	800e334 <CreateLine>
           ResetdBAmax();
- 8005ae6:	f002 fee7 	bl	80088b8 <ResetdBAmax>
+ 8005ae2:	f002 fee9 	bl	80088b8 <ResetdBAmax>
           showTime();
- 8005aea:	f000 fccf 	bl	800648c <showTime>
+ 8005ae6:	f000 fcd1 	bl	800648c <showTime>
           ESPTransmitDone = true;
- 8005aee:	4b5c      	ldr	r3, [pc, #368]	@ (8005c60 <ESP_Upkeep+0x7c0>)
- 8005af0:	2201      	movs	r2, #1
- 8005af2:	701a      	strb	r2, [r3, #0]
+ 8005aea:	4b3b      	ldr	r3, [pc, #236]	@ (8005bd8 <ESP_Upkeep+0x738>)
+ 8005aec:	2201      	movs	r2, #1
+ 8005aee:	701a      	strb	r2, [r3, #0]
           EspState = ESP_STATE_DEINIT;
- 8005af4:	4b57      	ldr	r3, [pc, #348]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005af6:	220d      	movs	r2, #13
- 8005af8:	701a      	strb	r2, [r3, #0]
+ 8005af0:	4b36      	ldr	r3, [pc, #216]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005af2:	220d      	movs	r2, #13
+ 8005af4:	701a      	strb	r2, [r3, #0]
           }
         else{
           EspState = ESP_STATE_RESET;
         }
       }
     break;
- 8005afa:	e12e      	b.n	8005d5a <ESP_Upkeep+0x8ba>
+ 8005af6:	e124      	b.n	8005d42 <ESP_Upkeep+0x8a2>
         else if (Mode == AT_MODE_GETTIME) {
- 8005afc:	4b61      	ldr	r3, [pc, #388]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005afe:	781b      	ldrb	r3, [r3, #0]
- 8005b00:	2b05      	cmp	r3, #5
- 8005b02:	d12e      	bne.n	8005b62 <ESP_Upkeep+0x6c2>
+ 8005af8:	4b40      	ldr	r3, [pc, #256]	@ (8005bfc <ESP_Upkeep+0x75c>)
+ 8005afa:	781b      	ldrb	r3, [r3, #0]
+ 8005afc:	2b05      	cmp	r3, #5
+ 8005afe:	d12e      	bne.n	8005b5e <ESP_Upkeep+0x6be>
             setTime = false;
- 8005b04:	4b62      	ldr	r3, [pc, #392]	@ (8005c90 <ESP_Upkeep+0x7f0>)
- 8005b06:	2200      	movs	r2, #0
- 8005b08:	701a      	strb	r2, [r3, #0]
+ 8005b00:	4b41      	ldr	r3, [pc, #260]	@ (8005c08 <ESP_Upkeep+0x768>)
+ 8005b02:	2200      	movs	r2, #0
+ 8005b04:	701a      	strb	r2, [r3, #0]
             ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP;
- 8005b0a:	f009 f869 	bl	800ebe0 <HAL_GetTick>
- 8005b0e:	0003      	movs	r3, r0
- 8005b10:	4a60      	ldr	r2, [pc, #384]	@ (8005c94 <ESP_Upkeep+0x7f4>)
- 8005b12:	189a      	adds	r2, r3, r2
- 8005b14:	4b60      	ldr	r3, [pc, #384]	@ (8005c98 <ESP_Upkeep+0x7f8>)
- 8005b16:	601a      	str	r2, [r3, #0]
+ 8005b06:	f009 f86b 	bl	800ebe0 <HAL_GetTick>
+ 8005b0a:	0003      	movs	r3, r0
+ 8005b0c:	4a3f      	ldr	r2, [pc, #252]	@ (8005c0c <ESP_Upkeep+0x76c>)
+ 8005b0e:	189a      	adds	r2, r3, r2
+ 8005b10:	4b3f      	ldr	r3, [pc, #252]	@ (8005c10 <ESP_Upkeep+0x770>)
+ 8005b12:	601a      	str	r2, [r3, #0]
             Info("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
- 8005b18:	4b5f      	ldr	r3, [pc, #380]	@ (8005c98 <ESP_Upkeep+0x7f8>)
- 8005b1a:	681b      	ldr	r3, [r3, #0]
- 8005b1c:	4a5f      	ldr	r2, [pc, #380]	@ (8005c9c <ESP_Upkeep+0x7fc>)
- 8005b1e:	495b      	ldr	r1, [pc, #364]	@ (8005c8c <ESP_Upkeep+0x7ec>)
- 8005b20:	2002      	movs	r0, #2
- 8005b22:	f008 fc07 	bl	800e334 <CreateLine>
+ 8005b14:	4b3e      	ldr	r3, [pc, #248]	@ (8005c10 <ESP_Upkeep+0x770>)
+ 8005b16:	681b      	ldr	r3, [r3, #0]
+ 8005b18:	4a3e      	ldr	r2, [pc, #248]	@ (8005c14 <ESP_Upkeep+0x774>)
+ 8005b1a:	493a      	ldr	r1, [pc, #232]	@ (8005c04 <ESP_Upkeep+0x764>)
+ 8005b1c:	2002      	movs	r0, #2
+ 8005b1e:	f008 fc09 	bl	800e334 <CreateLine>
             ESPTimeStamp = savedESPTimeStamp;
- 8005b26:	4b5e      	ldr	r3, [pc, #376]	@ (8005ca0 <ESP_Upkeep+0x800>)
- 8005b28:	681a      	ldr	r2, [r3, #0]
- 8005b2a:	4b45      	ldr	r3, [pc, #276]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005b2c:	601a      	str	r2, [r3, #0]
+ 8005b22:	4b3d      	ldr	r3, [pc, #244]	@ (8005c18 <ESP_Upkeep+0x778>)
+ 8005b24:	681a      	ldr	r2, [r3, #0]
+ 8005b26:	4b24      	ldr	r3, [pc, #144]	@ (8005bb8 <ESP_Upkeep+0x718>)
+ 8005b28:	601a      	str	r2, [r3, #0]
             ResetESPIndicator();
- 8005b2e:	f007 fc47 	bl	800d3c0 <ResetESPIndicator>
+ 8005b2a:	f007 fc49 	bl	800d3c0 <ResetESPIndicator>
             clearDMABuffer();
- 8005b32:	f7ff f987 	bl	8004e44 <clearDMABuffer>
+ 8005b2e:	f7ff f989 	bl	8004e44 <clearDMABuffer>
             stop = HAL_GetTick();
- 8005b36:	f009 f853 	bl	800ebe0 <HAL_GetTick>
- 8005b3a:	0002      	movs	r2, r0
- 8005b3c:	4b49      	ldr	r3, [pc, #292]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005b3e:	601a      	str	r2, [r3, #0]
+ 8005b32:	f009 f855 	bl	800ebe0 <HAL_GetTick>
+ 8005b36:	0002      	movs	r2, r0
+ 8005b38:	4b28      	ldr	r3, [pc, #160]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 8005b3a:	601a      	str	r2, [r3, #0]
             Info("Message time update in %lu ms", (stop-start));
- 8005b40:	4b48      	ldr	r3, [pc, #288]	@ (8005c64 <ESP_Upkeep+0x7c4>)
- 8005b42:	681a      	ldr	r2, [r3, #0]
- 8005b44:	4b48      	ldr	r3, [pc, #288]	@ (8005c68 <ESP_Upkeep+0x7c8>)
- 8005b46:	681b      	ldr	r3, [r3, #0]
- 8005b48:	1ad3      	subs	r3, r2, r3
- 8005b4a:	4a56      	ldr	r2, [pc, #344]	@ (8005ca4 <ESP_Upkeep+0x804>)
- 8005b4c:	494f      	ldr	r1, [pc, #316]	@ (8005c8c <ESP_Upkeep+0x7ec>)
- 8005b4e:	2002      	movs	r0, #2
- 8005b50:	f008 fbf0 	bl	800e334 <CreateLine>
+ 8005b3c:	4b27      	ldr	r3, [pc, #156]	@ (8005bdc <ESP_Upkeep+0x73c>)
+ 8005b3e:	681a      	ldr	r2, [r3, #0]
+ 8005b40:	4b27      	ldr	r3, [pc, #156]	@ (8005be0 <ESP_Upkeep+0x740>)
+ 8005b42:	681b      	ldr	r3, [r3, #0]
+ 8005b44:	1ad3      	subs	r3, r2, r3
+ 8005b46:	4a35      	ldr	r2, [pc, #212]	@ (8005c1c <ESP_Upkeep+0x77c>)
+ 8005b48:	492e      	ldr	r1, [pc, #184]	@ (8005c04 <ESP_Upkeep+0x764>)
+ 8005b4a:	2002      	movs	r0, #2
+ 8005b4c:	f008 fbf2 	bl	800e334 <CreateLine>
             EspState = ESP_STATE_DEINIT;
- 8005b54:	4b3f      	ldr	r3, [pc, #252]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005b56:	220d      	movs	r2, #13
- 8005b58:	701a      	strb	r2, [r3, #0]
+ 8005b50:	4b1e      	ldr	r3, [pc, #120]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005b52:	220d      	movs	r2, #13
+ 8005b54:	701a      	strb	r2, [r3, #0]
             Mode = AT_MODE_SEND;
- 8005b5a:	4b4a      	ldr	r3, [pc, #296]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005b5c:	2202      	movs	r2, #2
- 8005b5e:	701a      	strb	r2, [r3, #0]
+ 8005b56:	4b29      	ldr	r3, [pc, #164]	@ (8005bfc <ESP_Upkeep+0x75c>)
+ 8005b58:	2202      	movs	r2, #2
+ 8005b5a:	701a      	strb	r2, [r3, #0]
     break;
- 8005b60:	e0fb      	b.n	8005d5a <ESP_Upkeep+0x8ba>
+ 8005b5c:	e0f1      	b.n	8005d42 <ESP_Upkeep+0x8a2>
           EspState = ESP_STATE_RESET;
- 8005b62:	4b3c      	ldr	r3, [pc, #240]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005b64:	2209      	movs	r2, #9
- 8005b66:	701a      	strb	r2, [r3, #0]
+ 8005b5e:	4b1b      	ldr	r3, [pc, #108]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005b60:	2209      	movs	r2, #9
+ 8005b62:	701a      	strb	r2, [r3, #0]
     break;
- 8005b68:	e0f7      	b.n	8005d5a <ESP_Upkeep+0x8ba>
+ 8005b64:	e0ed      	b.n	8005d42 <ESP_Upkeep+0x8a2>
 
     case ESP_STATE_DEINIT:
       EspTurnedOn = false;
- 8005b6a:	4b4f      	ldr	r3, [pc, #316]	@ (8005ca8 <ESP_Upkeep+0x808>)
- 8005b6c:	2200      	movs	r2, #0
- 8005b6e:	701a      	strb	r2, [r3, #0]
+ 8005b66:	4b2e      	ldr	r3, [pc, #184]	@ (8005c20 <ESP_Upkeep+0x780>)
+ 8005b68:	2200      	movs	r2, #0
+ 8005b6a:	701a      	strb	r2, [r3, #0]
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
- 8005b70:	4b4e      	ldr	r3, [pc, #312]	@ (8005cac <ESP_Upkeep+0x80c>)
- 8005b72:	2200      	movs	r2, #0
- 8005b74:	2101      	movs	r1, #1
- 8005b76:	0018      	movs	r0, r3
- 8005b78:	f00a fac3 	bl	8010102 <HAL_GPIO_WritePin>
+ 8005b6c:	4b2d      	ldr	r3, [pc, #180]	@ (8005c24 <ESP_Upkeep+0x784>)
+ 8005b6e:	2200      	movs	r2, #0
+ 8005b70:	2101      	movs	r1, #1
+ 8005b72:	0018      	movs	r0, r3
+ 8005b74:	f00a fac5 	bl	8010102 <HAL_GPIO_WritePin>
       HAL_Delay(1);
- 8005b7c:	2001      	movs	r0, #1
- 8005b7e:	f009 f839 	bl	800ebf4 <HAL_Delay>
+ 8005b78:	2001      	movs	r0, #1
+ 8005b7a:	f009 f83b 	bl	800ebf4 <HAL_Delay>
       HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
- 8005b82:	2380      	movs	r3, #128	@ 0x80
- 8005b84:	011b      	lsls	r3, r3, #4
- 8005b86:	484a      	ldr	r0, [pc, #296]	@ (8005cb0 <ESP_Upkeep+0x810>)
- 8005b88:	2200      	movs	r2, #0
- 8005b8a:	0019      	movs	r1, r3
- 8005b8c:	f00a fab9 	bl	8010102 <HAL_GPIO_WritePin>
+ 8005b7e:	2380      	movs	r3, #128	@ 0x80
+ 8005b80:	011b      	lsls	r3, r3, #4
+ 8005b82:	4829      	ldr	r0, [pc, #164]	@ (8005c28 <ESP_Upkeep+0x788>)
+ 8005b84:	2200      	movs	r2, #0
+ 8005b86:	0019      	movs	r1, r3
+ 8005b88:	f00a fabb 	bl	8010102 <HAL_GPIO_WritePin>
       HAL_Delay(1);
- 8005b90:	2001      	movs	r0, #1
- 8005b92:	f009 f82f 	bl	800ebf4 <HAL_Delay>
+ 8005b8c:	2001      	movs	r0, #1
+ 8005b8e:	f009 f831 	bl	800ebf4 <HAL_Delay>
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
- 8005b96:	4b45      	ldr	r3, [pc, #276]	@ (8005cac <ESP_Upkeep+0x80c>)
- 8005b98:	2200      	movs	r2, #0
- 8005b9a:	2102      	movs	r1, #2
- 8005b9c:	0018      	movs	r0, r3
- 8005b9e:	f00a fab0 	bl	8010102 <HAL_GPIO_WritePin>
+ 8005b92:	4b24      	ldr	r3, [pc, #144]	@ (8005c24 <ESP_Upkeep+0x784>)
+ 8005b94:	2200      	movs	r2, #0
+ 8005b96:	2102      	movs	r1, #2
+ 8005b98:	0018      	movs	r0, r3
+ 8005b9a:	f00a fab2 	bl	8010102 <HAL_GPIO_WritePin>
       EspState = ESP_STATE_RESET;
- 8005ba2:	4b2c      	ldr	r3, [pc, #176]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005ba4:	2209      	movs	r2, #9
- 8005ba6:	701a      	strb	r2, [r3, #0]
+ 8005b9e:	4b0b      	ldr	r3, [pc, #44]	@ (8005bcc <ESP_Upkeep+0x72c>)
+ 8005ba0:	2209      	movs	r2, #9
+ 8005ba2:	701a      	strb	r2, [r3, #0]
       HAL_Delay(1);
- 8005ba8:	2001      	movs	r0, #1
- 8005baa:	f009 f823 	bl	800ebf4 <HAL_Delay>
+ 8005ba4:	2001      	movs	r0, #1
+ 8005ba6:	f009 f825 	bl	800ebf4 <HAL_Delay>
       errorcntr = 0;
- 8005bae:	4b2a      	ldr	r3, [pc, #168]	@ (8005c58 <ESP_Upkeep+0x7b8>)
- 8005bb0:	2200      	movs	r2, #0
- 8005bb2:	701a      	strb	r2, [r3, #0]
+ 8005baa:	4b09      	ldr	r3, [pc, #36]	@ (8005bd0 <ESP_Upkeep+0x730>)
+ 8005bac:	2200      	movs	r2, #0
+ 8005bae:	701a      	strb	r2, [r3, #0]
+      timeoutcntr = 0;
+ 8005bb0:	4b0e      	ldr	r3, [pc, #56]	@ (8005bec <ESP_Upkeep+0x74c>)
+ 8005bb2:	2200      	movs	r2, #0
+ 8005bb4:	701a      	strb	r2, [r3, #0]
       break;
- 8005bb4:	e0d4      	b.n	8005d60 <ESP_Upkeep+0x8c0>
+ 8005bb6:	e0c7      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+ 8005bb8:	20000a1c 	.word	0x20000a1c
+ 8005bbc:	20000a29 	.word	0x20000a29
+ 8005bc0:	2000002a 	.word	0x2000002a
+ 8005bc4:	20000a2a 	.word	0x20000a2a
+ 8005bc8:	20000a16 	.word	0x20000a16
+ 8005bcc:	20000028 	.word	0x20000028
+ 8005bd0:	20000a17 	.word	0x20000a17
+ 8005bd4:	0003a980 	.word	0x0003a980
+ 8005bd8:	20000553 	.word	0x20000553
+ 8005bdc:	20000564 	.word	0x20000564
+ 8005be0:	20000560 	.word	0x20000560
+ 8005be4:	0802398c 	.word	0x0802398c
+ 8005be8:	0802301c 	.word	0x0802301c
+ 8005bec:	20000a18 	.word	0x20000a18
+ 8005bf0:	080239c0 	.word	0x080239c0
+ 8005bf4:	080239fc 	.word	0x080239fc
+ 8005bf8:	20000a0c 	.word	0x20000a0c
+ 8005bfc:	20000a2b 	.word	0x20000a2b
+ 8005c00:	08023a2c 	.word	0x08023a2c
+ 8005c04:	08023a44 	.word	0x08023a44
+ 8005c08:	20000001 	.word	0x20000001
+ 8005c0c:	047e7c4f 	.word	0x047e7c4f
+ 8005c10:	20000a20 	.word	0x20000a20
+ 8005c14:	08023a48 	.word	0x08023a48
+ 8005c18:	20000a24 	.word	0x20000a24
+ 8005c1c:	08023a8c 	.word	0x08023a8c
+ 8005c20:	2000054c 	.word	0x2000054c
+ 8005c24:	50001c00 	.word	0x50001c00
+ 8005c28:	50000800 	.word	0x50000800
 
     case ESP_STATE_RESET:
       if(TimestampIsReached(ESPTimeStamp) || ReconfigSet){
- 8005bb6:	4b22      	ldr	r3, [pc, #136]	@ (8005c40 <ESP_Upkeep+0x7a0>)
- 8005bb8:	681b      	ldr	r3, [r3, #0]
- 8005bba:	0018      	movs	r0, r3
- 8005bbc:	f008 fb64 	bl	800e288 <TimestampIsReached>
- 8005bc0:	1e03      	subs	r3, r0, #0
- 8005bc2:	d104      	bne.n	8005bce <ESP_Upkeep+0x72e>
- 8005bc4:	4b3b      	ldr	r3, [pc, #236]	@ (8005cb4 <ESP_Upkeep+0x814>)
- 8005bc6:	781b      	ldrb	r3, [r3, #0]
- 8005bc8:	2b00      	cmp	r3, #0
- 8005bca:	d100      	bne.n	8005bce <ESP_Upkeep+0x72e>
- 8005bcc:	e07e      	b.n	8005ccc <ESP_Upkeep+0x82c>
+ 8005c2c:	4b49      	ldr	r3, [pc, #292]	@ (8005d54 <ESP_Upkeep+0x8b4>)
+ 8005c2e:	681b      	ldr	r3, [r3, #0]
+ 8005c30:	0018      	movs	r0, r3
+ 8005c32:	f008 fb29 	bl	800e288 <TimestampIsReached>
+ 8005c36:	1e03      	subs	r3, r0, #0
+ 8005c38:	d103      	bne.n	8005c42 <ESP_Upkeep+0x7a2>
+ 8005c3a:	4b47      	ldr	r3, [pc, #284]	@ (8005d58 <ESP_Upkeep+0x8b8>)
+ 8005c3c:	781b      	ldrb	r3, [r3, #0]
+ 8005c3e:	2b00      	cmp	r3, #0
+ 8005c40:	d038      	beq.n	8005cb4 <ESP_Upkeep+0x814>
         ESPTransmitDone = false;
- 8005bce:	4b24      	ldr	r3, [pc, #144]	@ (8005c60 <ESP_Upkeep+0x7c0>)
- 8005bd0:	2200      	movs	r2, #0
- 8005bd2:	701a      	strb	r2, [r3, #0]
+ 8005c42:	4b46      	ldr	r3, [pc, #280]	@ (8005d5c <ESP_Upkeep+0x8bc>)
+ 8005c44:	2200      	movs	r2, #0
+ 8005c46:	701a      	strb	r2, [r3, #0]
         if(Mode == AT_MODE_INIT){
- 8005bd4:	4b2b      	ldr	r3, [pc, #172]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005bd6:	781b      	ldrb	r3, [r3, #0]
- 8005bd8:	2b00      	cmp	r3, #0
- 8005bda:	d105      	bne.n	8005be8 <ESP_Upkeep+0x748>
+ 8005c48:	4b45      	ldr	r3, [pc, #276]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005c4a:	781b      	ldrb	r3, [r3, #0]
+ 8005c4c:	2b00      	cmp	r3, #0
+ 8005c4e:	d105      	bne.n	8005c5c <ESP_Upkeep+0x7bc>
           InitIsDone = true;
- 8005bdc:	4b36      	ldr	r3, [pc, #216]	@ (8005cb8 <ESP_Upkeep+0x818>)
- 8005bde:	2201      	movs	r2, #1
- 8005be0:	701a      	strb	r2, [r3, #0]
+ 8005c50:	4b44      	ldr	r3, [pc, #272]	@ (8005d64 <ESP_Upkeep+0x8c4>)
+ 8005c52:	2201      	movs	r2, #1
+ 8005c54:	701a      	strb	r2, [r3, #0]
           EspState = ESP_STATE_MODE_SELECT;
- 8005be2:	4b1c      	ldr	r3, [pc, #112]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005be4:	220b      	movs	r2, #11
- 8005be6:	701a      	strb	r2, [r3, #0]
+ 8005c56:	4b44      	ldr	r3, [pc, #272]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005c58:	220b      	movs	r2, #11
+ 8005c5a:	701a      	strb	r2, [r3, #0]
         }
         if(Mode == AT_MODE_CONFIG){
- 8005be8:	4b26      	ldr	r3, [pc, #152]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005bea:	781b      	ldrb	r3, [r3, #0]
- 8005bec:	2b01      	cmp	r3, #1
- 8005bee:	d108      	bne.n	8005c02 <ESP_Upkeep+0x762>
+ 8005c5c:	4b40      	ldr	r3, [pc, #256]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005c5e:	781b      	ldrb	r3, [r3, #0]
+ 8005c60:	2b01      	cmp	r3, #1
+ 8005c62:	d108      	bne.n	8005c76 <ESP_Upkeep+0x7d6>
           ConnectionMade = true;
- 8005bf0:	4b32      	ldr	r3, [pc, #200]	@ (8005cbc <ESP_Upkeep+0x81c>)
- 8005bf2:	2201      	movs	r2, #1
- 8005bf4:	701a      	strb	r2, [r3, #0]
+ 8005c64:	4b41      	ldr	r3, [pc, #260]	@ (8005d6c <ESP_Upkeep+0x8cc>)
+ 8005c66:	2201      	movs	r2, #1
+ 8005c68:	701a      	strb	r2, [r3, #0]
           beurs = true;
- 8005bf6:	4b32      	ldr	r3, [pc, #200]	@ (8005cc0 <ESP_Upkeep+0x820>)
- 8005bf8:	2201      	movs	r2, #1
- 8005bfa:	701a      	strb	r2, [r3, #0]
+ 8005c6a:	4b41      	ldr	r3, [pc, #260]	@ (8005d70 <ESP_Upkeep+0x8d0>)
+ 8005c6c:	2201      	movs	r2, #1
+ 8005c6e:	701a      	strb	r2, [r3, #0]
           EspState = ESP_STATE_MODE_SELECT;
- 8005bfc:	4b15      	ldr	r3, [pc, #84]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005bfe:	220b      	movs	r2, #11
- 8005c00:	701a      	strb	r2, [r3, #0]
+ 8005c70:	4b3d      	ldr	r3, [pc, #244]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005c72:	220b      	movs	r2, #11
+ 8005c74:	701a      	strb	r2, [r3, #0]
         }
         if(Mode == AT_MODE_SEND){
- 8005c02:	4b20      	ldr	r3, [pc, #128]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005c04:	781b      	ldrb	r3, [r3, #0]
- 8005c06:	2b02      	cmp	r3, #2
- 8005c08:	d102      	bne.n	8005c10 <ESP_Upkeep+0x770>
+ 8005c76:	4b3a      	ldr	r3, [pc, #232]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005c78:	781b      	ldrb	r3, [r3, #0]
+ 8005c7a:	2b02      	cmp	r3, #2
+ 8005c7c:	d102      	bne.n	8005c84 <ESP_Upkeep+0x7e4>
           EspState = ESP_STATE_INIT;
- 8005c0a:	4b12      	ldr	r3, [pc, #72]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005c0c:	2202      	movs	r2, #2
- 8005c0e:	701a      	strb	r2, [r3, #0]
+ 8005c7e:	4b3a      	ldr	r3, [pc, #232]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005c80:	2202      	movs	r2, #2
+ 8005c82:	701a      	strb	r2, [r3, #0]
         }
         if(Mode == AT_MODE_RECONFIG){
- 8005c10:	4b1c      	ldr	r3, [pc, #112]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005c12:	781b      	ldrb	r3, [r3, #0]
- 8005c14:	2b03      	cmp	r3, #3
- 8005c16:	d108      	bne.n	8005c2a <ESP_Upkeep+0x78a>
+ 8005c84:	4b36      	ldr	r3, [pc, #216]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005c86:	781b      	ldrb	r3, [r3, #0]
+ 8005c88:	2b03      	cmp	r3, #3
+ 8005c8a:	d108      	bne.n	8005c9e <ESP_Upkeep+0x7fe>
           EspState = ESP_STATE_CONFIG;
- 8005c18:	4b0e      	ldr	r3, [pc, #56]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005c1a:	220e      	movs	r2, #14
- 8005c1c:	701a      	strb	r2, [r3, #0]
+ 8005c8c:	4b36      	ldr	r3, [pc, #216]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005c8e:	220e      	movs	r2, #14
+ 8005c90:	701a      	strb	r2, [r3, #0]
           Info("Do nothing until reset");
- 8005c1e:	4a29      	ldr	r2, [pc, #164]	@ (8005cc4 <ESP_Upkeep+0x824>)
- 8005c20:	4b1a      	ldr	r3, [pc, #104]	@ (8005c8c <ESP_Upkeep+0x7ec>)
- 8005c22:	0019      	movs	r1, r3
- 8005c24:	2002      	movs	r0, #2
- 8005c26:	f008 fb85 	bl	800e334 <CreateLine>
+ 8005c92:	4a38      	ldr	r2, [pc, #224]	@ (8005d74 <ESP_Upkeep+0x8d4>)
+ 8005c94:	4b38      	ldr	r3, [pc, #224]	@ (8005d78 <ESP_Upkeep+0x8d8>)
+ 8005c96:	0019      	movs	r1, r3
+ 8005c98:	2002      	movs	r0, #2
+ 8005c9a:	f008 fb4b 	bl	800e334 <CreateLine>
         }
         if(Mode == AT_MODE_TEST){
- 8005c2a:	4b16      	ldr	r3, [pc, #88]	@ (8005c84 <ESP_Upkeep+0x7e4>)
- 8005c2c:	781b      	ldrb	r3, [r3, #0]
- 8005c2e:	2b04      	cmp	r3, #4
- 8005c30:	d165      	bne.n	8005cfe <ESP_Upkeep+0x85e>
+ 8005c9e:	4b30      	ldr	r3, [pc, #192]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005ca0:	781b      	ldrb	r3, [r3, #0]
+ 8005ca2:	2b04      	cmp	r3, #4
+ 8005ca4:	d11f      	bne.n	8005ce6 <ESP_Upkeep+0x846>
           EspState = ESP_STATE_MODE_SELECT;
- 8005c32:	4b08      	ldr	r3, [pc, #32]	@ (8005c54 <ESP_Upkeep+0x7b4>)
- 8005c34:	220b      	movs	r2, #11
- 8005c36:	701a      	strb	r2, [r3, #0]
+ 8005ca6:	4b30      	ldr	r3, [pc, #192]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005ca8:	220b      	movs	r2, #11
+ 8005caa:	701a      	strb	r2, [r3, #0]
           beursTest = true;
- 8005c38:	4b23      	ldr	r3, [pc, #140]	@ (8005cc8 <ESP_Upkeep+0x828>)
- 8005c3a:	2201      	movs	r2, #1
- 8005c3c:	701a      	strb	r2, [r3, #0]
+ 8005cac:	4b33      	ldr	r3, [pc, #204]	@ (8005d7c <ESP_Upkeep+0x8dc>)
+ 8005cae:	2201      	movs	r2, #1
+ 8005cb0:	701a      	strb	r2, [r3, #0]
         if(Mode == AT_MODE_TEST){
- 8005c3e:	e05e      	b.n	8005cfe <ESP_Upkeep+0x85e>
- 8005c40:	20000a1c 	.word	0x20000a1c
- 8005c44:	20000a29 	.word	0x20000a29
- 8005c48:	2000002a 	.word	0x2000002a
- 8005c4c:	20000a2a 	.word	0x20000a2a
- 8005c50:	20000a16 	.word	0x20000a16
- 8005c54:	20000028 	.word	0x20000028
- 8005c58:	20000a17 	.word	0x20000a17
- 8005c5c:	0003a980 	.word	0x0003a980
- 8005c60:	20000553 	.word	0x20000553
- 8005c64:	20000564 	.word	0x20000564
- 8005c68:	20000560 	.word	0x20000560
- 8005c6c:	0802398c 	.word	0x0802398c
- 8005c70:	0802301c 	.word	0x0802301c
- 8005c74:	20000a18 	.word	0x20000a18
- 8005c78:	080239c0 	.word	0x080239c0
- 8005c7c:	080239fc 	.word	0x080239fc
- 8005c80:	20000a0c 	.word	0x20000a0c
- 8005c84:	20000a2b 	.word	0x20000a2b
- 8005c88:	08023a2c 	.word	0x08023a2c
- 8005c8c:	08023a44 	.word	0x08023a44
- 8005c90:	20000001 	.word	0x20000001
- 8005c94:	047e7c4f 	.word	0x047e7c4f
- 8005c98:	20000a20 	.word	0x20000a20
- 8005c9c:	08023a48 	.word	0x08023a48
- 8005ca0:	20000a24 	.word	0x20000a24
- 8005ca4:	08023a8c 	.word	0x08023a8c
- 8005ca8:	2000054c 	.word	0x2000054c
- 8005cac:	50001c00 	.word	0x50001c00
- 8005cb0:	50000800 	.word	0x50000800
- 8005cb4:	2000054f 	.word	0x2000054f
- 8005cb8:	2000054d 	.word	0x2000054d
- 8005cbc:	20000550 	.word	0x20000550
- 8005cc0:	20000552 	.word	0x20000552
- 8005cc4:	08023aac 	.word	0x08023aac
- 8005cc8:	20000551 	.word	0x20000551
+ 8005cb2:	e018      	b.n	8005ce6 <ESP_Upkeep+0x846>
         }
       }
       else if (TimestampIsReached(ESPNTPTimeStamp)) {
- 8005ccc:	4b27      	ldr	r3, [pc, #156]	@ (8005d6c <ESP_Upkeep+0x8cc>)
- 8005cce:	681b      	ldr	r3, [r3, #0]
- 8005cd0:	0018      	movs	r0, r3
- 8005cd2:	f008 fad9 	bl	800e288 <TimestampIsReached>
- 8005cd6:	1e03      	subs	r3, r0, #0
- 8005cd8:	d041      	beq.n	8005d5e <ESP_Upkeep+0x8be>
+ 8005cb4:	4b32      	ldr	r3, [pc, #200]	@ (8005d80 <ESP_Upkeep+0x8e0>)
+ 8005cb6:	681b      	ldr	r3, [r3, #0]
+ 8005cb8:	0018      	movs	r0, r3
+ 8005cba:	f008 fae5 	bl	800e288 <TimestampIsReached>
+ 8005cbe:	1e03      	subs	r3, r0, #0
+ 8005cc0:	d041      	beq.n	8005d46 <ESP_Upkeep+0x8a6>
         if(Mode == AT_MODE_SEND ) {
- 8005cda:	4b25      	ldr	r3, [pc, #148]	@ (8005d70 <ESP_Upkeep+0x8d0>)
- 8005cdc:	781b      	ldrb	r3, [r3, #0]
- 8005cde:	2b02      	cmp	r3, #2
- 8005ce0:	d13d      	bne.n	8005d5e <ESP_Upkeep+0x8be>
+ 8005cc2:	4b27      	ldr	r3, [pc, #156]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005cc4:	781b      	ldrb	r3, [r3, #0]
+ 8005cc6:	2b02      	cmp	r3, #2
+ 8005cc8:	d13d      	bne.n	8005d46 <ESP_Upkeep+0x8a6>
             Mode = AT_MODE_GETTIME;
- 8005ce2:	4b23      	ldr	r3, [pc, #140]	@ (8005d70 <ESP_Upkeep+0x8d0>)
- 8005ce4:	2205      	movs	r2, #5
- 8005ce6:	701a      	strb	r2, [r3, #0]
+ 8005cca:	4b25      	ldr	r3, [pc, #148]	@ (8005d60 <ESP_Upkeep+0x8c0>)
+ 8005ccc:	2205      	movs	r2, #5
+ 8005cce:	701a      	strb	r2, [r3, #0]
 //          EspState = ESP_STATE_MODE_SELECT;
          EspState = ESP_STATE_INIT;
- 8005ce8:	4b22      	ldr	r3, [pc, #136]	@ (8005d74 <ESP_Upkeep+0x8d4>)
- 8005cea:	2202      	movs	r2, #2
- 8005cec:	701a      	strb	r2, [r3, #0]
+ 8005cd0:	4b25      	ldr	r3, [pc, #148]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005cd2:	2202      	movs	r2, #2
+ 8005cd4:	701a      	strb	r2, [r3, #0]
          savedESPTimeStamp = ESPTimeStamp;
- 8005cee:	4b22      	ldr	r3, [pc, #136]	@ (8005d78 <ESP_Upkeep+0x8d8>)
- 8005cf0:	681a      	ldr	r2, [r3, #0]
- 8005cf2:	4b22      	ldr	r3, [pc, #136]	@ (8005d7c <ESP_Upkeep+0x8dc>)
- 8005cf4:	601a      	str	r2, [r3, #0]
+ 8005cd6:	4b1f      	ldr	r3, [pc, #124]	@ (8005d54 <ESP_Upkeep+0x8b4>)
+ 8005cd8:	681a      	ldr	r2, [r3, #0]
+ 8005cda:	4b2a      	ldr	r3, [pc, #168]	@ (8005d84 <ESP_Upkeep+0x8e4>)
+ 8005cdc:	601a      	str	r2, [r3, #0]
          setTime = true;
- 8005cf6:	4b22      	ldr	r3, [pc, #136]	@ (8005d80 <ESP_Upkeep+0x8e0>)
- 8005cf8:	2201      	movs	r2, #1
- 8005cfa:	701a      	strb	r2, [r3, #0]
+ 8005cde:	4b2a      	ldr	r3, [pc, #168]	@ (8005d88 <ESP_Upkeep+0x8e8>)
+ 8005ce0:	2201      	movs	r2, #1
+ 8005ce2:	701a      	strb	r2, [r3, #0]
  //        Debug("setTime to true");
         }
       }
       break;
- 8005cfc:	e02f      	b.n	8005d5e <ESP_Upkeep+0x8be>
- 8005cfe:	e02e      	b.n	8005d5e <ESP_Upkeep+0x8be>
+ 8005ce4:	e02f      	b.n	8005d46 <ESP_Upkeep+0x8a6>
+ 8005ce6:	e02e      	b.n	8005d46 <ESP_Upkeep+0x8a6>
 
     case ESP_STATE_CONFIG:
       Info("Do nothing until reset");
- 8005d00:	4a20      	ldr	r2, [pc, #128]	@ (8005d84 <ESP_Upkeep+0x8e4>)
- 8005d02:	4b21      	ldr	r3, [pc, #132]	@ (8005d88 <ESP_Upkeep+0x8e8>)
- 8005d04:	0019      	movs	r1, r3
- 8005d06:	2002      	movs	r0, #2
- 8005d08:	f008 fb14 	bl	800e334 <CreateLine>
+ 8005ce8:	4a22      	ldr	r2, [pc, #136]	@ (8005d74 <ESP_Upkeep+0x8d4>)
+ 8005cea:	4b23      	ldr	r3, [pc, #140]	@ (8005d78 <ESP_Upkeep+0x8d8>)
+ 8005cec:	0019      	movs	r1, r3
+ 8005cee:	2002      	movs	r0, #2
+ 8005cf0:	f008 fb20 	bl	800e334 <CreateLine>
       Process_PC_Config(GetUsbRxPointer());
- 8005d0c:	f016 ffa8 	bl	801cc60 <GetUsbRxPointer>
- 8005d10:	0003      	movs	r3, r0
- 8005d12:	0018      	movs	r0, r3
- 8005d14:	f000 f8b2 	bl	8005e7c <Process_PC_Config>
+ 8005cf4:	f016 ffb4 	bl	801cc60 <GetUsbRxPointer>
+ 8005cf8:	0003      	movs	r3, r0
+ 8005cfa:	0018      	movs	r0, r3
+ 8005cfc:	f000 f8be 	bl	8005e7c <Process_PC_Config>
       break;
- 8005d18:	e022      	b.n	8005d60 <ESP_Upkeep+0x8c0>
+ 8005d00:	e022      	b.n	8005d48 <ESP_Upkeep+0x8a8>
 
     case ESP_STATE_ERROR:
       // Handle error state
       Error("ESP Error occurred");
- 8005d1a:	4a1c      	ldr	r2, [pc, #112]	@ (8005d8c <ESP_Upkeep+0x8ec>)
- 8005d1c:	4b1c      	ldr	r3, [pc, #112]	@ (8005d90 <ESP_Upkeep+0x8f0>)
- 8005d1e:	0019      	movs	r1, r3
- 8005d20:	2001      	movs	r0, #1
- 8005d22:	f008 fb07 	bl	800e334 <CreateLine>
+ 8005d02:	4a22      	ldr	r2, [pc, #136]	@ (8005d8c <ESP_Upkeep+0x8ec>)
+ 8005d04:	4b22      	ldr	r3, [pc, #136]	@ (8005d90 <ESP_Upkeep+0x8f0>)
+ 8005d06:	0019      	movs	r1, r3
+ 8005d08:	2001      	movs	r0, #1
+ 8005d0a:	f008 fb13 	bl	800e334 <CreateLine>
       EspState = ESP_STATE_INIT;
- 8005d26:	4b13      	ldr	r3, [pc, #76]	@ (8005d74 <ESP_Upkeep+0x8d4>)
- 8005d28:	2202      	movs	r2, #2
- 8005d2a:	701a      	strb	r2, [r3, #0]
+ 8005d0e:	4b16      	ldr	r3, [pc, #88]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005d10:	2202      	movs	r2, #2
+ 8005d12:	701a      	strb	r2, [r3, #0]
       break;
- 8005d2c:	e018      	b.n	8005d60 <ESP_Upkeep+0x8c0>
+ 8005d14:	e018      	b.n	8005d48 <ESP_Upkeep+0x8a8>
 
     default:
       // Handle unexpected state
       Error("Something unknown went wrong with the ESP_STATE");
- 8005d2e:	4a19      	ldr	r2, [pc, #100]	@ (8005d94 <ESP_Upkeep+0x8f4>)
- 8005d30:	4b17      	ldr	r3, [pc, #92]	@ (8005d90 <ESP_Upkeep+0x8f0>)
- 8005d32:	0019      	movs	r1, r3
- 8005d34:	2001      	movs	r0, #1
- 8005d36:	f008 fafd 	bl	800e334 <CreateLine>
+ 8005d16:	4a1f      	ldr	r2, [pc, #124]	@ (8005d94 <ESP_Upkeep+0x8f4>)
+ 8005d18:	4b1d      	ldr	r3, [pc, #116]	@ (8005d90 <ESP_Upkeep+0x8f0>)
+ 8005d1a:	0019      	movs	r1, r3
+ 8005d1c:	2001      	movs	r0, #1
+ 8005d1e:	f008 fb09 	bl	800e334 <CreateLine>
       EspState = ESP_STATE_ERROR;
- 8005d3a:	4b0e      	ldr	r3, [pc, #56]	@ (8005d74 <ESP_Upkeep+0x8d4>)
- 8005d3c:	2207      	movs	r2, #7
- 8005d3e:	701a      	strb	r2, [r3, #0]
+ 8005d22:	4b11      	ldr	r3, [pc, #68]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005d24:	2207      	movs	r2, #7
+ 8005d26:	701a      	strb	r2, [r3, #0]
       break;
- 8005d40:	e00e      	b.n	8005d60 <ESP_Upkeep+0x8c0>
+ 8005d28:	e00e      	b.n	8005d48 <ESP_Upkeep+0x8a8>
       break;
+ 8005d2a:	46c0      	nop			@ (mov r8, r8)
+ 8005d2c:	e00c      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+      break;
+ 8005d2e:	46c0      	nop			@ (mov r8, r8)
+ 8005d30:	e00a      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+        break;
+ 8005d32:	46c0      	nop			@ (mov r8, r8)
+ 8005d34:	e008      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+    break;
+ 8005d36:	46c0      	nop			@ (mov r8, r8)
+ 8005d38:	e006      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+    break;
+ 8005d3a:	46c0      	nop			@ (mov r8, r8)
+ 8005d3c:	e004      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+      break;
+ 8005d3e:	46c0      	nop			@ (mov r8, r8)
+ 8005d40:	e002      	b.n	8005d48 <ESP_Upkeep+0x8a8>
+    break;
  8005d42:	46c0      	nop			@ (mov r8, r8)
- 8005d44:	e00c      	b.n	8005d60 <ESP_Upkeep+0x8c0>
+ 8005d44:	e000      	b.n	8005d48 <ESP_Upkeep+0x8a8>
       break;
  8005d46:	46c0      	nop			@ (mov r8, r8)
- 8005d48:	e00a      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-        break;
- 8005d4a:	46c0      	nop			@ (mov r8, r8)
- 8005d4c:	e008      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-    break;
- 8005d4e:	46c0      	nop			@ (mov r8, r8)
- 8005d50:	e006      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-    break;
- 8005d52:	46c0      	nop			@ (mov r8, r8)
- 8005d54:	e004      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-      break;
- 8005d56:	46c0      	nop			@ (mov r8, r8)
- 8005d58:	e002      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-    break;
- 8005d5a:	46c0      	nop			@ (mov r8, r8)
- 8005d5c:	e000      	b.n	8005d60 <ESP_Upkeep+0x8c0>
-      break;
- 8005d5e:	46c0      	nop			@ (mov r8, r8)
   }
   return EspState;
- 8005d60:	4b04      	ldr	r3, [pc, #16]	@ (8005d74 <ESP_Upkeep+0x8d4>)
- 8005d62:	781b      	ldrb	r3, [r3, #0]
+ 8005d48:	4b07      	ldr	r3, [pc, #28]	@ (8005d68 <ESP_Upkeep+0x8c8>)
+ 8005d4a:	781b      	ldrb	r3, [r3, #0]
 }
- 8005d64:	0018      	movs	r0, r3
- 8005d66:	46bd      	mov	sp, r7
- 8005d68:	b002      	add	sp, #8
- 8005d6a:	bdb0      	pop	{r4, r5, r7, pc}
- 8005d6c:	20000a20 	.word	0x20000a20
- 8005d70:	20000a2b 	.word	0x20000a2b
- 8005d74:	20000028 	.word	0x20000028
- 8005d78:	20000a1c 	.word	0x20000a1c
- 8005d7c:	20000a24 	.word	0x20000a24
- 8005d80:	20000001 	.word	0x20000001
- 8005d84:	08023aac 	.word	0x08023aac
- 8005d88:	08023a44 	.word	0x08023a44
+ 8005d4c:	0018      	movs	r0, r3
+ 8005d4e:	46bd      	mov	sp, r7
+ 8005d50:	b002      	add	sp, #8
+ 8005d52:	bdb0      	pop	{r4, r5, r7, pc}
+ 8005d54:	20000a1c 	.word	0x20000a1c
+ 8005d58:	2000054f 	.word	0x2000054f
+ 8005d5c:	20000553 	.word	0x20000553
+ 8005d60:	20000a2b 	.word	0x20000a2b
+ 8005d64:	2000054d 	.word	0x2000054d
+ 8005d68:	20000028 	.word	0x20000028
+ 8005d6c:	20000550 	.word	0x20000550
+ 8005d70:	20000552 	.word	0x20000552
+ 8005d74:	08023aac 	.word	0x08023aac
+ 8005d78:	08023a44 	.word	0x08023a44
+ 8005d7c:	20000551 	.word	0x20000551
+ 8005d80:	20000a20 	.word	0x20000a20
+ 8005d84:	20000a24 	.word	0x20000a24
+ 8005d88:	20000001 	.word	0x20000001
  8005d8c:	08023ac4 	.word	0x08023ac4
  8005d90:	0802301c 	.word	0x0802301c
  8005d94:	08023ad8 	.word	0x08023ad8
