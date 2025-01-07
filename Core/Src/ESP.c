@@ -15,6 +15,7 @@
 #include "PowerUtils.h"
 #include "RealTimeClock.h"
 #include "sen5x.h"
+#include "statusCheck.h"
 #include "main.h"
 #include <stdint.h>
 #ifdef PUBLIC
@@ -115,7 +116,7 @@ void setESPTimeStamp(uint32_t delayms) {
 }
 void setCharges(){
   batteryCharge = ReadBatteryVoltage();
-  solarCharge = ReadSolarVoltage();
+  solarCharge = ReadSolarVoltage() / 1000.0;
 }
 bool checkEEprom(){
   static uint8_t tempConfig[IdSize];
@@ -983,7 +984,7 @@ void ESP_WakeTest(void) {
 //      Debug("TestState: ESP_TEST_VALIDATE");
       //Set measurement completed
       TIM3 -> CCR1 = LED_OFF;
-      TIM3 -> CCR2 = LED_ON;
+      TIM3 -> CCR2 = Calculate_LED_ON();
       TIM3 -> CCR3 = LED_OFF;
       TestState = ESP_TEST_DEINIT;
 
@@ -1009,7 +1010,7 @@ void ESP_WakeTest(void) {
 //      Debug("TestState: ESP_TEST_BOOT");
       TIM3 -> CCR1 = 4000;
       TIM3 -> CCR2 = 4000;
-      TIM3 -> CCR3 = 0;
+      TIM3 -> CCR3 = Calculate_LED_ON();
       //WAIT FOR RESET;
       break;
   }

@@ -16,6 +16,7 @@
 #include "microphone.h"
 #include "sen5x.h"
 #include "sound_measurement.h"
+#include "statusCheck.h"
 
 //static I2C_HandleTypeDef* sensorI2C = NULL;
 
@@ -171,14 +172,14 @@ void Device_Test(){
 //      Debug("MIC_TestMeasurementDone() is true");
       SensorProbe.MIC_Present = true;
       Sensor.MIC_measurementEnabled = true;
-      SetStatusLED(LED_OFF, LED_ON, LED_OFF);
+      SetStatusLED(LED_OFF, Calculate_LED_ON(), LED_OFF);
     }
     else{
       if (micSettlingComplete()) {
         // his has to be met first
 //        Debug("micSettlingComplete() is true");
         Sensor.MIC_measurementEnabled = true;
-        SetStatusLED(LED_ON, LED_OFF, LED_OFF);
+        SetStatusLED(Calculate_LED_ON(), LED_OFF, LED_OFF);
       }
     }
   }

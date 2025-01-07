@@ -3,8 +3,15 @@
  *
  *  Created on: Sep 17, 2024
  *      Author: Danny
+ *
+ *      tim clock = APB tim clock / prescaler
+ *      frequency = tim clock / auto reload register
+ *      duty cycle in % = (Capture Compare Register CCRx / auto reload register) * 100%
+ *
+ *
  */
 #include "statusCheck.h"
+#include "PowerUtils.h"
 #include "RealTimeClock.h"
 #include "rtc.h"
 #include "sen5x.h"
@@ -55,6 +62,27 @@ Battery_Status batteryChargeCheck(){
   }
   return(status);
 }
+/*
+//==========================
+// code om de pwm helderheid van de leds te testen
+for (int b=40 ; b>0 ; b--) {
+  SetStatusLED(4000, 4000, b*100);  // 0 is on | 4000 is off
+  HAL_Delay(1000);
+}
+//====================
+*/
+
+uint16_t Calculate_LED_ON() {
+  static uint16_t solmV;
+  solmV = ReadSolarVoltage();
+  if (solmV < 2900) {
+    solmV = 2900;
+  }
+  if (solmV > 4700) {
+    solmV = 4700;
+  }
+  return (solmV+(3566-solmV)*1.5);
+}
 
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue){
   if(usbPluggedIn || init || userToggle){
@@ -82,7 +110,7 @@ void SetVocLED(uint16_t red, uint16_t green, uint16_t blue){
 }
 void SetMeasurementIndicator(){
   if(usbPluggedIn||userToggle){
-    TIM2 -> CCR3 = LED_ON;
+    TIM2 -> CCR3 = Calculate_LED_ON();
   }
 }
 void ResetMeasurementIndicator(){
@@ -92,14 +120,14 @@ void ResetMeasurementIndicator(){
 }
 void SetMICIndicator(){
   if(usbPluggedIn||userToggle){
-    TIM2 -> CCR1 = LED_ON;
+    TIM2 -> CCR1 = Calculate_LED_ON();
   }
   else {
     if (batteryCharge > 3.7) {
-      TIM2 -> CCR3 = LED_ON;
+      TIM2 -> CCR3 = Calculate_LED_ON();
     }
     else {
-      TIM2 -> CCR1 = LED_ON;
+      TIM2 -> CCR1 = Calculate_LED_ON();
     }
   }
 }
@@ -118,7 +146,7 @@ void ResetMICIndicator(){
 }
 void SetESPIndicator(){
   if(usbPluggedIn||userToggle){
-    TIM2 -> CCR4 = LED_ON;
+    TIM2 -> CCR4 = Calculate_LED_ON();
   }
 }
 void ResetESPIndicator(){
@@ -129,9 +157,9 @@ void ResetESPIndicator(){
 
 void SetPMIndicator() {
   if(usbPluggedIn||userToggle){
-    TIM2 -> CCR4 = LED_ON;
-    TIM2 -> CCR1 = LED_ON;
-    TIM2 -> CCR3 = LED_ON;
+    TIM2 -> CCR4 = Calculate_LED_ON();
+    TIM2 -> CCR1 = Calculate_LED_ON();
+    TIM2 -> CCR3 = Calculate_LED_ON();
   }
 }
 
@@ -207,11 +235,11 @@ void configCheck(){
     if (GetPMSensorPresence() && ((product_name[4] == '4') || (product_name[4] == '5'))) {
       uint16_t color;
       VOCNOx = !VOCNOx;
-      if (VOCNOx)  color = 0;
+      if (VOCNOx)  color = Calculate_LED_ON();
         else color = 4000;
       Info("VOC and NOx only measurement %s", VOCNOx?"enabled":"disabled");
       for (uint8_t i=0; i<2; i++) {
-        TIM3 -> CCR1 = 0;
+        TIM3 -> CCR1 = Calculate_LED_ON();
         TIM3 -> CCR2 = color;
         TIM3 -> CCR3 = color;
         HAL_Delay(400);

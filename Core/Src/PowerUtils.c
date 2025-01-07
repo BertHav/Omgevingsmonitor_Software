@@ -38,10 +38,11 @@ float ReadBatteryVoltage(void){
 
 /* function to read the actual battery voltage */
 
-float ReadSolarVoltage(void){
+//float ReadSolarVoltage(void){
+uint16_t ReadSolarVoltage(void){
   /* Channel 15 is the Solar voltage */
-  static uint32_t value = 0;
-  static float trueValue = 0;
+  static uint32_t solarvalue = 0;
+//  static float trueValue = 0;
   sConfig.Channel = ADC_CHANNEL_15;
   sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
@@ -49,15 +50,16 @@ float ReadSolarVoltage(void){
   }
   HAL_ADC_Start(&hadc);
   HAL_ADC_PollForConversion(&hadc, 1);
-  value = (HAL_ADC_GetValue(&hadc)*Vref*3)/4095;
-  trueValue = (float)value / 1000.0;
+  solarvalue = (HAL_ADC_GetValue(&hadc)*Vref*3)/4095;
+//  trueValue = (float)solarvalue / 1000.0;
   /* Disable Channel 14 */
   sConfig.Channel = ADC_CHANNEL_15;
   sConfig.Rank = ADC_RANK_NONE;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
     Error_Handler();
   }
-  return trueValue;
+//  return trueValue;
+  return solarvalue;
  }
 
 // True if 5V on USB Connector
