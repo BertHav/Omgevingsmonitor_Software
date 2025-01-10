@@ -24,8 +24,6 @@
 #include "math.h"
 #include "microphone_constants.h" // Supply this to define the microphone response
 #include "stm32l0xx_it.h"
-#include "print_functions.h"
-//#include "microphone.h"
 
 // This function must be supplied externally:
 extern void errorHandler(const char * func, const uint32_t line, const char * file);
@@ -91,7 +89,7 @@ static uint32_t getFilteredMaxAmplitudeQ31(const int32_t * data,
 // Return false if no data available.
 bool getSoundData(SoundData_t * data, bool getSPLdata, bool getMaxAmpData)
 {
-//	print("micEnabled:  %d, SPLcalcComplete: %d\r\n", micEnabled, SPLcalcComplete);
+//	printf("micEnabled:  %d, SPLcalcComplete: %d\r\n", micEnabled, SPLcalcComplete);
   if ((!micEnabled) || (!SPLcalcComplete))
     {
         return false;
@@ -188,7 +186,7 @@ static bool startMicSettlingPeriod(void)
 {
 //  Debug("TMR6 started\r\n");
 //  if (htim6 == NULL) {
-//    print("htim6 == NULL");
+//    printf("htim6 == NULL");
 //  }
   __HAL_TIM_SetCounter(htim6, 0);
     if (HAL_TIM_Base_Start(htim6) != HAL_OK)
@@ -201,7 +199,7 @@ static bool startMicSettlingPeriod(void)
 // See whether the warmup/settling time has finished
 bool micSettlingComplete(void)
 {
-//   print("Checking micSettlingComplete\r\n");
+//   printf("Checking micSettlingComplete\r\n");
     bool complete = __HAL_TIM_GET_FLAG(htim6, TIM_SR_UIF);
     if (complete)
     {

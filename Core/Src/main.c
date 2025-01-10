@@ -41,10 +41,10 @@
 #include "statusCheck.h"
 #include "RealTimeClock.h"
 #include "sound_measurement.h"
-#include "print_functions.h"
 #include "sen5x.h"
 #include "sgp40.h"
 #include "wsenHIDS.h"
+#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -91,6 +91,7 @@
   Battery_Status charge;
   extern DMA_HandleTypeDef hdma_spi2_rx;
 
+  void check_cli_command();
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,7 +100,6 @@ void SystemClock_Config(void);
 
 void SetTestDone(){
   testDone = true;
-//  Info("testDone true in SetTestDone\r\n");
   HAL_Delay(1000);
   SetDBLED(false, false, true);
   SetStatusLED(4000, 4000, 3000);
@@ -225,16 +225,17 @@ int main(void)
 	 * : Add CLI via usb-c
 	 * : Network not found? Sleep
 	 */
+//  usbUARTinit(); //serial over USB
   GPIO_InitPWMLEDs(&htim2, &htim3);
   if(UserButton_Pressed()){
     EnableESPProg();
     ESP_Programming = true;
   }
   SetVerboseLevel(VERBOSE_ALL);
-  BinaryReleaseInfo();
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
   InitClock(&hrtc);
   Debug("Clock init done");
+  BinaryReleaseInfo();
 
   if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn)) {
     errorHandler(__func__, __LINE__, __FILE__);
@@ -273,7 +274,6 @@ int main(void)
       if (priorUSBpluggedIn != usbPluggedIn) {
         Debug("USB power state change detected");
         if (IsSGPPresent() && !usbPluggedIn) {
-//        if (IsSGPPresent() && ((product_name[4] == '4') || (product_name[4] == '5')) && !usbPluggedIn) {
           SetVOCSensorDIS_ENA(true);
         }
         if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
@@ -292,7 +292,6 @@ int main(void)
       }
       if ( ((charge >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
         if (!sen5x_Get_sen5x_enable_state()&& usbPluggedIn ) {
-          Debug("sen5x_enable called from line 287 main.c");
           sen5x_enable(0);
         }
         sen5x_statemachine();
@@ -316,7 +315,6 @@ int main(void)
         Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
       }
     }
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -386,15 +384,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-// Provide a print interface for print_functions.
-void printString(const char * str, uint16_t length)
-{
-    HAL_UART_Transmit(&huart1, (uint8_t*) str, length, 0xFFFF);
-}
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
+void check_cli_command(){
   switch (u1_rx_buff[0]){
     case (uint8_t)'a':
       printf("VerboseLevel set to all\r\n");
@@ -433,6 +424,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       printf("t - Show actual systemtime\r\n");
   break;
   }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
+  check_cli_command();
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1); //Re-arm the interrupt
 }
 

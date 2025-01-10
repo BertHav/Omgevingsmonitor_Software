@@ -19,14 +19,14 @@
 #include "statusCheck.h"
 
 //static I2C_HandleTypeDef* sensorI2C = NULL;
-
+/*
 EnabledMeasurements Sensor = {
     .HT_measurementEnabled = true,
     .VOC_measurementEnabled = true,
     .PM_measurementEnabled = true,
     .MIC_measurementEnabled = true
 };
-
+*/
 EnabledMeasurements Sensor;
 DevicePresent SensorProbe;
 
@@ -37,6 +37,10 @@ void testInit(){
   SensorProbe.MIC_Present = false;
   SensorProbe.ESP_Present = false;
   SensorProbe.SGP_Enabled = false;
+  Sensor.HT_measurementEnabled = true;
+  Sensor.VOC_measurementEnabled = true;
+  Sensor.PM_measurementEnabled = true;
+  Sensor.MIC_measurementEnabled = true;
 }
 
 bool GetPMSensorPresence(){
@@ -232,8 +236,9 @@ void EnabledConnectedDevices() {
 }
 
 void DisableConnectedDevices() {
-    Sensor.HT_measurementEnabled = false;
-    Sensor.VOC_measurementEnabled = false;
-    Sensor.PM_measurementEnabled = false;
-    Sensor.MIC_measurementEnabled = false;
+  Debug("Devices disabled");
+  Sensor.HT_measurementEnabled = false;
+  Sensor.VOC_measurementEnabled = false;
+  Sensor.PM_measurementEnabled = false;
+  Sensor.MIC_measurementEnabled = false;
 }

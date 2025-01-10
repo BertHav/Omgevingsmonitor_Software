@@ -10,7 +10,6 @@
 //#include "main.h"
 #include "GPIO.h"
 #include "sound_measurement.h"
-#include "print_functions.h"
 
 static volatile uint32_t StartTime = 0;
 static volatile uint32_t StartupDoneTime = 0;
@@ -65,7 +64,7 @@ void MIC_Print(void) {
 //  setMic(dBAAverage);
   setMic(dBAmax);
   }
-  print("SPL_dBA: %.1f, SPL_peak_mPa: %s, dBA peak: %.1f, dBA average: %.1f\r\n", dBA,mPabuffer, dBAmax, dBAAverage);
+  printf("SPL_dBA: %.1f, SPL_peak_mPa: %s, dBA peak: %.1f, dBA average: %.1f\r\n", dBA,mPabuffer, dBAmax, dBAAverage);
 
   if(counter > NUMBER_OF_SAMPLES){
     counter = 0;

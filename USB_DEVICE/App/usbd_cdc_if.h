@@ -134,4 +134,3 @@ uint32_t GetUsbRxDataSize();
 #endif
 
 #endif /* __USBD_CDC_IF_H__ */
-

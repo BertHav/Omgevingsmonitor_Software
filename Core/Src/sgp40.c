@@ -346,7 +346,6 @@ SGP40State SGP_Upkeep(void) {
     break;
 
   case SGP_STATE_PROCESS_RESULTS:
-//    Debug("Processing results in SGP_STATE_PROCESS_RESULTS.");
     setVOC(vocIndex);
     SGPState = SGP_WAIT_STATE_MODE;
     break;
@@ -362,7 +361,6 @@ SGP40State SGP_Upkeep(void) {
   break;
   case SGP_STATE_WAIT:
     if(TimestampIsReached(SGP40TimeStamp)){
-//      Debug("in SGP_STATE_WAIT");
       SetSGP40_GasIndexAlgorithm_Sampling_Interval(); // set the correct sample interval
       SGPState = SGP_STATE_INIT;
     }

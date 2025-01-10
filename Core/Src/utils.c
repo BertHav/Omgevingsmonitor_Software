@@ -6,6 +6,10 @@
  */
 #include "main.h"
 #include "utils.h"
+ #include "usbd_cdc_if.h"
+#include "PC_Config.h"
+//#include "../Inc/PC_Config.h"
+
 
 // Default verbose level
 VerboseLevel CurrentVerboseLevel = VERBOSE_ALL;
@@ -45,6 +49,7 @@ void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
   if (verboseLevel > CurrentVerboseLevel) {
     return;
   }
+
   char textBuffer[TEXTBUFFER_LEN];
 
   // Format the initial part of the message with the tag and timestamp
@@ -65,8 +70,10 @@ void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
   printf("%s\r\n", textBuffer);
 }
 
-int _write(int fd, const void *buf, size_t count) {
+int _write(int fd, void *buf, size_t count) {
+//  int _write(int fd, const void *buf, size_t count) {  // conflict with usb logging during test
   HAL_UART_Transmit(&huart1, buf, count, 100);
+
   return count;
 }
 
@@ -86,7 +93,9 @@ void BinaryReleaseInfo() {
   Info("Software version: %s", SRC_VERSION);
 }
 
+//
 // Call this as: errorHandler(__func__, __LINE__, __FILE__);
+//
 void errorHandler(const char * func, const uint32_t line, const char * file)
 {
     printf("Error in %s at line %lu in file: %s\r\n", func, line, file);

@@ -41,6 +41,7 @@ static bool ConnectionMade = false;
 static bool beursTest = false;
 static bool beurs = false;
 static bool setTime = true;
+static bool msgdone = false;
 bool ESPTransmitDone = false;
 static uint32_t uid[3];
 static uint32_t start;
@@ -75,12 +76,10 @@ static AT_Commands AT_SNTP[] = {AT_WAKEUP, AT_CIPSNTPCFG, AT_CIPSNTPTIME, AT_CIP
 uint8_t ATState;
 uint8_t ATCounter = 0;
 static uint8_t errorcntr = 0;
-//===
 static uint8_t timeoutcntr = 0;
-//===
 static uint32_t ESPTimeStamp = 0;
 static uint32_t ESPNTPTimeStamp = 0;
-static uint32_t savedESPTimeStamp = 0;
+static uint32_t savedESPTimeStamp = 30000;
 static uint8_t retry = 0;
 
 
@@ -313,7 +312,7 @@ uint16_t CreateMessage(bool onBeurs){
   }
   //(char*)nameConfig
   //get name etc from EEprom
-  Debug("sensorid voor opensensmaps nox: %d", noxConfig);
+//  Debug("sensorid voor opensensmaps nox: %d", noxConfig);
   setCharges();
 #ifdef LONGDATAGRAM
   memset(message, '\0', 1152);
@@ -393,8 +392,8 @@ uint16_t CreateMessage(bool onBeurs){
 
     sprintf(&message[index], "{\"SolarVoltage\":%.2f}", solarCharge);
 #endif
-  Debug("Length of datagram: %d", index);
-  index = sprintf(&message[index], "]");
+  sprintf(&message[index], "]");
+  Debug("Length of datagram: %d", strlen(message));
   return strlen(message);
 }
 
@@ -640,6 +639,7 @@ bool WEBSERVER(){
     return false;
   }
 }
+
 //These are the commands necesarry for sending data.
 bool HTTPCPOST(){
   char atCommandBuff[256];
@@ -663,6 +663,7 @@ bool HTTPCPOST(){
     return false;
   }
 }
+
 bool SENDDATA(){
   uint16_t len = strlen(message);
   if(ESP_Send((uint8_t*)message, len)) {
@@ -672,6 +673,7 @@ bool SENDDATA(){
     return false;
   }
 }
+
 bool SLEEP(){
   char* atCommand = "AT+GSLP=30000\r\n";
   //SetCommandBuffer(atCommand);
@@ -682,6 +684,7 @@ bool SLEEP(){
     return false;
   }
 }
+
 bool CIPSNTPCFG(){
   char* atCommand = "AT+CIPSNTPCFG=1,100,\"nl.pool.ntp.org\",\"time.google.com\",\"time.windows.com\"\r\n";
   //SetCommandBuffer(atCommand);
@@ -693,6 +696,7 @@ bool CIPSNTPCFG(){
     return false;
   }
 }
+
 bool CIPSNTPTIME(){
   char* atCommand = "AT+CIPSNTPTIME?\r\n";
   //SetCommandBuffer(atCommand);
@@ -703,6 +707,7 @@ bool CIPSNTPTIME(){
     return false;
   }
 }
+
 bool CIPSNTPINTV(){
   char* atCommand = "AT+CIPSNTPINTV=14400\r\n";
   //SetCommandBuffer(atCommand);
@@ -991,7 +996,7 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_DEINIT:
-//      Debug("TestState: ESP_TEST_DEINIT");
+      Debug("TestState: ESP_TEST_DEINIT");
       testRound = false;
       EspTurnedOn = false;
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
@@ -1041,6 +1046,8 @@ ESP_States ESP_Upkeep(void) {
       break;
 
     case ESP_STATE_INIT:
+      DisableConnectedDevices();
+      SetESPIndicator();
       if(!EspTurnedOn){
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
         HAL_Delay(1);
@@ -1103,7 +1110,6 @@ ESP_States ESP_Upkeep(void) {
         ATCounter = 0;
         Mode = AT_MODE_SEND;
         start = HAL_GetTick();
-        SetESPIndicator();
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
@@ -1114,7 +1120,6 @@ ESP_States ESP_Upkeep(void) {
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
         Mode = AT_MODE_RECONFIG;
-        SetESPIndicator();
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
@@ -1124,7 +1129,6 @@ ESP_States ESP_Upkeep(void) {
         ATCounter = 0;
         Mode = AT_MODE_GETTIME;
         start = HAL_GetTick();
-        SetESPIndicator();
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
@@ -1152,7 +1156,6 @@ ESP_States ESP_Upkeep(void) {
           if (errorcntr >= ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
             ESPTransmitDone = true;
-            ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
             Error("ESP to many retransmits, terminated after %lu ms", (stop-start));
@@ -1171,7 +1174,6 @@ ESP_States ESP_Upkeep(void) {
           if (timeoutcntr >= ESP_MAX_RETRANSMITIONS) {
             ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
             ESPTransmitDone = true;
-            ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
             Error("ESP to many timeouts, terminated after %lu ms", (stop-start));
@@ -1217,7 +1219,6 @@ ESP_States ESP_Upkeep(void) {
       if(ATCommand == AT_END){
         if(Mode == AT_MODE_SEND){
           ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
-          ResetESPIndicator();
           clearDMABuffer();
           stop = HAL_GetTick();
           Info("Message send in %lu ms", (stop-start));
@@ -1231,7 +1232,6 @@ ESP_States ESP_Upkeep(void) {
             ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP;
             Info("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
             ESPTimeStamp = savedESPTimeStamp;
-            ResetESPIndicator();
             clearDMABuffer();
             stop = HAL_GetTick();
             Info("Message time update in %lu ms", (stop-start));
@@ -1252,7 +1252,11 @@ ESP_States ESP_Upkeep(void) {
       HAL_Delay(1);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
       EspState = ESP_STATE_RESET;
+      if (usbPluggedIn) {
+        EnabledConnectedDevices();
+      }
       HAL_Delay(1);
+      ResetESPIndicator();
       errorcntr = 0;
       timeoutcntr = 0;
       break;
@@ -1287,6 +1291,7 @@ ESP_States ESP_Upkeep(void) {
 //          EspState = ESP_STATE_MODE_SELECT;
          EspState = ESP_STATE_INIT;
          savedESPTimeStamp = ESPTimeStamp;
+         Debug("savedESPTimeStamp: %d", savedESPTimeStamp);
          setTime = true;
  //        Debug("setTime to true");
         }
@@ -1294,7 +1299,10 @@ ESP_States ESP_Upkeep(void) {
       break;
 
     case ESP_STATE_CONFIG:
-      Info("Do nothing until reset");
+      if (!msgdone) {
+        Info("Do nothing until reset");
+        msgdone = true;
+      }
       Process_PC_Config(GetUsbRxPointer());
       break;
 

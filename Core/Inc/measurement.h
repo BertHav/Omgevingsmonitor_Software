@@ -42,6 +42,7 @@ void SetESPMeasurementDone();
 bool IsSGPPresent();
 void SetVOCSensorDIS_ENA(bool setting);
 bool IsPMSensorEnabled();
+bool IsMICSensorEnabled();
 bool GetPMSensorPresence();
 void SetPMSensorStatus(bool setting);
 void SetVOCSensorStatus(bool setting);

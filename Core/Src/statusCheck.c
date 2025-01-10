@@ -267,7 +267,9 @@ void configCheck(){
   }
   if(Check_USB_PowerOn()){
     usbPluggedIn = true;
-    EnabledConnectedDevices();
+    // hieronder uitgecommentarieerd omdat die op usb de sensors altijd activeert
+//    Debug("EnabledConnectedDevices() in statuscheck 270");
+//    EnabledConnectedDevices();
   }
   else{
     if(!userToggle && !init){

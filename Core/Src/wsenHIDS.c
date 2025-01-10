@@ -178,7 +178,7 @@ void ShowHumidity(){
 }
 
 bool HIDS_GetMeasurementValues(float* humidity, float* temperature) {
-  // TODO: Store last measurement humidity for sgp40 measurement.
+  // TODO: Store last measurement humidity for accurate sgp40 measurement.
   if(MeasurementDone) return true;
   if(!HIDS_MeasurementReady()) return false;
 //  uint32_t amountOfMeasurements = HIDS_MeasurementDuration / HIDS_Interval_ms;
@@ -187,17 +187,18 @@ bool HIDS_GetMeasurementValues(float* humidity, float* temperature) {
   float currentHumidity;
 //  static float temperatures[HIDS_MAX_MEASUREMENTS];
 //  static float humidities[HIDS_MAX_MEASUREMENTS];
-
   //Debug("HT measurements: %d out of %d completed.", measurements + 1, amountOfMeasurements);
   if (!ReadRegister(HIDS_I2C_ADDRESS, MeasureBuffer, HIDS_MEASURE_BUFFER_LENGTH)) {
     Error("Error during reading the wsenHIDS result register");
   }
 	if(!CheckCRC(MeasureBuffer)) {
-		//Error("HIDS measurements CRC check failed.");
-		//Info("Measure buffer structure:");
+/*
+	  Error("HIDS measurements CRC check failed.");
+		Info("Measure buffer structure:");
 		for(uint8_t i = 0; i < HIDS_MEASURE_BUFFER_LENGTH; i++) {
-			//Debug("HIDS_Measurement buffer[%d]: %d", i, MeasureBuffer[i]);
+			Debug("HIDS_Measurement buffer[%d]: %d", i, MeasureBuffer[i]);
 		}
+*/
 		return false;
 	}
 
@@ -257,28 +258,23 @@ wsenHIDSState HIDS_Upkeep(void) {
       break;
 
     case HIDS_STATE_INIT:
-//      Debug("entered HIDS_STATE_INIT");
       ResetHIDSresults();
       HIDSState = HIDS_STATE_START_MEASUREMENTS;
       break;
 
     case HIDS_STATE_START_MEASUREMENTS:
-//      Debug("entered HIDS_STATE_START_MEASUREMENTS");
       SetMeasurementIndicator();
       HIDS_StartMeasurement();
       HIDSState = HIDS_STATE_WAIT_FOR_COMPLETION;
       break;
 
     case HIDS_STATE_WAIT_FOR_COMPLETION:
-//      Debug("entered HIDS_STATE_WAIT_FOR_COMPLETION");
       if(HIDS_GetMeasurementValues(&humid, &temp)) {
         HIDSState = HIDS_STATE_PROCESS_RESULTS;
       }
       break;
 
     case HIDS_STATE_PROCESS_RESULTS:
-//      Debug("entered HIDS_STATE_PROCESS_RESULTS");
-//      Debug("Processing results.");
       Debug("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
       setHIDS(temp, humid);
       ResetMeasurementIndicator();
@@ -287,7 +283,6 @@ wsenHIDSState HIDS_Upkeep(void) {
       break;
 
     case HIDS_STATE_WAIT:
-//      Debug("entered HIDS_STATE_WAIT");
       if(TimestampIsReached(HIDSTimeStamp)) {
         HIDSState = HIDS_STATE_INIT;
       }
