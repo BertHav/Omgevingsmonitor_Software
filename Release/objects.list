@@ -13,7 +13,6 @@
 "./Core/Src/main.o"
 "./Core/Src/measurement.o"
 "./Core/Src/microphone.o"
-"./Core/Src/print_functions.o"
 "./Core/Src/rtc.o"
 "./Core/Src/sen5x.o"
 "./Core/Src/sen5x_i2c.o"
