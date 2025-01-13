@@ -15,6 +15,7 @@
 
 
 static bool CheckCRC(uint8_t *data, uint8_t dataLength, uint8_t segmentSize);
+static bool sgpinitdone = false;
 static uint8_t CalculateCRC(uint8_t *data, uint8_t length);
 static I2CReadCb ReadFunction = NULL;
 static I2CWriteCB WriteFunction = NULL;
@@ -353,8 +354,12 @@ SGP40State SGP_Upkeep(void) {
     SGPState = SGP_STATE_WAIT;
     if ((sgp40samplecounter == 1) && (!usbPluggedIn)) {
       // restart the SGP40 with a soft reset to enter idle mode
-      SGP_SoftReset();
-      SetVOCSensorStatus(false);
+      // During startup take 12 samples
+      if (sgpinitdone) {
+        SGP_SoftReset();
+        SetVOCSensorStatus(false);
+      }
+      sgpinitdone = true;
     }
     SGP40TimeStamp = HAL_GetTick() + 800;  // about every 1 seconds
     ResetMeasurementIndicator();

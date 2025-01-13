@@ -221,7 +221,7 @@ void configCheck(){
     SetConfigMode(); //Make config mode wifi
     SetDBLED(true, true, true);
   }
-  if(!BootButton_Pressed() && UserButton_Pressed() && !buttonHeld){
+  if(!BootButton_Pressed() && UserButton_Pressed() && !buttonHeld && !GetReconfigMode()){
     SetLEDsOff();
     Debug("userToggle flipped");
     userToggle = !userToggle;

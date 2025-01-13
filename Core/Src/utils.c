@@ -73,7 +73,24 @@ void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
 int _write(int fd, void *buf, size_t count) {
 //  int _write(int fd, const void *buf, size_t count) {  // conflict with usb logging during test
   HAL_UART_Transmit(&huart1, buf, count, 100);
+#ifdef USBLOGGING
+  if (usblog && count < 100) {
+    uint8_t usboutmsg[100];
+    strncpy((char*)usboutmsg, buf, count);
+    usboutmsg[count] = '\0';
+    count = vcp_send(usboutmsg, count);
+  }
 
+  else if (count > 99) {
+    uint8_t usboutmsg[100];
+    strncpy((char*)usboutmsg, buf, 97);
+    usboutmsg[97] = '\r';
+    usboutmsg[98] = '\n';
+    usboutmsg[99] = '\0';
+    count = vcp_send(usboutmsg, 100);
+  }
+
+#endif
   return count;
 }
 

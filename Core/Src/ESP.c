@@ -78,8 +78,8 @@ uint8_t ATCounter = 0;
 static uint8_t errorcntr = 0;
 static uint8_t timeoutcntr = 0;
 static uint32_t ESPTimeStamp = 0;
-static uint32_t ESPNTPTimeStamp = 0;
-static uint32_t savedESPTimeStamp = 30000;
+static uint32_t ESPNTPTimeStamp = 20000;
+static uint32_t savedESPTimeStamp = 28000;
 static uint8_t retry = 0;
 
 
@@ -168,6 +168,11 @@ void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox) {
 
 void SetConfigMode(){
   ReconfigSet = true;
+  usblog = false;
+}
+
+bool GetReconfigMode() {
+  return ReconfigSet;
 }
 // Taken from firmware https://github.com/opendata-stuttgart/sensors-software/blob/master/airrohr-firmware/airrohr-firmware.ino
 
@@ -195,16 +200,16 @@ void ESP_Init(UART_HandleTypeDef* espUart) {
 }
 
 static bool ESP_Send(uint8_t* command, uint16_t length) {
-#ifdef LONGMESSAGES
-  printf("ESP_Send: %s\r\n", command);
-#else
-  Debug("ESP_Send: %s", command);
-#endif
   HAL_StatusTypeDef status = HAL_UART_Transmit_DMA(EspUart, command, length);
   if (status != HAL_OK) {
     Error("Error in HAL_UART_Transmit_DMA");
     return false;
   }
+#ifdef LONGMESSAGES
+  printf("ESP_Send: %s\r\n", command);
+#else
+  Debug("ESP_Send: %s", command);
+#endif
   return true;
 }
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
@@ -804,6 +809,7 @@ bool AT_Send(AT_Commands state){
 
   case AT_WAKEUP:
   if(TimestampIsReached(ESPTimeStamp)){
+//    Debug("AT_WAKEUP");
     ATCommandSend = PollAwake();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_LONG;
   }
@@ -876,11 +882,13 @@ bool AT_Send(AT_Commands state){
     break;
 
   case AT_CIPMUX:
+    Debug("ATCommandSend = CIPMUX()");
     ATCommandSend = CIPMUX();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_WEBSERVER:
+    Debug("ATCommandSend = WEBSERVER()");
     ATCommandSend = WEBSERVER();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
@@ -1113,22 +1121,24 @@ ESP_States ESP_Upkeep(void) {
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-      if(ReconfigSet){
-        memcpy(ATCommandArray, AT_WIFI_RECONFIG, 5);
-        Debug("Reconfig mode voor local wifi config selected");
-        DisableConnectedDevices();
-        EspState = ESP_STATE_SEND;
-        ATCounter = 0;
-        Mode = AT_MODE_RECONFIG;
-        ATCommand = ATCommandArray[ATCounter];
-        ATExpectation = RECEIVE_EXPECTATION_OK;
-      }
       if(InitIsDone && ConnectionMade && beursTest && setTime){
+//        Debug("mode select is get time");
         memcpy(ATCommandArray, AT_SNTP, 4);
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
         Mode = AT_MODE_GETTIME;
         start = HAL_GetTick();
+        ATCommand = ATCommandArray[ATCounter];
+        ATExpectation = RECEIVE_EXPECTATION_OK;
+      }
+      if(ReconfigSet){
+        memcpy(ATCommandArray, AT_WIFI_RECONFIG, 5);
+        Debug("Reconfig mode voor local wifi config selected");
+        DisableConnectedDevices();
+        usblog = false;
+        EspState = ESP_STATE_SEND;
+        ATCounter = 0;
+        Mode = AT_MODE_RECONFIG;
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
@@ -1160,6 +1170,7 @@ ESP_States ESP_Upkeep(void) {
             stop = HAL_GetTick();
             Error("ESP to many retransmits, terminated after %lu ms", (stop-start));
             EspState = ESP_STATE_DEINIT;
+            break;
           }
         }
         if(ATReceived == RECEIVE_STATUS_INCOMPLETE){
@@ -1172,7 +1183,7 @@ ESP_States ESP_Upkeep(void) {
           timeoutcntr++;
           Error("In ESP_STATE_WAIT_FOR_REPLY: RECEIVE_STATUS_TIMEOUT reached");
           if (timeoutcntr >= ESP_MAX_RETRANSMITIONS) {
-            ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
+            ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_RETRANSMIT_SEND;
             ESPTransmitDone = true;
             clearDMABuffer();
             stop = HAL_GetTick();
@@ -1180,9 +1191,10 @@ ESP_States ESP_Upkeep(void) {
             // TODO hier gaat iets fout, de verzending herstart niet meer
             // in log alleen nog D [01039053] EspState: 4 ATcmd: 20 Mode: 2 ATExp: 0
             EspState = ESP_STATE_DEINIT;
-            // mogelijke oplossing door deze twee regels te verwijderen
-            // ATCommand = AT_END;
-            // ATExpectation = RECEIVE_EXPECTATION_OK;
+             ATCommand = AT_END;
+             // mogelijke oplossing door deze regel te verwijderen
+             ATExpectation = RECEIVE_EXPECTATION_OK;
+             break;
           }
           if(ATCommand != AT_SENDDATA){
             EspState = ESP_STATE_SEND;
@@ -1245,6 +1257,7 @@ ESP_States ESP_Upkeep(void) {
     break;
 
     case ESP_STATE_DEINIT:
+//      Debug("ESP_STATE_DEINIT entered");
       EspTurnedOn = false;
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(1);
@@ -1252,9 +1265,11 @@ ESP_States ESP_Upkeep(void) {
       HAL_Delay(1);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
       EspState = ESP_STATE_RESET;
-      if (usbPluggedIn) {
+//      Debug("EspState changed to ESP_STATE_RESET;");
+
+//      if (usbPluggedIn) {
         EnabledConnectedDevices();
-      }
+//      }
       HAL_Delay(1);
       ResetESPIndicator();
       errorcntr = 0;
@@ -1263,6 +1278,7 @@ ESP_States ESP_Upkeep(void) {
 
     case ESP_STATE_RESET:
       if(TimestampIsReached(ESPTimeStamp) || ReconfigSet){
+//        Debug("ESPTimeStamp reached in ESP_STATE_RESET Mode=%d", Mode);
         ESPTransmitDone = false;
         if(Mode == AT_MODE_INIT){
           InitIsDone = true;

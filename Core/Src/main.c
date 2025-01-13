@@ -215,6 +215,9 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+#ifdef USBLOGGING
+  vcp_init();
+#endif
   // General TODO 's
 	/*
 	 * : Put SSID in EEPROM
@@ -241,7 +244,7 @@ int main(void)
     errorHandler(__func__, __LINE__, __FILE__);
   }
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
-  deviceTimeOut = HAL_GetTick() + 5000;
+  deviceTimeOut = HAL_GetTick() + 25000;
   priorUSBpluggedIn = !Check_USB_PowerOn(); // force the status of the SGP40
   /* USER CODE END 2 */
 
@@ -315,6 +318,12 @@ int main(void)
         Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
       }
     }
+#ifdef USBLOGGING
+    int len = vcp_recv (u1_rx_buff, 3);
+    if (len > 0) {
+      check_cli_command();
+    }
+#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -385,7 +394,7 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void check_cli_command(){
+void check_cli_command() {
   switch (u1_rx_buff[0]){
     case (uint8_t)'a':
       printf("VerboseLevel set to all\r\n");
@@ -412,6 +421,11 @@ void check_cli_command(){
     case (uint8_t)'t':
       showTime(); // show me the current time
       break;
+#ifdef USBLOGGING
+    case (uint8_t)'u':
+      usblog = !usblog; // log info to usb too
+      break;
+#endif
     default:
       Error("Error unknown request from Serial UART1 (TTY)\r\n");
       printf("Possible commands:\r\n\r\n");
@@ -422,6 +436,9 @@ void check_cli_command(){
       printf("n - VerboseLevel set to none\r\n");
       printf("s - Start particle measurement\r\n");
       printf("t - Show actual systemtime\r\n");
+#ifdef USBLOGGING
+      printf("u - USB logging toggle\r\n");
+#endif
   break;
   }
 }

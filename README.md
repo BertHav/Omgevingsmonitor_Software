@@ -19,6 +19,9 @@ dBA >= 40 && dBA < 50 blue
 dBA >= 35 && dBA < 40 purple
 dBA < 35 LED off, equals to noise level of the microphone
 
+#### version 4.0 
+USB monitoring is possible bij defining USBLOGGING, approximately at line 55, in usbd_cdc_if.h. This has an effect on the inrush current that is inexplicable to me, making it impossible for me to measure the current consumption during code execution and during stop mode. For this reason, the directive is disabled by default.
+
 
 #### version 3.91 
 fix voor local build. The project was nested with another project in the debug configuration. This has been fixed.
@@ -62,3 +65,7 @@ Source code parts moved from main.x to measurement.x. Auto reboot on incorrect s
 
 #### Version 3.4 
 NOx and VOC from sen55 is included in measurement. For this it is necessary that the sen55 has a longer runtime, this needs a USB powersupply. NOx is after 6 hours of operation reliable, VOC after about an hour. With battery operation the values for NOx and VOC reads zero from the sen55.
+
+
+# License
+Parts are licensed under GNU GENERAL PUBLIC LICENSE Version 3 and GNU AFFERO GENERAL PUBLIC LICENSE Version 3AGPL-3.0
