@@ -19,27 +19,34 @@ dBA >= 40 && dBA < 50 blue
 dBA >= 35 && dBA < 40 purple
 dBA < 35 LED off, equals to noise level of the microphone
 
-#### version 4.0 
-USB monitoring is possible bij defining USBLOGGING, approximately at line 55, in usbd_cdc_if.h. This has an effect on the inrush current that is inexplicable to me, making it impossible for me to measure the current consumption during code execution and during stop mode. For this reason, the directive is disabled by default.
+## Compiling and building
+The project was developed with STM32CubeIDE 1.16.1
 
-
-#### version 3.91 
-fix voor local build. The project was nested with another project in the debug configuration. This has been fixed.
+The project has two build configurations: Debug & Release. Select the option under Project -> Build configurations -> Set Active
 
 Follow the procedure under ["Compileren en bouwen"](https://wiki.deomgevingsmonitor.nl/index.php/Programmeeromgeving).
+Below is the translation in English (or something similar ;-). 
+
+Get the sources by using git or download the software as a zip file.
+
+Place the unzipped sources in your working directory of STM32CubeIDE.
+
+For clearity rename the source folder to MJSGadget - dB meter. 
 
 Start STM32CubeIDE, if you are not logged in to ST in the IDE, do that first. 
 
-Below is the translation in English or something similar. 
+Select File -> Open Projects from File System. Select your source folder MJSGadget - dB Meter. Uncheck the "Search for nested projects". Leave the rest of the settings in the "Import Projects from File System or Archive" unchanged. 
 
 In the Project Explorer double click on the file 'MJSGadget*.ioc'. 
 Choose 'Continue' in the 'New STM32Cube firmware version available' dialog. 
 After the MJSGadget*.ioc window has opened, click (in the left column) on 'Middleware and Software Packs'. 
 Click on USB_DEVICE. If everything is correct, there is a green check mark in front of USB_DEVICE. 
 
-Click on the button 'Device Configuration Tool Code Generation' (icon with yellow wheel) 
+Click in the ribbon on the button 'Device Configuration Tool Code Generation' (icon with yellow wheel) 
 
-Unfortunately, a number of necessary files are deleted. 
+Click Yes in the "Open Associated Perpective?"dialog.
+
+After the configuration process unfortunately, a number of necessary files are deleted. 
 
 Therefore, perform the following steps:
 
@@ -53,6 +60,14 @@ In the Project Explorer select the folder Drivers/CMSIS and use Ctrl-V
 
 Run Project -> Clean.
 Check 'Start a build immediately' and choose 'Clean'.
+
+
+#### version 4.0 
+USB monitoring is possible bij defining USBLOGGING, approximately at line 55, in usbd_cdc_if.h. This has an effect on the inrush current that is inexplicable to me, making it impossible for me to measure the current consumption during code execution and during stop mode. For this reason, the directive is disabled by default.
+
+
+#### version 3.91 
+fix voor local build. The project was nested with another project in the debug configuration. This has been fixed.
 
 #### version 3.71 
 fix for reset timeoutcntr
