@@ -47,16 +47,15 @@ void setsen5xSamplecounter(uint8_t samples) {
 
 bool sen5x_enable(uint32_t sleepTime) {
   if (IsPMSensorEnabled()) {
-    Debug("sen5x measurement is enabled");
     sen5x_Enable = !sen5x_Enable;
     if (sen5x_Enable) {
       setsen5xReadTimer(0);
     }
     else {
-      Info("This cycle the sen5x is disabled");
       //The ticker starts after 880*100, is about one and a half minute effective this turn the sen5x device will not start
       setsen5xReadTimer(HAL_GetTick() + (sleepTime*100));
     }
+    Info("This cycle the sen5x is : %s", sen5x_Enable?"enabled":"disabled");
   }
   else {
     Info("sen5x measurement is disabled");
@@ -88,7 +87,6 @@ void reset_fanCleaningDone(void) {
 }
 
 int16_t probe_sen5x(void) {
-//  Debug("test for sen5x_device");
   int16_t error = 0;
   unsigned char serial_number[32];
   uint8_t serial_number_size = 32;
@@ -165,7 +163,7 @@ int16_t probe_sen5x(void) {
       Info("Temperature Offset set to %.2f °C (SEN54/SEN55 only)", temp_offset);
   }
   sen5x_Power_Off();
-  sen5xReadTimer  = HAL_GetTick() + 25000; // after 25 second first measurement
+  sen5xReadTimer  = HAL_GetTick() + 2000; // after 25 second first measurement
   return error;
 }
 
@@ -192,8 +190,6 @@ int16_t sen5x_lightup_measurement(void) {
 }
 
 int16_t sen5x_extinguish_measurement(void) {
-// Stop Measurement
-//  Debug("entering sen5x_extinguish_measurement");
   int16_t error = 0;
   if (VOCNOx) {
     Info("Continious VOC & NOx is active, sensor not powered off");
@@ -241,17 +237,10 @@ int16_t sen5x_read_measurement(SEN5X_DateTypeDef* sen5x_data) {
   sen5x_data->ambient_temperature = ambient_temperature;
   sen5x_data->voc_index = voc_index;
   sen5x_data->nox_index = nox_index;
-//  setPMs(mass_concentration_pm2p5, mass_concentration_pm10p0, nox_index);
   return 0;
 }
 
 void sen5x_printvalues(void) {
-  // Read Measurement
-//  Debug("entering sen5x_printvalues");
-//  Info("sen5x_printvalues entered for sample %d", sen5xSamples);
-//  if (sen5xSamples != 3) {
-//    return; // first two sample reads are not reliable
-//  }
   if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
       printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
   }
@@ -303,7 +292,6 @@ void sen5xStoreMax() {
 */
 
 void sensirion_i2c_hal_free(void) {
-//  Debug("entering sensirion_i2c_hal_free");
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
 }
 
@@ -357,11 +345,9 @@ bool sen5x_check_for_errors(void){
   uint32_t device_status = 0;
   if (sen5x_read_device_status(&device_status)) {
     Error("Error reading sen5x device status register");
-//    device_status = SEN5X_NO_RESPONSE;
     return 0;
   }
   if (device_status == 0) {
-//    Debug("sen5x operates normal");
     return 0;
   }
   if (device_status & SEN5X_FAN_SPEED_ERROR) {
@@ -402,7 +388,6 @@ void set_light_on_state(void) {
 
 void sen5x_statemachine() {
   bool data_ready = false;
-//  Debug("sen5xReadTimer has value %d", sen5xReadTimer);
   if (TimestampIsReached(sen5xReadTimer)) {
     switch (PMsamplesState) {
     case S5X_DISABLED:
@@ -410,12 +395,10 @@ void sen5x_statemachine() {
       sen5xReadTimer = HAL_GetTick() + 3141592; //some more less then an hour a message when continue operated.
       break;
     case LIGHT_OUT:
-//      Debug("state is LIGHT_OUT");
       sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s when started up
       set_light_on_state();
       break;
     case CHECK_SEN5X:
-//      Debug("state is CHECK_SEN5X");
       PMsamplesState = LIGHT_ON;
       if (sen5xErrors > 5) {
         PMsamplesState = S5X_DISABLED;
@@ -435,7 +418,6 @@ void sen5x_statemachine() {
       }
       break;
     case LIGHT_ON:
-//      Debug("state is LIGHT_ON");
       sen5x_read_data_ready(&data_ready);  // is new data ready in the sensor module?
       if (data_ready) {
         SetPMIndicator();
@@ -466,7 +448,6 @@ void sen5x_statemachine() {
       break;
     case CLEAN_FAN:
       // start the cleaning procedure once a week
-//      Debug(" state is CLEAN_FAN");
       if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
         sen5x_start_fan_cleaning();
         Info("executing fan cleaning");
@@ -476,7 +457,6 @@ void sen5x_statemachine() {
       PMsamplesState = SAMPLES_TAKEN;
       break;
     case SAMPLES_TAKEN:
-//      Debug(" state is SAMPLES_TAKEN");
       if (!usbPluggedIn) {
         if (sen5x_extinguish_measurement()) {
           Error("Error executing sen5x_extinguish_measurement()");

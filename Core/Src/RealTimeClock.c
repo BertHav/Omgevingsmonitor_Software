@@ -123,10 +123,8 @@ void ParseTime(char* buffer) {
   if (currentDate.WeekDay == 2) {
     reset_fanCleaningDone();
   }
-//  Debug("PARSETIME parameters => weekday: %d, year: %d, month: %d, day: %d, hours: %d, minutes: %d, seconds: %d", weekday, year, month, day, hours, minutes, seconds);
   if (posixBootTime == 0) {
     posixBootTime = makeTime(&currentDate, &currentTime);
-//    Debug("posixBootTime: %lu", posixBootTime);
   }
 }
 
@@ -135,9 +133,7 @@ void RTC_SetTime(RTC_TimeTypeDef* sTime) {
     sTime->TimeFormat = RTC_HOURFORMAT_24;
     sTime->DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
     sTime->StoreOperation = RTC_STOREOPERATION_RESET;
-    
-    if (HAL_RTC_SetTime(RealTime_Handle, sTime, RTC_FORMAT_BIN) != HAL_OK) {
-        // Foutafhandeling
+        if (HAL_RTC_SetTime(RealTime_Handle, sTime, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error setting time to RTC");
     }
 }
@@ -145,7 +141,6 @@ void RTC_SetTime(RTC_TimeTypeDef* sTime) {
 // Functie om de datum in te stellen
 void RTC_SetDate(RTC_DateTypeDef* sDate) {
     if (HAL_RTC_SetDate(RealTime_Handle, sDate, RTC_FORMAT_BIN) != HAL_OK) {
-        // Foutafhandeling
       Error("Error setting date to RTC");
     }
     //check the backup register
@@ -207,37 +202,19 @@ uint32_t getPosixTime(void) {
 void getUTCfromPosixTime(uint32_t posixTime, char* strbuf1) {
   RTC_TimeTypeDef currentTime;
   RTC_DateTypeDef currentDate;
-//  RTC_GetTime(&currentTime, &currentDate);
   breakPosixTime(posixTime, &currentDate, &currentTime);
-//  printf("%s %d-%d-%d %dh:%dm:%ds\r\n", dayNames[currentDate.WeekDay - 1], currentDate.Date, currentDate.Month, currentDate.Year,
-//      currentTime.Hours, currentTime.Minutes, currentTime.Seconds);
   sprintf(strbuf1, "%02d-%02d-%02d %02dh:%02dm:%02ds\r\n", currentDate.Date, currentDate.Month, currentDate.Year,
       currentTime.Hours, currentTime.Minutes, currentTime.Seconds);
 }
 
-// Functie om een alarm in te stellen
 void RTC_SetAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds) {
     RTC_AlarmTypeDef sAlarm = {0};
-
-/*
-// alarm elk uur
-sAlarm.AlarmMask  = (RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS) ;
-sAlarm.AlarmTime.Seconds = 0;
-sAlarm.AlarmTime.Minutes = 0;
-sAlarm.AlarmTime.SubSeconds = 0;
-sAlarm.AlarmSubSecondMask   = RTC_ALARMSUBSECONDMASK_NONE;
-ALARM_ActivateAlarm(&sAlarm);
-
- */
-
     sAlarm.AlarmTime.Hours = hours;
     sAlarm.AlarmTime.Minutes = minutes;
     sAlarm.AlarmTime.Seconds = seconds;
     sAlarm.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
     sAlarm.Alarm = RTC_ALARM_A;
-
     if (HAL_RTC_SetAlarm_IT(RealTime_Handle, &sAlarm, RTC_FORMAT_BIN) != HAL_OK) {
-        // Foutafhandeling
       Error("Error activating interrupt voor RTC Alarm time");
     }
 }
@@ -251,23 +228,12 @@ ALARM_ActivateAlarm(&sAlarm);
 
 void RTC_SetWakeUpTimer(uint32_t secondsOfSleep)
 {
-    //Switch of the timer to reset it
-
-    //Set the prescale so that the clock will be 1Hz
-//    HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, secondsOfSleep, RTC_WAKEUPCLOCK_CK_SPRE_16BITS);
-
-//    HAL_NVIC_SetPriority(RTC_IRQn, 0, 0);
-//    HAL_NVIC_EnableIRQ(RTC_IRQn);
-
-    // ==== sleep insert
-//    HAL_RTCEx_DeactivateWakeUpTimer(&hrtc);
     HAL_RTCEx_DeactivateWakeUpTimer(RealTime_Handle);
     __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(RealTime_Handle, RTC_FLAG_WUTF);
     __HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG();
 // for testing 60 seconds => 60 - 1 = 59
 //    HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, 0x003D, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
     HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, secondsOfSleep-1, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
-     // ==== end sleep insert
 }
 
 void Enter_Standby_Mode(void)
@@ -277,12 +243,12 @@ void Enter_Standby_Mode(void)
   Debug("Entering STANDBY mode, deepsleep");
     // prevent waking up by RTC
   HAL_Delay(100);
-    HAL_RTCEx_DeactivateWakeUpTimer(RealTime_Handle);
-    // Schakel Standby Mode in only is battery is drained
-    HAL_SuspendTick();
-    HAL_PWR_EnterSTANDBYMode();
-    SystemClock_Config();
-    HAL_ResumeTick(); // Enable SysTick after wake-up
+  HAL_RTCEx_DeactivateWakeUpTimer(RealTime_Handle);
+  // Disable unwanted wake-ups
+  GPIO_PrepareForStandbyMode();
+  // Schakel Standby Mode in only if battery is drained
+  HAL_SuspendTick();
+  HAL_PWR_EnterSTANDBYMode();
 }
 
 void Enter_Stop_Mode(uint16_t sleepTime)
@@ -291,14 +257,13 @@ void Enter_Stop_Mode(uint16_t sleepTime)
     sen5x_Power_Off();
   }
   Info("Battery voltage %.02fV", ReadBatteryVoltage());
+  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);
   HAL_Delay(100);
   HAL_SuspendTick();
   RTC_SetWakeUpTimer(sleepTime);
-//  HAL_PWREx_EnableFlashPowerDown();  // is default stopped in l0xx cpu's
-//  SET_BIT(PWR->CR, PWR_CR_ULP); seems of no influence
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
   SystemClock_Config();
   if (sen5x_enable((uint32_t)sleepTime)) {
@@ -309,7 +274,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
       HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
       SystemClock_Config();
-//      setsen5xReadTimer(2000);
       setsen5xReadTimer(0);
     }
   }
@@ -318,7 +282,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   ResetDBACalculator();  // reset the DBA average calculation
   ResetSGP40samplecounter();
   setsen5xSamplecounter(0);
-//  setESPTimeStamp(3000);
   setESPTimeStamp(2500);
   setSGP40TimeStamp(0);
   setHIDSTimeStamp(0);
@@ -419,7 +382,5 @@ void breakPosixTime(uint32_t timeInput, RTC_DateTypeDef* currentDate, RTC_TimeTy
   }
   currentDate->Month = month + 1;  // jan is month 1
   currentDate->Date = time + 1;     // day of month
-//  printf("breakPosixTime: daynr: %d, %s %02d-%02d-%d %02d:%02d:%02d\r\n", currentDate->WeekDay, dayNames[currentDate->WeekDay - 1],
-//      currentDate->Date, currentDate->Month, currentDate->Year, currentTime->Hours, currentTime->Minutes, currentTime->Seconds);
 }
 

@@ -4,12 +4,6 @@
  *  Created on: Jun 10, 2024
  *      Author: Joris Blankestijn
  */
-/*
-#include "stm32l0xx_hal.h"
-#include "utils.h"
-#include "statusCheck.h"
-#include "print_functions.h"
-*/
 #include "measurement.h"
 #include "wsenHIDS.h"
 #include "sgp40.h"
@@ -18,15 +12,6 @@
 #include "sound_measurement.h"
 #include "statusCheck.h"
 
-//static I2C_HandleTypeDef* sensorI2C = NULL;
-/*
-EnabledMeasurements Sensor = {
-    .HT_measurementEnabled = true,
-    .VOC_measurementEnabled = true,
-    .PM_measurementEnabled = true,
-    .MIC_measurementEnabled = true
-};
-*/
 EnabledMeasurements Sensor;
 DevicePresent SensorProbe;
 
@@ -60,8 +45,8 @@ bool IsSGPPresent() {
 }
 
 void SetVOCSensorDIS_ENA(bool setting) {
+
   SensorProbe.SGP_Enabled = setting;
-//  SensorProbe.VOC_Present = setting;
   Sensor.VOC_measurementEnabled = setting;
   Debug("on-board SGP40 %s", setting?"enabled":"disabled");
 }
@@ -84,7 +69,10 @@ void SetHTSensorStatus(bool setting) {
 }
 
 void SetVOCSensorStatus(bool setting) {
-  Sensor.VOC_measurementEnabled = setting;
+  if (SensorProbe.SGP_Enabled) {
+    Sensor.VOC_measurementEnabled = setting;
+  }
+  Debug("SetVOCSensorStatus VOC_measurementEnabled = %d", setting);
 }
 
 void SetPMSensorStatus(bool setting) {
@@ -173,7 +161,6 @@ void Device_Test(){
   if(!SensorProbe.MIC_Present){
     if(MIC_TestMeasurementDone()){
       //when this condition is met, the device is definite operational
-//      Debug("MIC_TestMeasurementDone() is true");
       SensorProbe.MIC_Present = true;
       Sensor.MIC_measurementEnabled = true;
       SetStatusLED(LED_OFF, Calculate_LED_ON(), LED_OFF);
@@ -181,7 +168,6 @@ void Device_Test(){
     else{
       if (micSettlingComplete()) {
         // his has to be met first
-//        Debug("micSettlingComplete() is true");
         Sensor.MIC_measurementEnabled = true;
         SetStatusLED(Calculate_LED_ON(), LED_OFF, LED_OFF);
       }

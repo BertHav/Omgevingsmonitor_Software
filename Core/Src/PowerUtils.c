@@ -17,7 +17,7 @@
 float ReadBatteryVoltage(void){
   /* Channel 14 is de battery voltage */
   static uint32_t value = 0;
-  static float trueValue = 0;
+  static float trueValue = 0.0;
   sConfig.Channel = ADC_CHANNEL_14;
   sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {

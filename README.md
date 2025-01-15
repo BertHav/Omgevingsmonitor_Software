@@ -61,6 +61,8 @@ In the Project Explorer select the folder Drivers/CMSIS and use Ctrl-V
 Run Project -> Clean.
 Check 'Start a build immediately' and choose 'Clean'.
 
+#### version 4.01
+Correction for LED color on low battery and some clean up.
 
 #### version 4.0 
 USB monitoring is possible bij defining USBLOGGING, approximately at line 55, in usbd_cdc_if.h. This has an effect on the inrush current that is inexplicable to me, making it impossible for me to measure the current consumption during code execution and during stop mode. For this reason, the directive is disabled by default.

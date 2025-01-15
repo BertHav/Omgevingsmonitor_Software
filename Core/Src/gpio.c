@@ -164,4 +164,13 @@ void GPIO_InitPWMLEDs(TIM_HandleTypeDef* timer2, TIM_HandleTypeDef* timer3) {
   TIM3 -> CCR2 = 4000;
   TIM3 -> CCR3 = 4000;
 }
+
+void GPIO_PrepareForStandbyMode() {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /*Reconfigure GPIO pins : PA0 PA2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
 /* USER CODE END 2 */

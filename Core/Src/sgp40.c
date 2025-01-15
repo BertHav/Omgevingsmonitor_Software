@@ -24,12 +24,10 @@ static uint8_t ExecuteSelfTestBuffer[SGP_SHORT_COMMAND_BUFFER_LENGTH] = {0x28, 0
 static uint8_t TurnHeaterOffBuffer[SGP_SHORT_COMMAND_BUFFER_LENGTH] = {0x36, 0x15};
 static uint8_t GetSerialNumberBuffer[SGP_SHORT_COMMAND_BUFFER_LENGTH] = {0x36, 0x82};
 
-//static uint8_t MeasureRawSignalBufferCompensated[SGP_SHORT_COMMAND_BUFFER_LENGTH] = {0x26, 0x0f};
 static uint8_t MeasureRawSignalBuffer[SGP_LONG_COMMAND_BUFFER_LENGTH] = {0x26, 0x0F, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93};
 static uint8_t MeasureRawWithCompBuffer[SGP_LONG_COMMAND_BUFFER_LENGTH] = {0x26, 0x0F};
 static uint8_t SoftResetBuffer[SGP_SHORT_COMMAND_BUFFER_LENGTH] = {0x00, 0x06};
 static uint8_t SGP_ReadBuffer[SGP_SERIAL_NUMBER_RESPONSE_LENGTH] = {0};
-// static uint8_t SGP_WriteBuffer[SGP_SERIAL_NUMBER_BUFFER_LENGTH] = {0};
 
 static uint8_t SGP_AmountOfSamplesDone = 0;
 static uint8_t SGP_TotalSamples = 1;
@@ -124,7 +122,6 @@ void SGP_TurnHeaterOff(void) {
 
 bool SGP_GetMeasurementValues(int32_t *vocIndex) {
   if (SGP_HeatedUp() && !HeatUpIsDone && !SGP_MsgSent) {
-//    Debug("SGP is heated up");
     HeatUpIsDone = true;
     // SGP is heated up, we ignore the output and start another measurement.
     if(HT_MeasurementReceived){
@@ -138,7 +135,6 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
     SGP_MsgSent = true;
   }
   if (HeatUpIsDone && SGP_MeasurementReady() && !MeasurementIsReady) {
-//    Debug("SGP40 sample[%i] is ready", SGP_AmountOfSamplesDone + 1);
     MeasurementIsReady = true;
     // Measurement is ready to be read, also turning the heater off.
     ReadRegister(SGP_I2C_ADDRESS, SGP_ReadBuffer, SGP_MEASURE_BUFFER_RESPONSE_LENGTH);
@@ -181,12 +177,8 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
         SetVocLED(Red, Green, Blue);
       }
       SGP_AmountOfSamplesDone = 0;
-//      Debug("SGP_Measurement completely done.");
       HT_MeasurementReceived = false;
       SGP_MsgSent = false;
-//      for (uint8_t i = 0; i < SGP_MEASURE_BUFFER_RESPONSE_LENGTH; i++) {
-//        Debug("SGP_Measurement buffer[%d]: %d", i, SGP_ReadBuffer[i]);
-//      }
       return true;
     }
   }
@@ -353,7 +345,6 @@ SGP40State SGP_Upkeep(void) {
   case SGP_WAIT_STATE_MODE:
     SGPState = SGP_STATE_WAIT;
     if ((sgp40samplecounter == 1) && (!usbPluggedIn)) {
-      // restart the SGP40 with a soft reset to enter idle mode
       // During startup take 12 samples
       if (sgpinitdone) {
         SGP_SoftReset();

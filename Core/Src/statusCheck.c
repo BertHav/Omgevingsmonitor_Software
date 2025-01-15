@@ -21,6 +21,7 @@ bool usbPluggedIn = false;
 bool userToggle = false;
 static bool init = true;
 static bool buttonHeld = false;
+static uint8_t usedMicLEDcolor;
 uint32_t ConfigStamp;
 uint32_t UserbuttonStamp;
 uint32_t PowerStamp = 0;
@@ -48,16 +49,16 @@ void InitDone(){
 Battery_Status batteryChargeCheck(){
   Battery_Status status;
   batteryCharge = ReadBatteryVoltage();
-  if(batteryCharge < 3.5){
+  if(batteryCharge < 3.50){
     status = BATTERY_CRITICAL;
   }
-  if(batteryCharge < 3.7 && batteryCharge >= 3.5){
+  if(batteryCharge >= 3.50 && batteryCharge < 3.70){
     status = BATTERY_LOW;
   }
-  if(batteryCharge < 4.0 && batteryCharge >= 3.7){
+  if(batteryCharge >= 3.70 && batteryCharge < 4.00){
     status = BATTERY_GOOD;
   }
-  if(batteryCharge >= 4.0){
+  if(batteryCharge >= 4.00){
     status = BATTERY_FULL;
   }
   return(status);
@@ -125,9 +126,11 @@ void SetMICIndicator(){
   else {
     if (batteryCharge > 3.7) {
       TIM2 -> CCR3 = Calculate_LED_ON();
+      usedMicLEDcolor = LED_GREEN;
     }
     else {
       TIM2 -> CCR1 = Calculate_LED_ON();
+      usedMicLEDcolor = LED_RED;
     }
   }
 }
@@ -136,7 +139,7 @@ void ResetMICIndicator(){
     TIM2 -> CCR1 = LED_OFF;
   }
   else {
-    if (batteryCharge > 3.74) {
+    if (usedMicLEDcolor == LED_GREEN) {
       TIM2 -> CCR3 = LED_OFF;
     }
     else {
@@ -179,6 +182,19 @@ void SetLEDsOff(void){
 return;
 }
 
+void SetAllREDLED() {
+// Fire all LEDs to red independent of usertoggle or power status and reboot
+  TIM2 -> CCR1 = 0;
+  TIM2 -> CCR3 = 4000;
+  TIM2 -> CCR4 = 4000;
+  TIM3 -> CCR1 = 0;
+  TIM3 -> CCR2 = 4000;
+  TIM3 -> CCR3 = 4000;
+
+  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false);
+  HAL_Delay(1000);
+}
+
 Battery_Status powerCheck(){
   Battery_Status status;
   if(!Check_USB_PowerOn()){
@@ -187,12 +203,13 @@ Battery_Status powerCheck(){
   else{
     status = USB_PLUGGED_IN;
   }
+
   return status;
 }
 
 void powerDisplay(Battery_Status status){
   if(status == USB_PLUGGED_IN){
-    Debug("LEDS are okay");
+    Debug("USB power detected, LED's are okay");
 
   }
   if(status == BATTERY_FULL){
@@ -248,7 +265,7 @@ void configCheck(){
         TIM3 -> CCR3 = 4000;
         HAL_Delay(400);
       }
-      Debug("userToggle flipped back to prior status");
+//      Debug("userToggle flipped back to prior status");
       userToggle = !userToggle;
       Info("userToggle status is %s", userToggle?"enabled":"disabled");
       if (usbPluggedIn) {
@@ -267,9 +284,6 @@ void configCheck(){
   }
   if(Check_USB_PowerOn()){
     usbPluggedIn = true;
-    // hieronder uitgecommentarieerd omdat die op usb de sensors altijd activeert
-//    Debug("EnabledConnectedDevices() in statuscheck 270");
-//    EnabledConnectedDevices();
   }
   else{
     if(!userToggle && !init){
@@ -279,22 +293,6 @@ void configCheck(){
   }
 }
 
-void GoToSleep(uint16_t sleepTime){
-  Debug("Entering sleep mode for %d seconds", sleepTime);
-  HAL_Delay(100);
-  HAL_SuspendTick();
-  //set wake up timer
-  RTC_SetWakeUpTimer(sleepTime);
-  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON,PWR_SLEEPENTRY_WFI);
-  SystemClock_Config();
-  HAL_ResumeTick();
-}
-
-/*
-void Status_Upkeep(){
-  configCheck();
-}
-*/
 Battery_Status Battery_Upkeep(){
   Battery_Status status;
   status = powerCheck();

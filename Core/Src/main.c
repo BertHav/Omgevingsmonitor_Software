@@ -83,7 +83,7 @@
   uint16_t IndexRxData = 0;
   uint32_t deviceTimeOut = 0;
   uint32_t LastRxTime = 0;
-  uint32_t batteryReadTimer = 0;
+  uint32_t batteryReadTimer = 10000;
   uint32_t timeReadTimer = 0;
   uint32_t sleepTime = 0;
   uint16_t size = 0;
@@ -100,11 +100,11 @@ void SystemClock_Config(void);
 
 void SetTestDone(){
   testDone = true;
-  HAL_Delay(1000);
+  HAL_Delay(500);
   SetDBLED(false, false, true);
   SetStatusLED(4000, 4000, 3000);
   SetVocLED(4000, 4000, 3000);
-  HAL_Delay(1000);
+  HAL_Delay(500);
   SetDBLED(false, false, false);
   SetStatusLED(4000, 4000, 4000);
   SetVocLED(4000, 4000, 4000);
@@ -228,8 +228,16 @@ int main(void)
 	 * : Add CLI via usb-c
 	 * : Network not found? Sleep
 	 */
-//  usbUARTinit(); //serial over USB
   GPIO_InitPWMLEDs(&htim2, &htim3);
+  BinaryReleaseInfo();
+  charge = Battery_Upkeep();
+  if(charge == BATTERY_CRITICAL) {
+    SetAllREDLED();
+    Info("Battery voltage %.02fV", ReadBatteryVoltage());
+#ifndef STLINK_V3PWR
+    Enter_Standby_Mode(); // Battery is empty we are going in deep sleep, nearly off and no wakeup from RTC
+#endif
+  }
   if(UserButton_Pressed()){
     EnableESPProg();
     ESP_Programming = true;
@@ -237,8 +245,6 @@ int main(void)
   SetVerboseLevel(VERBOSE_ALL);
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
   InitClock(&hrtc);
-  Debug("Clock init done");
-  BinaryReleaseInfo();
 
   if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn)) {
     errorHandler(__func__, __LINE__, __FILE__);
@@ -275,7 +281,7 @@ int main(void)
 #endif
     if (testDone && !ESP_Programming && !batteryEmpty) {
       if (priorUSBpluggedIn != usbPluggedIn) {
-        Debug("USB power state change detected");
+        Info("USB power state change detected");
         if (IsSGPPresent() && !usbPluggedIn) {
           SetVOCSensorDIS_ENA(true);
         }
@@ -460,7 +466,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       Sensor.PM_measurementEnabled = true;
       setsen5xReadTimer(100);
     }
-
   }
 }
 

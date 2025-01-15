@@ -40,6 +40,7 @@ void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void GPIO_InitPWMLEDs(TIM_HandleTypeDef* timer2, TIM_HandleTypeDef* timer3);
+void GPIO_PrepareForStandbyMode();
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

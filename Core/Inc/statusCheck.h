@@ -17,6 +17,8 @@
 
 #define LED_OFF 4000
 #define LED_ON 3000
+#define LED_RED 1
+#define LED_GREEN 2
 typedef enum {
   BATTERY_CRITICAL,
   BATTERY_LOW,
@@ -30,8 +32,10 @@ extern bool userToggle;
 
 void setuserToggle(void);
 void configCheck();
+void SetAllREDLED();
 Battery_Status Battery_Upkeep();
 Battery_Status powerCheck();
+void powerDisplay(Battery_Status status);
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue);   // Sets Status LED to (RGB) color
 uint16_t Calculate_LED_ON();
 void SetDBLED(bool red, bool green, bool blue);       // Sets dB LED to (RGB) color
@@ -46,5 +50,4 @@ void SetESPIndicator();
 void ResetESPIndicator();
 void SetPMIndicator();
 void ResetPMIndicator();
-void GoToSleep(uint16_t sleepTime);
 #endif /* INC_STATUSCHECK_H_ */
