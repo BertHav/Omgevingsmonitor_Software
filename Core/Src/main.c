@@ -45,6 +45,7 @@
 #include "sgp40.h"
 #include "wsenHIDS.h"
 #include "usbd_cdc_if.h"
+#include "ssd1306.h"
 
 /* USER CODE END Includes */
 

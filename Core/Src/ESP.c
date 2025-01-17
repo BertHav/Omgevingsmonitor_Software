@@ -46,15 +46,8 @@ static uint32_t uid[3];
 static uint32_t start;
 static uint32_t stop;
 static uint8_t oldEspState = 255;
-float Temperature = 0.0;
-float Humidity = 0.0;
 float batteryCharge = 0.0;
 float solarCharge = 0.0;
-uint16_t VOCIndex = 0;
-static float dBA = 0.0;
-static float airPM2 = 0.0;
-static float airPM10 = 0.0;
-static float airNOx = 0.0;
 static char message[1152];
 static const char APIBeurs[] = "\"https://deomgevingsmonitor.nl//api/set_device_data.php\"";
 static const char API[] = "\"https://api.opensensemap.org/boxes/";
@@ -85,7 +78,8 @@ static AT_Commands ATCommand = AT_WAKEUP;
 static ESP_States EspState = ESP_STATE_INIT;
 static AT_Mode Mode;
 static ESP_Test TestState = ESP_TEST_INIT;
-//static ATCommandsParameters ATCommands[ESP_AT_COMMANDS_COUNT];
+
+MeasurementValues MeasVal;
 
 void forceNTPupdate() {
   ESPNTPTimeStamp = 0;
@@ -120,34 +114,40 @@ bool checkName(){
   test = (configSum != 0);
   return test;
 }
-void ESP_GetHT(float temp, float humid){
-  Temperature = temp;
-  Humidity = humid;
-}
+
+#ifdef SSD1306
+
+#endif
+
 void setHIDS(float temp, float humid){
-  Temperature = temp;
-  Humidity = humid;
+  MeasVal.Temperature = temp;
+  MeasVal.Humidity = humid;
 }
+
 void setVOC(uint16_t voc){
-  VOCIndex = voc;
+  MeasVal.VOCIndex = voc;
 }
+
 void setMic(float dB){
-  dBA = dB;
+  MeasVal.dBA = dB;
 }
 
 void setPMsen50(uint16_t PM2, uint16_t PM10) {
-  airPM2 = PM2 / 10.0f;
-  airPM10 = PM10 / 10.0f;
+  MeasVal.airPM2 = PM2 / 10.0f;
+  MeasVal.airPM10 = PM10 / 10.0f;
 }
 
 void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox) {
-  airPM2 = PM2 / 10.0f;
-  airPM10 = PM10 / 10.0f;
-  VOCIndex = voc / 10.0f;
-  airNOx = nox / 10.0f;
+  MeasVal.airPM2 = PM2 / 10.0f;
+  MeasVal.airPM10 = PM10 / 10.0f;
+  MeasVal.VOCIndex = voc / 10.0f;
+  MeasVal.airNOx = nox / 10.0f;
 }
 
 void SetConfigMode(){
+  if (!ReconfigSet) {
+    Debug("ReconfigSet in SetConfigMode");
+  }
   ReconfigSet = true;
   usblog = false;
 }
@@ -279,19 +279,19 @@ uint16_t CreateMessage(bool onBeurs){
   index = strlen(message);
 
   uint8ArrayToString(Buffer, tempConfig);
-  sprintf(&message[index], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"},", uid[2], (char*)nameConfig, Buffer, Temperature);
+  sprintf(&message[index], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, humidConfig);
-  sprintf(&message[index], "{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"},", uid[2], (char*)nameConfig, Buffer, Humidity);
+  sprintf(&message[index], "{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, dBA);
+  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.dBA);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, vocConfig);
-  sprintf(&message[index], "{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"},", uid[2], (char*)nameConfig, Buffer, VOCIndex);
+  sprintf(&message[index], "{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndex);
   index = strlen(message);
 
   if(!onBeurs){
@@ -304,15 +304,15 @@ uint16_t CreateMessage(bool onBeurs){
     index = strlen(message);
 
     uint8ArrayToString(Buffer, noxConfig);
-    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, airNOx);
+    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOx);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM2Config);
-    sprintf(&message[index], "{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"},", uid[2], (char*)nameConfig, Buffer, airPM2);
+    sprintf(&message[index], "{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airPM2);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM10Config);
-    sprintf(&message[index], "{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, airPM10);
+    sprintf(&message[index], "{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airPM10);
     index = strlen(message);
 
   }
@@ -961,8 +961,8 @@ void ESP_WakeTest(void) {
       break;
 
     case ESP_TEST_BOOT:
-      TIM3 -> CCR1 = 4000;
-      TIM3 -> CCR2 = 4000;
+      TIM3 -> CCR1 = LED_OFF;
+      TIM3 -> CCR2 = LED_OFF;
       TIM3 -> CCR3 = Calculate_LED_ON();
       break;
   }
@@ -993,6 +993,7 @@ ESP_States ESP_Upkeep(void) {
       break;
 
     case ESP_STATE_INIT:
+//      Debug("entry in ESP_STATE_INIT");
       DisableConnectedDevices();
       SetESPIndicator();
       if(!EspTurnedOn){
@@ -1018,6 +1019,7 @@ ESP_States ESP_Upkeep(void) {
       break;
 
     case ESP_STATE_WAIT_AWAKE:
+//        Debug("entry in ESP_STATE_WAIT_AWAKE");
         ATReceived = DMA_ProcessBuffer(RECEIVE_EXPECTATION_READY);
         bool proceed = ATCompare(ATReceived, RECEIVE_EXPECTATION_READY);
         if(proceed || TimestampIsReached(timeoutTimer)){
@@ -1026,6 +1028,7 @@ ESP_States ESP_Upkeep(void) {
         break;
 
     case ESP_STATE_MODE_SELECT:
+//      Debug("entry in ESP_STATE_MODE_SELECT");
       memset(ATCommandArray, AT_END, 9);
       if(!InitIsDone || WifiReset){
         memcpy(ATCommandArray, AT_INIT, 7);
@@ -1083,6 +1086,7 @@ ESP_States ESP_Upkeep(void) {
     break;
 
     case ESP_STATE_SEND:
+//      Debug("entry in ESP_STATE_SEND");
         ATSend = AT_Send(ATCommand);
         if(ATSend){
           EspState = ESP_STATE_WAIT_FOR_REPLY;
@@ -1090,6 +1094,10 @@ ESP_States ESP_Upkeep(void) {
     break;
 
     case ESP_STATE_WAIT_FOR_REPLY:
+      if ((ReconfigSet) && (Mode != AT_MODE_RECONFIG)) {
+        EspState = ESP_STATE_MODE_SELECT;
+        break;
+      }
       if(TimestampIsReached(ESPTimeStamp)){
         ATReceived = DMA_ProcessBuffer(ATExpectation);
         bool proceed = ATCompare(ATReceived, ATExpectation);
@@ -1127,9 +1135,9 @@ ESP_States ESP_Upkeep(void) {
             stop = HAL_GetTick();
             Error("ESP to many timeouts, terminated after %lu ms", (stop-start));
             EspState = ESP_STATE_DEINIT;
-             ATCommand = AT_END;
-             ATExpectation = RECEIVE_EXPECTATION_OK;
-             break;
+            ATCommand = AT_END;
+            ATExpectation = RECEIVE_EXPECTATION_OK;
+            break;
           }
           if(ATCommand != AT_SENDDATA){
             EspState = ESP_STATE_SEND;
@@ -1148,6 +1156,7 @@ ESP_States ESP_Upkeep(void) {
       break;
 
     case ESP_STATE_NEXT_AT:
+//      Debug("entry in ESP_STATE_NEXT_AT");
       ATCounter += 1;
       ATCommand = ATCommandArray[ATCounter];
       if(ATCommand == AT_RESTORE){
@@ -1192,6 +1201,7 @@ ESP_States ESP_Upkeep(void) {
     break;
 
     case ESP_STATE_DEINIT:
+//      Debug("entry in ESP_STATE_DEINIT");
       EspTurnedOn = false;
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(1);
@@ -1229,10 +1239,13 @@ ESP_States ESP_Upkeep(void) {
           EspState = ESP_STATE_MODE_SELECT;
           beursTest = true;
         }
+        if ((ReconfigSet) && (Mode != AT_MODE_RECONFIG)) {
+          EspState = ESP_STATE_INIT;
+        }
       }
       else if (TimestampIsReached(ESPNTPTimeStamp)) {
         if(Mode == AT_MODE_SEND ) {
-            Mode = AT_MODE_GETTIME;
+           Mode = AT_MODE_GETTIME;
            EspState = ESP_STATE_INIT;
            savedESPTimeStamp = ESPTimeStamp;
            setTime = true;

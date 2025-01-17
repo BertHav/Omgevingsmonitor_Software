@@ -233,8 +233,7 @@ bool HIDS_GetMeasurementValues(float* humidity, float* temperature) {
    *temperature = currentTemperature;
    *humidity = currentHumidity;
 
-   SGP_GetHT(temperature, humidity);
-   ESP_GetHT(currentTemperature, currentHumidity);
+   SGP_SetHT(temperature, humidity);
 
 //   measurements = 0;
    MeasurementDone = true;
@@ -245,6 +244,7 @@ bool HIDS_GetMeasurementValues(float* humidity, float* temperature) {
 
 	//return false;
 }
+
 void ResetHIDSresults() {
   humid = 0.0;
   temp = 0.0;

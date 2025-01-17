@@ -239,7 +239,7 @@ static uint8_t CalculateCRC(uint8_t *data, uint8_t length) {
   return crc;
 }
 
-void SGP_GetHT(float* temperature, float* humidity){
+void SGP_SetHT(float* temperature, float* humidity){
   uint8_t humBuf[2];
   uint8_t tempBuf[2];
   SGP_Temp = (uint16_t)(((*temperature+45.0f)/175.0f)*(float)0xFFFF);

@@ -53,7 +53,7 @@ bool SGP_GetMeasurementValues(int32_t* vocIndex);
 bool SGP_DeviceConnected(void);
 bool SGP_SelfTest(void);
 void SGP_SoftReset(void);
-void SGP_GetHT(float* temperature, float* humidity);
+void SGP_SetHT(float* temperature, float* humidity);
 SGP40State SGP_Upkeep(void);
 void setSGP40TimeStamp(uint32_t ticks);
 void ResetSGP40samplecounter();

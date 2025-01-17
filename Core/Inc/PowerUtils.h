@@ -14,6 +14,7 @@
 #include "stm32l0xx_hal.h"
 #include "stm32l0xx_hal_gpio.h"
 
+
 typedef enum {
   CHARGING_OFF,
   CHARGING_ON,
@@ -25,7 +26,6 @@ float      ReadBatteryVoltage(void);   // Returns battery voltage in mV
 uint16_t ReadSolarVoltage(void);     // Returns solarpanel voltage in mV
 bool          Check_USB_PowerOn(void);    // True if 5V on USB Connector
 ChargeStatus  Read_Charge_Status(void);   // Returns Chargestatus
-
 
 
 /* LED Indicator operations

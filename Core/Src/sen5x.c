@@ -65,10 +65,16 @@ bool sen5x_enable(uint32_t sleepTime) {
 }
 
 void sen5x_Power_On(void) {
-  Debug("executing sen5x_Power_On");
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
+  Debug("executing sen5x_Power_On");
+#ifdef SSD1306
+  HAL_Delay(5);
+  ssd1306_Init(&hi2c2);
+  ssd1306_WriteString("dBA 120.00 peak 140.00", Font_7x10, White);
+  ssd1306_UpdateScreen(&hi2c2);
+  HAL_Delay(10000);
+#endif
   sen5x_On = true;
-  HAL_Delay(55);
 }
 
 void sen5x_Power_Off(void) {
@@ -291,9 +297,8 @@ void sen5xStoreMax() {
  * Release all resources initialized by sensirion_i2c_hal_init().
 */
 
-void sensirion_i2c_hal_free(void) {
-  HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
-}
+//void sensirion_i2c_hal_free(void) {
+//}
 
 /**
  * Execute one read transaction on the I2C bus, reading a given number of bytes.

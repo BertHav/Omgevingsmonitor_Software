@@ -16,6 +16,8 @@
 #include "measurement.h"
 #include "PC_Config.h"
 #include "statusCheck.h"
+#include "ssd1306.h"
+
 
 // #define LONGMESSAGES true  // show long messages f.i. the datagram on debug UART
 #define LONGDATAGRAM  // use opensensemap
@@ -51,6 +53,21 @@
 #define AT_RESPONSE_TIME_UPDATED "+TIME_UPDATED"
 
 #define AT_COMMANDS_SIZE 21
+
+typedef struct
+{
+  float Temperature;
+  float Humidity;
+  float airPM2;
+  float airPM10;
+  float ambient_humidity;
+  float ambient_temperature;
+  uint16_t VOCIndex;
+  float airNOx;
+  float dBA;
+} MeasurementValues;
+
+extern MeasurementValues MeasVal;
 
 typedef enum {
   ESP_TEST_INIT,
