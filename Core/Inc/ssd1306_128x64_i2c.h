@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include "fonts.h"
 // define build inclusion in project
-//#define SSD1306 ENA
+//#define SSD1306
 
 #define SSD1306_I2C_ADDR        0x78
 

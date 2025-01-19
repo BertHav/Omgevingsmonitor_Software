@@ -73,6 +73,7 @@ bool sen5x_enable(uint32_t sleepTime) {
 void sen5x_Power_On(void) {
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
   Debug("executing sen5x_Power_On");
+  HAL_Delay(100);
 #ifdef SSD1306
   if (ssd1306_Init()) {
     Info("Display SSD1306 not detected on I2C2");
@@ -83,8 +84,6 @@ void sen5x_Power_On(void) {
     SSD1306detected = true;
   }
   displayCreateStyle();
-//  HAL_Delay(7000);
-//  while (1){};
 #endif
   sen5x_On = true;
 }
@@ -93,13 +92,15 @@ void sen5x_Power_Off(void) {
   if (VOCNOx) {
     Debug("VOC and NOx measurement enabled, no power off");
   }
-  else if (SSD1306detected && (usbPluggedIn || userToggle)) {
-    Info("Display detected and USB power or userToggle enabled");
-  }
   else {
-    Debug("executing sen5x_Power_Off");
-    HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
-    sen5x_On = false;
+    if (SSD1306detected && (usbPluggedIn || userToggle)) {
+      Info("Display detected and USB power or userToggle enabled");
+    }
+    else {
+      Debug("executing sen5x_Power_Off");
+      HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
+      sen5x_On = false;
+    }
   }
 }
 

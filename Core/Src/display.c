@@ -4,8 +4,8 @@
  *  Created on: Jan 19, 2025
  *      Author: itsme
  */
-#ifdef SSD1306
 #include "ssd1306_128x64_i2c.h"
+#ifdef SSD1306
 #include "fonts.h"
 #include "ESP.h"
 #include <string.h>

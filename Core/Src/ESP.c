@@ -23,6 +23,7 @@
 #else
 #include "cred.h"
 #endif
+#include "ssd1306_128x64_i2c.h"
 #ifdef SSD1306
 #include "display.h"
 #endif

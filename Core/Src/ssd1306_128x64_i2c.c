@@ -31,7 +31,7 @@ int8_t ssd1306_WriteContent(const uint8_t* data, uint16_t count) {
 uint8_t  ssd1306_Init() {
 	// Init sequence
   // Wait for the screen to boot
-  HAL_Delay(100);
+  // HAL_Delay(100); // moved to power on routine to detect sen5x reliable
 
   int status = 0;
   status += ssd1306_WriteCommand(SSD1306_CMD_DISPLAYOFF);                    // 0xAE
