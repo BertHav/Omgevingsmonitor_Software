@@ -202,7 +202,6 @@ void SetVOCindicator(uint16_t VOCi) {
   static uint16_t Blue;
   static uint16_t Green;
   static uint16_t TimeValue = 4000;
-  Debug("Entry in SetVOCindicator with value %d", VOCi);
   if(VOCi > 0 && VOCi <= 100){
     Green = (1.0-(VOCi/100.0))*TimeValue;
     Blue = (VOCi/100.0)*TimeValue;
