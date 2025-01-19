@@ -16,8 +16,10 @@
 #include "statusCheck.h"
 #include "ESP.h"
 #include "measurement.h"
+#include "ssd1306_128x64_i2c.h"
+#include "display.h"
 
-
+bool SSD1306detected = false;
 bool fanCleaningDone = false;
 bool sen5x_On = false;
 bool VOCNOx = false;
@@ -29,6 +31,10 @@ static uint16_t pm2p5max;
 static uint16_t pm10p0max;
 static uint16_t s5xvocimax;
 static uint16_t s5xnoximax;
+static uint16_t pm2p5;
+static uint16_t pm10p0;
+static uint16_t s5xvoci;
+static uint16_t s5xnoxi;
 uint32_t sen5xReadTimer = 0;
 sen5x_states PMsamplesState = LIGHT_OUT;
 SEN5X_DateTypeDef sen5x_data;
@@ -68,11 +74,17 @@ void sen5x_Power_On(void) {
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
   Debug("executing sen5x_Power_On");
 #ifdef SSD1306
-  HAL_Delay(5);
-  ssd1306_Init(&hi2c2);
-  ssd1306_WriteString("dBA 120.00 peak 140.00", Font_7x10, White);
-  ssd1306_UpdateScreen(&hi2c2);
-  HAL_Delay(10000);
+  if (ssd1306_Init()) {
+    Info("Display SSD1306 not detected on I2C2");
+    SSD1306detected = false;
+  }
+  else {
+    Info("Display SSD1306 is detected on I2C2");
+    SSD1306detected = true;
+  }
+  displayCreateStyle();
+//  HAL_Delay(7000);
+//  while (1){};
 #endif
   sen5x_On = true;
 }
@@ -80,6 +92,9 @@ void sen5x_Power_On(void) {
 void sen5x_Power_Off(void) {
   if (VOCNOx) {
     Debug("VOC and NOx measurement enabled, no power off");
+  }
+  else if (SSD1306detected && (usbPluggedIn || userToggle)) {
+    Info("Display detected and USB power or userToggle enabled");
   }
   else {
     Debug("executing sen5x_Power_Off");
@@ -198,7 +213,7 @@ int16_t sen5x_lightup_measurement(void) {
 int16_t sen5x_extinguish_measurement(void) {
   int16_t error = 0;
   if (VOCNOx) {
-    Info("Continious VOC & NOx is active, sensor not powered off");
+    Info("Continuous VOC & NOx is active, sensor not powered off");
     Info("PM measurement is disabled");
     error =sen5x_start_measurement_without_pm();
     if (error) {
@@ -273,24 +288,64 @@ void sen5x_printvalues(void) {
   }
 }
 
+void sen5xResetMax() {
+  pm2p5max = 0;
+  pm10p0max = 0;
+  s5xvocimax = 0;
+  s5xnoximax = 0;
+}
+
 void sen5xStoreMax() {
+  bool updateflag = false;
   if ((sen5x_data.mass_concentration_pm2p5 != 0xFFFF) && (sen5x_data.mass_concentration_pm2p5 > pm2p5max)) {
     pm2p5max = sen5x_data.mass_concentration_pm2p5;
+    updateflag = true;
   }
   if ((sen5x_data.mass_concentration_pm10p0 != 0xFFFF) && (sen5x_data.mass_concentration_pm10p0 > pm10p0max)) {
     pm10p0max = sen5x_data.mass_concentration_pm10p0;
+    updateflag = true;
   }
   if ((sen5x_data.voc_index != 0x7fff) && (sen5x_data.voc_index > s5xvocimax)) {
     s5xvocimax = sen5x_data.voc_index;
+    updateflag = true;
   }
   if ((sen5x_data.nox_index != 0x7fff) && (sen5x_data.nox_index > s5xnoximax)) {
     s5xnoximax = sen5x_data.nox_index;
+    updateflag = true;
+  }
+  if (updateflag) {
+    /*
+    if (((product_name[4] == '4') || (product_name[4] == '5'))) {
+      setPMs(pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
+//      Debug("pm2p5max = %d, pm10p0max = %d, s5xvocimax = %d, s5xnoximax = %d", pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
+    }
+    else {
+      setPMsen50(pm2p5max, pm10p0max);
+    }
+*/
+  }
+}
+
+void sen5xStore() {
+  if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
+    pm2p5 = sen5x_data.mass_concentration_pm2p5;
+  }
+  if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
+    pm10p0 = sen5x_data.mass_concentration_pm10p0;
+  }
+  if (sen5x_data.voc_index != 0x7fff) {
+    s5xvoci = sen5x_data.voc_index;
+    SetVOCindicator(s5xvoci/10);
+  }
+  if (sen5x_data.nox_index != 0x7fff) {
+    s5xnoxi = sen5x_data.nox_index;
   }
   if (((product_name[4] == '4') || (product_name[4] == '5'))) {
-    setPMs(pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
+    setPMs(pm2p5, pm10p0, s5xvoci, s5xnoxi);
+//    Debug("pm2p5 = %d, pm10p0 = %d, s5xvoci = %d, s5xnoxi = %d", pm2p5, pm10p0, s5xvoci, s5xnoxi);
   }
   else {
-    setPMsen50(pm2p5max, pm10p0max);
+    setPMsen50(pm2p5, pm10p0);
   }
 }
 /**
@@ -430,7 +485,6 @@ void sen5x_statemachine() {
           Error("Error executing sen5x_read_measured_values()");
         }
         sen5xSamples++;
-        sen5xStoreMax();
         if (sen5xSamples == 31) { // about two times a minute
           sen5xSamples = 0;  // enable display on serial
         }
@@ -438,6 +492,7 @@ void sen5x_statemachine() {
           sen5xStoreMax();
         }
         if (sen5xSamples == 2) { // take 2 samples, show 1 sample before we continue in the state machine
+          sen5xStore();
 #ifndef STLINK_V3PWR
           sen5x_printvalues(); // print the values
 #else

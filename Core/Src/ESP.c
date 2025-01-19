@@ -23,6 +23,9 @@
 #else
 #include "cred.h"
 #endif
+#ifdef SSD1306
+#include "display.h"
+#endif
 
 static UART_HandleTypeDef* EspUart = NULL;
 extern DMA_HandleTypeDef hdma_usart4_rx;
@@ -115,33 +118,69 @@ bool checkName(){
   return test;
 }
 
-#ifdef SSD1306
-
-#endif
 
 void setHIDS(float temp, float humid){
   MeasVal.Temperature = temp;
   MeasVal.Humidity = humid;
+#ifdef SSD1306
+  if (SSD1306detected) {
+    displayTemperature();
+    displayHumidity();
+  }
+#endif
 }
 
 void setVOC(uint16_t voc){
   MeasVal.VOCIndex = voc;
+#ifdef SSD1306
+  if (SSD1306detected) {
+    displayVOC();
+  }
+#endif
 }
 
-void setMic(float dB){
+void setMic(float dB, float dBmax, float dBAavg){
   MeasVal.dBA = dB;
+  MeasVal.dBApeak = dBmax;
+  MeasVal.dBAaverage = dBAavg;
+#ifdef SSD1306
+  if (SSD1306detected) {
+    displayActdBA();
+    displayPeakdBA();
+  }
+#endif
 }
 
 void setPMsen50(uint16_t PM2, uint16_t PM10) {
   MeasVal.airPM2 = PM2 / 10.0f;
   MeasVal.airPM10 = PM10 / 10.0f;
+#ifdef SSD1306
+  if (SSD1306detected) {
+    displayPMs();
+  }
+#endif
 }
 
 void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox) {
+//  Debug("SetPMs entered");
   MeasVal.airPM2 = PM2 / 10.0f;
   MeasVal.airPM10 = PM10 / 10.0f;
-  MeasVal.VOCIndex = voc / 10.0f;
+  if (!VOCNOx || usbPluggedIn) {
+    MeasVal.VOCIndex = voc / 10.0f;
+  }
   MeasVal.airNOx = nox / 10.0f;
+#ifdef SSD1306
+  if (SSD1306detected) {
+//    Debug("calling display update for PM");
+    displayPMs();
+    if (usbPluggedIn) {
+//      Debug("calling VOC update");
+      displayVOC();
+    }
+//    Debug("calling NOx update");
+    displayNOx();
+  }
+#endif
 }
 
 void SetConfigMode(){
@@ -287,7 +326,7 @@ uint16_t CreateMessage(bool onBeurs){
   index = strlen(message);
 
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.dBA);
+  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, vocConfig);
@@ -304,7 +343,7 @@ uint16_t CreateMessage(bool onBeurs){
     index = strlen(message);
 
     uint8ArrayToString(Buffer, noxConfig);
-    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOx);
+    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOx);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM2Config);
@@ -1179,6 +1218,7 @@ ESP_States ESP_Upkeep(void) {
           stop = HAL_GetTick();
           Info("Message send in %lu ms", (stop-start));
           ResetdBAmax();
+          sen5xResetMax();
           showTime();
           ESPTransmitDone = true;
           EspState = ESP_STATE_DEINIT;

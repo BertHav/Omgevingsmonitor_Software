@@ -195,6 +195,29 @@ void SetAllREDLED() {
   HAL_Delay(1000);
 }
 
+void SetVOCindicator(uint16_t VOCi) {
+//  *vocIndex = VOCi;
+//  if(*vocIndex > 0 && *vocIndex <= 100){
+  static uint16_t Red;
+  static uint16_t Blue;
+  static uint16_t Green;
+  static uint16_t TimeValue = 4000;
+  Debug("Entry in SetVOCindicator with value %d", VOCi);
+  if(VOCi > 0 && VOCi <= 100){
+    Green = (1.0-(VOCi/100.0))*TimeValue;
+    Blue = (VOCi/100.0)*TimeValue;
+    Red = TimeValue;
+    SetVocLED(Red, Green, Blue);
+  }
+  if(VOCi > 100){
+    Green = (((VOCi-100.0)/400.0))*TimeValue;
+    Red = (1.0-((VOCi-100.0)/400.0))*TimeValue;
+    Blue = TimeValue;
+    SetVocLED(Red, Green, Blue);
+  }
+
+}
+
 Battery_Status powerCheck(){
   Battery_Status status;
   if(!Check_USB_PowerOn()){

@@ -16,8 +16,7 @@
 #include "measurement.h"
 #include "PC_Config.h"
 #include "statusCheck.h"
-#include "ssd1306.h"
-
+#include "ssd1306_128x64_i2c.h"
 
 // #define LONGMESSAGES true  // show long messages f.i. the datagram on debug UART
 #define LONGDATAGRAM  // use opensensemap
@@ -63,8 +62,10 @@ typedef struct
   float ambient_humidity;
   float ambient_temperature;
   uint16_t VOCIndex;
-  float airNOx;
+  uint16_t airNOx;
   float dBA;
+  float dBApeak;
+  float dBAaverage;
 } MeasurementValues;
 
 extern MeasurementValues MeasVal;
@@ -181,7 +182,7 @@ void ESP_DeInit(void);
 void ESP_WakeTest();
 void setVOC(uint16_t voc);
 void setHIDS(float temp, float humid);
-void setMic(float dB);
+void setMic(float dB, float dBmax, float dBAavg);
 void setPMsen50(uint16_t PM2, uint16_t PM10);
 void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox);
 void SetConfigMode();

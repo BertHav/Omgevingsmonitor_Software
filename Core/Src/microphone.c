@@ -62,7 +62,7 @@ void MIC_Print(void) {
   }
   dBAAverage = dBAsum/(float)denominator;
 //  setMic(dBAAverage);
-  setMic(dBAmax);
+  setMic(dBA, dBAmax, dBAAverage); // first parameter is uploaded to opensensemap.org others are stored in structure
   }
   printf("SPL_dBA: %.1f, SPL_peak_mPa: %s, dBA peak: %.1f, dBA average: %.1f\r\n", dBA,mPabuffer, dBAmax, dBAAverage);
 

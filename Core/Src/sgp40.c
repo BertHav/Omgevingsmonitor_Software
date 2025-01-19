@@ -48,10 +48,6 @@ static bool HT_MeasurementReceived = false;
 static bool SGP_MsgSent = false;
 static int32_t vocIndex;
 
-static uint16_t Red;
-static uint16_t Blue;
-static uint16_t Green;
-static uint16_t TimeValue = 4000;
 
 
 static void ReadRegister(uint8_t address, uint8_t *buffer, uint8_t nrBytes) {
@@ -163,19 +159,7 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
           sgp40samplecounter = 0;
         }
       }
-      *vocIndex = tempVocIndex;
-      if(*vocIndex > 0 && *vocIndex <= 100){
-        Green = (1.0-(*vocIndex/100.0))*TimeValue;
-        Blue = (*vocIndex/100.0)*TimeValue;
-        Red = TimeValue;
-        SetVocLED(Red, Green, Blue);
-      }
-      if(*vocIndex > 100){
-        Green = (((*vocIndex-100.0)/400.0))*TimeValue;
-        Red = (1.0-((*vocIndex-100.0)/400.0))*TimeValue;
-        Blue = TimeValue;
-        SetVocLED(Red, Green, Blue);
-      }
+      SetVOCindicator(tempVocIndex);
       SGP_AmountOfSamplesDone = 0;
       HT_MeasurementReceived = false;
       SGP_MsgSent = false;

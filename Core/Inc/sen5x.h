@@ -43,6 +43,7 @@ typedef struct
   int16_t nox_index;
 } SEN5X_DateTypeDef;
 
+extern bool SSD1306detected;
 extern SEN5X_DateTypeDef sen5x_data;
 extern uint32_t sen5xReadTimer;
 extern uint8_t sen5xErrors;
@@ -63,6 +64,7 @@ int16_t probe_sen5x(void);
 int16_t sen5x_lightup_measurement(void);
 void sen5x_printvalues(void);
 void sensirion_i2c_hal_free(void);
+void sen5xResetMax();
 int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint16_t count);
 int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint16_t count);
 void sensirion_i2c_hal_sleep_usec(uint32_t useconds);
