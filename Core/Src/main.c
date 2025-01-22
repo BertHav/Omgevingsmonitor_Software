@@ -261,7 +261,8 @@ int main(void)
     if(TimestampIsReached(batteryReadTimer)){
       charge = Battery_Upkeep();
       batteryReadTimer  = HAL_GetTick() + 50000;
-        showTime();
+      showTime();
+
     }
     configCheck();
 #ifndef STLINK_V3PWR
@@ -282,7 +283,6 @@ int main(void)
 #endif
     if (testDone && !ESP_Programming && !batteryEmpty) {
       if (priorUSBpluggedIn != usbPluggedIn) {
-        Info("USB power state change detected");
         if (IsSGPPresent() && !usbPluggedIn) {
           SetVOCSensorDIS_ENA(true);
         }
@@ -465,7 +465,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     setuserToggle();
     if (GetPMSensorPresence()) {
       Sensor.PM_measurementEnabled = true;
-      setsen5xReadTimer(100);
+//      setsen5xReadTimer(100);
+      sen5x_Set_sen5x_state(false);  // sounds contradictory, but this enables sen5x immediate
     }
   }
 }

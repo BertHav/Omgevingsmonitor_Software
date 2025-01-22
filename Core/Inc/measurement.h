@@ -44,6 +44,7 @@ void SetVOCSensorDIS_ENA(bool setting);
 bool IsPMSensorEnabled();
 bool IsMICSensorEnabled();
 bool GetPMSensorPresence();
+void DisablePMSensor();
 void SetPMSensorStatus(bool setting);
 void SetVOCSensorStatus(bool setting);
 void DisableConnectedDevices();

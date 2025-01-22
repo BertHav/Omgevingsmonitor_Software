@@ -19,7 +19,6 @@
 #include "ssd1306_128x64_i2c.h"
 #include "display.h"
 
-bool SSD1306detected = false;
 bool fanCleaningDone = false;
 bool sen5x_On = false;
 bool VOCNOx = false;
@@ -27,10 +26,6 @@ static bool sen5x_Enable = false;
 unsigned char product_name[8];
 uint8_t sen5xSamples = 0;
 uint8_t sen5xErrors = 0;
-static uint16_t pm2p5max;
-static uint16_t pm10p0max;
-static uint16_t s5xvocimax;
-static uint16_t s5xnoximax;
 static uint16_t pm2p5;
 static uint16_t pm10p0;
 static uint16_t s5xvoci;
@@ -41,6 +36,10 @@ SEN5X_DateTypeDef sen5x_data;
 
 bool sen5x_Get_sen5x_enable_state() {
   return sen5x_Enable;
+}
+
+void sen5x_Set_sen5x_state(bool status) {
+  sen5x_Enable = status;
 }
 
 void setsen5xReadTimer(uint32_t delayms) {
@@ -61,7 +60,7 @@ bool sen5x_enable(uint32_t sleepTime) {
       //The ticker starts after 880*100, is about one and a half minute effective this turn the sen5x device will not start
       setsen5xReadTimer(HAL_GetTick() + (sleepTime*100));
     }
-    Info("This cycle the sen5x is : %s", sen5x_Enable?"enabled":"disabled");
+    Info("This cycle the sen5x is: %s", sen5x_Enable?"enabled":"disabled");
   }
   else {
     Info("sen5x measurement is disabled");
@@ -73,19 +72,18 @@ bool sen5x_enable(uint32_t sleepTime) {
 void sen5x_Power_On(void) {
   HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_SET);
   Debug("executing sen5x_Power_On");
-  HAL_Delay(100);
-#ifdef SSD1306
-  if (ssd1306_Init()) {
-    Info("Display SSD1306 not detected on I2C2");
-    SSD1306detected = false;
+  HAL_Delay(150);
+  if (sen5x_device_reset()) {
+    Error("sen5x device reset error after power on");
   }
   else {
-    Info("Display SSD1306 is detected on I2C2");
-    SSD1306detected = true;
+    sen5x_On = true;
   }
-  displayCreateStyle();
+#ifdef SSD1306
+  if (userToggle || Check_USB_PowerOn()) {
+    displayStart();
+  }
 #endif
-  sen5x_On = true;
 }
 
 void sen5x_Power_Off(void) {
@@ -93,14 +91,20 @@ void sen5x_Power_Off(void) {
     Debug("VOC and NOx measurement enabled, no power off");
   }
   else {
+#ifdef SSD1306
     if (SSD1306detected && (usbPluggedIn || userToggle)) {
       Info("Display detected and USB power or userToggle enabled");
     }
     else {
+      ssd1306_powerOff();
+      Debug("Display switched off");
+#endif
       Debug("executing sen5x_Power_Off");
       HAL_GPIO_WritePin(Boost_Enable_GPIO_Port, Boost_Enable_Pin, GPIO_PIN_RESET);
       sen5x_On = false;
+#ifdef SSD1306
     }
+#endif
   }
 }
 
@@ -153,7 +157,6 @@ int16_t probe_sen5x(void) {
              firmware_minor, hardware_major, hardware_minor);
   }
 
-
 // set a temperature offset - supported by SEN54 and SEN55 sensors
 //
 // By default, the temperature and humidity outputs from the sensor
@@ -184,8 +187,13 @@ int16_t probe_sen5x(void) {
   } else {
       Info("Temperature Offset set to %.2f °C (SEN54/SEN55 only)", temp_offset);
   }
-  sen5x_Power_Off();
-  sen5xReadTimer  = HAL_GetTick() + 2000; // after 25 second first measurement
+  if (!Check_USB_PowerOn()) {
+    sen5x_Power_Off();
+    sen5xReadTimer  = HAL_GetTick() + 2000; // after 25 second first measurement
+  }
+  else {
+    sen5xReadTimer  = HAL_GetTick() + 28000; // after 25 second first measurement
+  }
   return error;
 }
 
@@ -289,65 +297,38 @@ void sen5x_printvalues(void) {
   }
 }
 
-void sen5xResetMax() {
-  pm2p5max = 0;
-  pm10p0max = 0;
-  s5xvocimax = 0;
-  s5xnoximax = 0;
-}
-
-void sen5xStoreMax() {
-  bool updateflag = false;
-  if ((sen5x_data.mass_concentration_pm2p5 != 0xFFFF) && (sen5x_data.mass_concentration_pm2p5 > pm2p5max)) {
-    pm2p5max = sen5x_data.mass_concentration_pm2p5;
-    updateflag = true;
-  }
-  if ((sen5x_data.mass_concentration_pm10p0 != 0xFFFF) && (sen5x_data.mass_concentration_pm10p0 > pm10p0max)) {
-    pm10p0max = sen5x_data.mass_concentration_pm10p0;
-    updateflag = true;
-  }
-  if ((sen5x_data.voc_index != 0x7fff) && (sen5x_data.voc_index > s5xvocimax)) {
-    s5xvocimax = sen5x_data.voc_index;
-    updateflag = true;
-  }
-  if ((sen5x_data.nox_index != 0x7fff) && (sen5x_data.nox_index > s5xnoximax)) {
-    s5xnoximax = sen5x_data.nox_index;
-    updateflag = true;
-  }
-  if (updateflag) {
-    /*
-    if (((product_name[4] == '4') || (product_name[4] == '5'))) {
-      setPMs(pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
-//      Debug("pm2p5max = %d, pm10p0max = %d, s5xvocimax = %d, s5xnoximax = %d", pm2p5max, pm10p0max, s5xvocimax, s5xnoximax);
-    }
-    else {
-      setPMsen50(pm2p5max, pm10p0max);
-    }
-*/
-  }
-}
 
 void sen5xStore() {
   if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
-    pm2p5 = sen5x_data.mass_concentration_pm2p5;
+    if (pm2p5 != sen5x_data.mass_concentration_pm2p5) {
+      pm2p5 = sen5x_data.mass_concentration_pm2p5;
+      setPM2p5(pm2p5);
+    }
   }
   if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
-    pm10p0 = sen5x_data.mass_concentration_pm10p0;
-  }
-  if (sen5x_data.voc_index != 0x7fff) {
-    s5xvoci = sen5x_data.voc_index;
-    SetVOCindicator(s5xvoci/10);
-  }
-  if (sen5x_data.nox_index != 0x7fff) {
-    s5xnoxi = sen5x_data.nox_index;
+    if (pm10p0 != sen5x_data.mass_concentration_pm10p0) {
+      pm10p0 = sen5x_data.mass_concentration_pm10p0;
+      setPM10(pm10p0);
+    }
   }
   if (((product_name[4] == '4') || (product_name[4] == '5'))) {
-    setPMs(pm2p5, pm10p0, s5xvoci, s5xnoxi);
-//    Debug("pm2p5 = %d, pm10p0 = %d, s5xvoci = %d, s5xnoxi = %d", pm2p5, pm10p0, s5xvoci, s5xnoxi);
+    if (!VOCNOx || usbPluggedIn) {
+      if (sen5x_data.voc_index != 0x7fff) {
+        if (s5xvoci != (sen5x_data.voc_index / 10)) {
+          s5xvoci = sen5x_data.voc_index / 10;
+          SetVOCindicator(s5xvoci);
+          setVOC(s5xvoci);
+        }
+      }
+    }
+    if (sen5x_data.nox_index != 0x7fff) {
+      if(s5xnoxi != sen5x_data.nox_index / 10) {
+        s5xnoxi = sen5x_data.nox_index / 10;
+        setNOx(s5xnoxi);
+      }
+    }
   }
-  else {
-    setPMsen50(pm2p5, pm10p0);
-  }
+    //    Debug("pm2p5 = %d, pm10p0 = %d, s5xvoci = %d, s5xnoxi = %d", pm2p5, pm10p0, s5xvoci, s5xnoxi);
 }
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
@@ -406,10 +387,10 @@ bool sen5x_check_for_errors(void){
   uint32_t device_status = 0;
   if (sen5x_read_device_status(&device_status)) {
     Error("Error reading sen5x device status register");
-    return 0;
+    return true;
   }
   if (device_status == 0) {
-    return 0;
+    return false;
   }
   if (device_status & SEN5X_FAN_SPEED_ERROR) {
     Debug("sen5x Fan speed out of range");
@@ -453,6 +434,8 @@ void sen5x_statemachine() {
     switch (PMsamplesState) {
     case S5X_DISABLED:
       Error("sen5x device is disabled due to too many errors");
+      SetPMSensorStatus(false);
+      DisablePMSensor();
       sen5xReadTimer = HAL_GetTick() + 3141592; //some more less then an hour a message when continue operated.
       break;
     case LIGHT_OUT:
@@ -469,12 +452,19 @@ void sen5x_statemachine() {
         if (sen5x_check_for_errors()) {
           if (sen5x_device_reset()) {
             Error("Error resetting sen5x");
+            sen5xErrors++;
+            PMsamplesState = CHECK_SEN5X;
           }
           else {
             Info("sen5x reset executed");
           }
-          sen5xErrors++;
-          sen5xReadTimer = HAL_GetTick() + 150;
+          sen5xReadTimer = HAL_GetTick() + 200;
+        }
+        else {
+          if (sen5xErrors != 0) {
+            sen5xErrors = 0;
+            Debug("sen5xErrors reset");
+          }
         }
       }
       break;
@@ -484,16 +474,16 @@ void sen5x_statemachine() {
         SetPMIndicator();
         if (sen5x_read_measurement(&sen5x_data)) {
           Error("Error executing sen5x_read_measured_values()");
+          sen5xErrors++;
         }
         sen5xSamples++;
         if (sen5xSamples == 31) { // about two times a minute
           sen5xSamples = 0;  // enable display on serial
         }
         if (sen5xSamples > 1) {
-          sen5xStoreMax();
+          sen5xStore();
         }
         if (sen5xSamples == 2) { // take 2 samples, show 1 sample before we continue in the state machine
-          sen5xStore();
 #ifndef STLINK_V3PWR
           sen5x_printvalues(); // print the values
 #else
@@ -501,6 +491,7 @@ void sen5x_statemachine() {
           sen5x_printvalues(); // print the values
           Info("!!==Values are bogus, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
 #endif
+          HAL_Delay(1000);
         }
       }
       if (usbPluggedIn || (sen5xSamples > 1)) {
@@ -518,13 +509,15 @@ void sen5x_statemachine() {
       PMsamplesState = SAMPLES_TAKEN;
       break;
     case SAMPLES_TAKEN:
-      if (!usbPluggedIn) {
+      if (!usbPluggedIn && !userToggle) {
         if (sen5x_extinguish_measurement()) {
           Error("Error executing sen5x_extinguish_measurement()");
         }
         sen5xSamples = 0;
         sen5x_Power_Off();
-        SetPMSensorStatus(false);
+//        if (!userToggle) {
+          SetPMSensorStatus(false);
+//        }
         PMsamplesState = LIGHT_OUT;
       }
       else {

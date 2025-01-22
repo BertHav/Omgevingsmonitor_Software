@@ -149,6 +149,7 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
       uint16_t rawSignal = ((SGP_ReadBuffer[1] << 8) | (SGP_ReadBuffer[0]));
       int32_t tempVocIndex = 0;
       GasIndexAlgorithm_process(&params, rawSignal, &tempVocIndex);
+      *vocIndex = tempVocIndex;
       sgp40samplecounter++;
       if (sgp40samplecounter == 1) {
         Debug("SGP40 rawSignal value: %d", rawSignal);

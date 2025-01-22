@@ -9,6 +9,9 @@
 #include "statusCheck.h"
 #include <string.h>
 #include <stdlib.h>
+#include "i2c.h"
+#include "display.h"
+
 
 typedef struct {
   uint16_t Day;
@@ -264,30 +267,46 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   HAL_Delay(100);
   HAL_SuspendTick();
   RTC_SetWakeUpTimer(sleepTime);
+#ifdef SSD1306
+  stop_I2C2();
+#endif
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
   SystemClock_Config();
+  HAL_ResumeTick(); // Enable SysTick after wake-up
+#ifdef SSD1306
+  MX_I2C2_Init();
+#endif
   if (sen5x_enable((uint32_t)sleepTime)) {
     showTime();
     set_light_on_state();
     if (!userToggle) {
       RTC_SetWakeUpTimer(SEN5X_START_UP_TIME); // go sleep for 27 + 3s measurement time is approx 30 seconds
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
+#ifdef SSD1306
+      stop_I2C2();
+#endif
       HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
       SystemClock_Config();
+      HAL_ResumeTick(); // Enable SysTick after wake-up
+#ifdef SSD1306
+      MX_I2C2_Init();
+      if (userToggle) {
+        displayStart();
+      }
+#endif
       setsen5xReadTimer(0);
     }
   }
-  HAL_ResumeTick(); // Enable SysTick after wake-up
   showTime();
   ResetDBACalculator();  // reset the DBA average calculation
   ResetSGP40samplecounter();
   setsen5xSamplecounter(0);
-  setESPTimeStamp(2500);
+  setESPTimeStamp(4500);
   setSGP40TimeStamp(0);
   setHIDSTimeStamp(0);
   setMICTimeStamp(0);
   ESPTransmitDone = false;
-  deviceTimeOut = HAL_GetTick() + 2300;
+  deviceTimeOut = HAL_GetTick() + 3000;
 }
 
 void InitClock(RTC_HandleTypeDef* h_hrtc){

@@ -124,17 +124,20 @@ void setHIDS(float temp, float humid){
   MeasVal.Temperature = temp;
   MeasVal.Humidity = humid;
 #ifdef SSD1306
-  if (SSD1306detected) {
+  if (SSD1306detected && (Check_USB_PowerOn() || userToggle)) {
     displayTemperature();
     displayHumidity();
   }
 #endif
 }
 
-void setVOC(uint16_t voc){
+void setVOC(uint16_t voc) {
   MeasVal.VOCIndex = voc;
+  if (voc > MeasVal.VOCIndexmax) {
+    MeasVal.VOCIndexmax = voc;
+  }
 #ifdef SSD1306
-  if (SSD1306detected) {
+  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
     displayVOC();
   }
 #endif
@@ -145,43 +148,56 @@ void setMic(float dB, float dBmax, float dBAavg){
   MeasVal.dBApeak = dBmax;
   MeasVal.dBAaverage = dBAavg;
 #ifdef SSD1306
-  if (SSD1306detected) {
+  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
     displayActdBA();
     displayPeakdBA();
   }
 #endif
 }
 
-void setPMsen50(uint16_t PM2, uint16_t PM10) {
-  MeasVal.airPM2 = PM2 / 10.0f;
-  MeasVal.airPM10 = PM10 / 10.0f;
+void setPM2p5(uint16_t PM2) {
+  MeasVal.PM2p5 = PM2 / 10.0f;
+  if (MeasVal.PM2p5 > MeasVal.PM2p5max) {
+    MeasVal.PM2p5max = MeasVal.PM2p5;
+  }
 #ifdef SSD1306
-  if (SSD1306detected) {
-    displayPMs();
+  if (SSD1306detected && (Check_USB_PowerOn() || userToggle)) {
+      displayPM2p5();
   }
 #endif
 }
 
-void setPMs(uint16_t PM2, uint16_t PM10, uint16_t voc, uint16_t nox) {
-//  Debug("SetPMs entered");
-  MeasVal.airPM2 = PM2 / 10.0f;
-  MeasVal.airPM10 = PM10 / 10.0f;
-  if (!VOCNOx || usbPluggedIn) {
-    MeasVal.VOCIndex = voc / 10.0f;
+void setPM10(uint16_t PM10) {
+  MeasVal.PM10p0 = PM10 / 10.0f;
+  if (MeasVal.PM10p0 > MeasVal.PM10p0max) {
+  MeasVal.PM10p0max = MeasVal.PM10p0;
   }
-  MeasVal.airNOx = nox / 10.0f;
+  #ifdef SSD1306
+  if (SSD1306detected && (Check_USB_PowerOn() || userToggle)) {
+      displayPM10();
+  }
+#endif
+}
+
+void setNOx(uint16_t nox) {
+//  Debug("SetNOx entered");
+  MeasVal.airNOx = nox;
+  if (nox > MeasVal.airNOxmax) {
+    MeasVal.airNOxmax = nox;
+  }
 #ifdef SSD1306
-  if (SSD1306detected) {
-//    Debug("calling display update for PM");
-    displayPMs();
-    if (usbPluggedIn) {
-//      Debug("calling VOC update");
-      displayVOC();
-    }
-//    Debug("calling NOx update");
+  if (SSD1306detected && (Check_USB_PowerOn() || userToggle)) {
+//    Debug("calling display NOx update");
     displayNOx();
   }
 #endif
+}
+
+void resetMaxMeasurementValues() {
+  MeasVal.PM2p5max = 0.0f;
+  MeasVal.PM10p0max = 0.0f;
+  MeasVal.VOCIndexmax = 0;
+  MeasVal.airNOxmax = 0;
 }
 
 void SetConfigMode(){
@@ -331,7 +347,7 @@ uint16_t CreateMessage(bool onBeurs){
   index = strlen(message);
 
   uint8ArrayToString(Buffer, vocConfig);
-  sprintf(&message[index], "{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndex);
+  sprintf(&message[index], "{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
   index = strlen(message);
 
   if(!onBeurs){
@@ -344,15 +360,15 @@ uint16_t CreateMessage(bool onBeurs){
     index = strlen(message);
 
     uint8ArrayToString(Buffer, noxConfig);
-    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOx);
+    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM2Config);
-    sprintf(&message[index], "{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airPM2);
+    sprintf(&message[index], "{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, PM10Config);
-    sprintf(&message[index], "{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airPM10);
+    sprintf(&message[index], "{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
     index = strlen(message);
 
   }
@@ -1219,7 +1235,7 @@ ESP_States ESP_Upkeep(void) {
           stop = HAL_GetTick();
           Info("Message send in %lu ms", (stop-start));
           ResetdBAmax();
-          sen5xResetMax();
+          resetMaxMeasurementValues();
           showTime();
           ESPTransmitDone = true;
           EspState = ESP_STATE_DEINIT;

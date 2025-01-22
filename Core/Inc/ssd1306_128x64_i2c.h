@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include "fonts.h"
-// define build inclusion in project
+// define build with display inclusion in project
 //#define SSD1306
 
 #define SSD1306_I2C_ADDR        0x78
@@ -78,6 +78,7 @@
 
 
 uint8_t  ssd1306_Init();
+void ssd1306_powerOff();
 void ssd1306_setPos(uint8_t x, uint8_t y);
 void ssd1306_clearDisplay();
 //void ssd1306_WriteCommand(uint8_t c);

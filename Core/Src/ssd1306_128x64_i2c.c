@@ -31,11 +31,14 @@ int8_t ssd1306_WriteContent(const uint8_t* data, uint16_t count) {
 uint8_t  ssd1306_Init() {
 	// Init sequence
   // Wait for the screen to boot
-  // HAL_Delay(100); // moved to power on routine to detect sen5x reliable
-
+  //  // moved to power on routine to detect sen5x reliable
+  HAL_Delay(100);
   int status = 0;
   status += ssd1306_WriteCommand(SSD1306_CMD_DISPLAYOFF);                    // 0xAE
-  Debug("status %d", status);
+  if (status) {
+    Error("SSD1306 First status response: %d", status);
+    return status;
+  }
   status += ssd1306_WriteCommand(SSD1306_CMD_SETDISPLAYCLOCKDIV);            // 0xD5
   status += ssd1306_WriteCommand(0x80);                                  // the suggested ratio 0x80
   HAL_Delay(1);
@@ -93,6 +96,11 @@ uint8_t  ssd1306_Init() {
 	// clear 
 //	ssd1306_clearDisplay();
 	return 0;
+}
+
+void ssd1306_powerOff() {
+  ssd1306_WriteCommand(SSD1306_CMD_DISPLAYOFF);                    // 0xAE
+  HAL_Delay(100);
 }
 
 void ssd1306_setScreenOn() {

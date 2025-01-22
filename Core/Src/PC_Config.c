@@ -132,7 +132,6 @@ static uint16_t CRC16_ARC(uint8_t data[], uint16_t size)
     for (int i = 0; i < size; i++)
     {
         crc ^= data[i];
-
         for (int j = 0; j < 8; j++)
         {
             if ((crc & 0x0001) != 0)
@@ -156,6 +155,5 @@ void printf_USB(const char* message, ...)
   va_start(args, message);
   vsprintf(string, message, args);
   va_end(args);
-
   CDC_Transmit_FS((uint8_t*)string, strlen(string));
 }

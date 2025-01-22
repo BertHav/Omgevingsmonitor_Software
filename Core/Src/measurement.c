@@ -11,6 +11,7 @@
 #include "sen5x.h"
 #include "sound_measurement.h"
 #include "statusCheck.h"
+#include "display.h"
 
 EnabledMeasurements Sensor;
 DevicePresent SensorProbe;
@@ -30,6 +31,10 @@ void testInit(){
 
 bool GetPMSensorPresence(){
   return SensorProbe.PM_Present;
+}
+
+void DisablePMSensor() {
+  SensorProbe.PM_Present = false;
 }
 
 bool IsHTSensorEnabled() {
@@ -180,6 +185,11 @@ void Device_Test(){
     Info("Test completed");
     Info("ESP function: %s", SensorProbe.ESP_Present?"passed": "failed");
     Info("MIC function: %s", SensorProbe.MIC_Present?"passed": "failed");
+#ifdef  SSD1306
+    if (Check_USB_PowerOn() || userToggle) {
+      display2ndmsg2ndline();
+    }
+#endif
     SetTestDone();
   }
 }

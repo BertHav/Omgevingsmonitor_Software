@@ -8,10 +8,15 @@
 #ifndef INC_DISPLAY_H_
 #define INC_DISPLAY_H_
 
+extern bool SSD1306detected;
+
 void displayCreateStyle();
+void display2ndmsg2ndline();
+void displayStart();
 void displayActdBA();
 void displayPeakdBA();
-void displayPMs();
+void displayPM2p5();
+void displayPM10();
 void displayVOC();
 void displayNOx();
 void displayTemperature();

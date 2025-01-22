@@ -20,7 +20,7 @@ bool configSet = false;
 bool usbPluggedIn = false;
 bool userToggle = false;
 static bool init = true;
-static bool buttonHeld = false;
+static bool userbuttonHeld = false;
 static uint8_t usedMicLEDcolor;
 uint32_t ConfigStamp;
 uint32_t UserbuttonStamp;
@@ -260,17 +260,23 @@ void configCheck(){
     SetConfigMode(); //Make config mode wifi
     SetDBLED(true, true, true);
   }
-  if(!BootButton_Pressed() && UserButton_Pressed() && !buttonHeld && !GetReconfigMode()){
+  if(!BootButton_Pressed() && UserButton_Pressed() && !userbuttonHeld && !GetReconfigMode()){
     SetLEDsOff();
-    Debug("userToggle flipped");
+    SetVocLED(LED_ON, LED_ON, LED_ON);
+    HAL_Delay(1500);
+    SetVocLED(LED_OFF, LED_OFF, LED_OFF);
     userToggle = !userToggle;
     if (userToggle) {
       EnabledConnectedDevices();
     }
-    buttonHeld = true;
+    Debug("userToggle flipped to %sabled", userToggle?"en": "dis");
+    userbuttonHeld = true;
     UserbuttonStamp = HAL_GetTick() + 2000;
   }
-  if (!BootButton_Pressed() && buttonHeld&& TimestampIsReached(UserbuttonStamp)) {
+  else {
+    userbuttonHeld = false;
+  }
+  if (!BootButton_Pressed() && userbuttonHeld && TimestampIsReached(UserbuttonStamp)) {
     if (GetPMSensorPresence() && ((product_name[4] == '4') || (product_name[4] == '5'))) {
       uint16_t color;
       VOCNOx = !VOCNOx;
@@ -299,11 +305,12 @@ void configCheck(){
     }
     while (UserButton_Pressed()){
     }
-    buttonHeld = false;
+    userbuttonHeld = false;
   }
   if(!BootButton_Pressed() && !UserButton_Pressed()){
-    buttonHeld = false;
+    userbuttonHeld = false;
   }
+
   if(Check_USB_PowerOn()){
     usbPluggedIn = true;
   }
@@ -313,6 +320,7 @@ void configCheck(){
     }
     usbPluggedIn = false;
   }
+
 }
 
 Battery_Status Battery_Upkeep(){
@@ -325,5 +333,6 @@ Battery_Status Battery_Upkeep(){
 void setuserToggle(void) {
   if (powerCheck() != USB_PLUGGED_IN) { //operate only in battery operation mode
     userToggle = true;
+    EnabledConnectedDevices();
   }
 }
