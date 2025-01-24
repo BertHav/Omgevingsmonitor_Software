@@ -8,7 +8,7 @@
 
 #include "microphone.h"
 //#include "main.h"
-#include "GPIO.h"
+#include "gpio.h"
 #include "sound_measurement.h"
 
 static volatile uint32_t StartTime = 0;

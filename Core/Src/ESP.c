@@ -6,10 +6,10 @@
  *              Bert Havinga nov-dec
  */
 
+#include <eeprom.h>
 #include "ESP.h"
-#include <String.h>
+#include <string.h>
 #include <stdio.h>
-#include "EEprom.h"
 #include "Config.h"
 #include "microphone.h"
 #include "PowerUtils.h"

@@ -2,30 +2,32 @@ Find more information at:
 https://wiki.deomgevingsmonitor.nl/index.php/Main_Page
 
 # General
-This release makes it possible to operate the Omgevings Monitor (OM) independently of USB power for a longer period >> days. Needless to write, this depends on the ambient temperature and the amount of daylight that the solar panel receives. In battery operation the status LED will flash briefly 3 to 4 times while measurements are being carried out. Green means the battery has sufficient charge. If the LED flashes red during measaurement the remaining charge level is approximately 20%, the battery needs to be charged. The measurements are carried out once every 15 minutes in battery operation.
+This release makes it possible to operate the Omgevings Monitor (OM) independently of USB power for a longer period >> days. Needless to write, this depends on the ambient temperature and the amount of daylight that the solar panel receives. In battery operation the status LED will flash briefly 3 to 4 times while measurements are being carried out. Green means the battery has sufficient charge. If the LED flashes red during measurement the remaining charge level is approximately 20%, the battery needs to be charged. The measurements are carried out once every 15 minutes in battery operation.
 
-It is possible to use the OM as a handheld by using the BOOT0 button in case of battery operation. The OM then wakes up from energy saving mode. This becomes visible by the lighting of the LEDs. By pressing the user button, the LEDs go out again and the OM starts operating in energy saving mode again. 
-
+It is possible to use the OM as a handheld by using the BOOT0 button in case of battery operation. The OM then wakes up from energy saving mode. This becomes visible by the lighting of the LEDs. By pressing the user button, the LEDs go out again and the OM starts operating in energy saving mode again. This can take up to about 45 seconds.
 If the battery is low, the system will enter a very low energy state and will not operate normal until the battery is charged. By pressing the reset button while charging, the device becomes operational again. 
 As long as there is some energy in the battery, it is possible that the device will start up briefly and then go back into battery protection mode.
 
 The dB LED has the following meaning, more or less in the order of the rainbow:
-dBA >= 90 white
-dBA >= 80 && dBA < 90 red
-dBA >= 70 && dBA < 80 yellow
-dBA >= 60 && dBA < 70 green
-dBA >= 50 && dBA < 60 light blue
-dBA >= 40 && dBA < 50 blue
-dBA >= 35 && dBA < 40 purple
-dBA < 35 LED off, equals to noise level of the microphone
+- dBA >= 90 white
+- dBA >= 80 - dBA < 90 red
+- dBA >= 70 - dBA < 80 yellow
+- dBA >= 60 - dBA < 70 green
+- dBA >= 50 - dBA < 60 light blue
+- dBA >= 40 - dBA < 50 blue
+- dBA >= 35 - dBA < 40 purple
+- dBA < 35 LED off, equals to noise level of the microphone
 
 ## Compiling and building
 The project was developed with STM32CubeIDE 1.16.1
 
 The project has two build configurations: Debug & Release. Select the option under Project -> Build configurations -> Set Active
 
-Follow the procedure under ["Compileren en bouwen"](https://wiki.deomgevingsmonitor.nl/index.php/Programmeeromgeving).
-Below is the translation in English (or something similar ;-). 
+For installation the STM32CubeIDE follow the procedure under ["Compileren en bouwen"](https://wiki.deomgevingsmonitor.nl/index.php/Programmeeromgeving).
+
+The installation of the sources in the IDE differs slightly from the procedure described on the previously mentioned page.
+
+Under Ubuntu Linux I encountered problems downloading the necessary firmware automatically. If necessary, download and install it manually in advance. The firmware can be found under ["get stm32l072RZTX firmware"](https://www.st.com/en/embedded-software/stm32cubel0.html#get-software). Install first the STM32Cube MCU Package for STM32L0 series 1.20.0 in ~/STM32Cube/Repository copy the Patch for STM32CubeL0 over the installad package. If you know the solution for configuring the STM32CubeIDE so that it automatically downloads the necessary packages, please mention it in an issue of this repo.
 
 Get the sources by using git or download the software as a zip file.
 
@@ -33,11 +35,14 @@ Place the unzipped sources in your working directory of STM32CubeIDE.
 
 For clearity rename the source folder to MJSGadget - dB meter. 
 
-Start STM32CubeIDE, if you are not logged in to ST in the IDE, do that first. 
+Start STM32CubeIDE, If this is the first time that STM32CubeIDE is used, choose the 'Import Project' option. Otherwise, 
+-Select File -> Open Projects from File System. Select your source folder MJSGadget - dB Meter. 
+-Uncheck the "Search for nested projects". Leave the rest of the settings in the "Import Projects from File System or Archive" unchanged. 
+-Click Finish
 
-Select File -> Open Projects from File System. Select your source folder MJSGadget - dB Meter. Uncheck the "Search for nested projects". Leave the rest of the settings in the "Import Projects from File System or Archive" unchanged. 
+If you are not logged in to ST in the IDE, do that first. 
 
-In the Project Explorer double click on the file 'MJSGadget*.ioc'. 
+In the Project Explorer double click on the file 'MJSGadget*.ioc'. (On linux, when the Pinout view is not shown, close the tab and reopen the ioc file.)
 Choose 'Continue' in the 'New STM32Cube firmware version available' dialog. 
 After the MJSGadget*.ioc window has opened, click (in the left column) on 'Middleware and Software Packs'. 
 Click on USB_DEVICE. If everything is correct, there is a green check mark in front of USB_DEVICE. 
@@ -56,9 +61,9 @@ In the Project Explorer select the folder Drivers/CMSIS/DSP and use Ctrl-V
 Go to the folder C:\Users\<user>\STM32Cube\Repository\STM32Cube_FW_L0_V1.12.2\Drivers\CMSIS
 Select the folder Lib and use Ctrl-C to copy the contents.
 In the Project Explorer select the folder Drivers/CMSIS and use Ctrl-V
-(For Linux the folders can be found under ~/STM32Cube/Repository/STM32Cube_FW_L0_V1.12.2/Drivers/CMSIS.)
+(For Linux the folders can be found under ~/STM32Cube/Repository/STM32Cube_FW_L0_V1.12.0/Drivers/CMSIS.)
 
-Run Project -> Clean.
+Execute Project -> Clean.
 Check 'Start a build immediately' and choose 'Clean'.
 
 ## Known issues
@@ -66,6 +71,8 @@ Check 'Start a build immediately' and choose 'Clean'.
 - If 3 red LEDs illuminate repeatedly during start-up, the reset button must be pressed for approximately 3 seconds. This ensures that the ESP has sufficient time to reset. Then check whether the WiFi connection still works correctly. The OM must have uploaded the first values ​​for temperature and humidity within one minute. If in doubt, the procedure for connecting to the home network can be carried out again.
 - The system must be reset twice to reach optimal energy saving mode.
 - If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
+
+#### version 4.31 Building on fresh Ubuntu verified. Readme instruction supplemented and corrected. Some files renamed to lower case and aligned with the sourcefiles.
 
 #### version 4.3 Various fixes to better handle error handling in different conditions. Feedback when the user button is pressed by the VOC LED, which then lights up white briefly. The 128x64 OLED display is optionally added to the I2C2 bus. This option is disabled by default in the build.
 

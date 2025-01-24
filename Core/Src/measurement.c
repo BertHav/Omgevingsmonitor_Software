@@ -77,7 +77,7 @@ void SetVOCSensorStatus(bool setting) {
   if (SensorProbe.SGP_Enabled) {
     Sensor.VOC_measurementEnabled = setting;
   }
-  Debug("SetVOCSensorStatus VOC_measurementEnabled = %d", setting);
+//  Debug("SetVOCSensorStatus VOC_measurementEnabled = %d", setting);
 }
 
 void SetPMSensorStatus(bool setting) {

@@ -1,5 +1,5 @@
+#include <eeprom.h>
 #include "../Inc/PC_Config.h"
-#include "../Inc/EEProm.h"
 #include "../Inc/Config.h"
 #include "utils.h"
 

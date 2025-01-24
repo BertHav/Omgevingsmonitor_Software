@@ -1,4 +1,4 @@
-#include "../Inc/EEProm.h"
+#include <eeprom.h>
 
 uint32_t WriteUint8ArrayEeprom(uint32_t startAddr, uint8_t data[], uint16_t size)
 {
