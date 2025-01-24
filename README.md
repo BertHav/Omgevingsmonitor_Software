@@ -1,3 +1,10 @@
+**Table of Contents**
+
+[TOCM]
+
+[TOC]
+
+
 Find more information at:
 https://wiki.deomgevingsmonitor.nl/index.php/Main_Page
 
@@ -27,27 +34,28 @@ For installation the STM32CubeIDE follow the procedure under ["Compileren en bou
 
 The installation of the sources in the IDE differs slightly from the procedure described on the previously mentioned page.
 
-Under Ubuntu Linux I encountered problems downloading the necessary firmware automatically. If necessary, download and install it manually in advance. The firmware can be found under ["get stm32l072RZTX firmware"](https://www.st.com/en/embedded-software/stm32cubel0.html#get-software). Install first the STM32Cube MCU Package for STM32L0 series 1.20.0 in ~/STM32Cube/Repository copy the Patch for STM32CubeL0 over the installad package. If you know the solution for configuring the STM32CubeIDE so that it automatically downloads the necessary packages, please mention it in an issue of this repo.
+Under Ubuntu Linux I encountered problems downloading the necessary firmware automatically. If necessary, download and install it manually in advance. The firmware can be found under ["get stm32l072RZTX firmware"](https://www.st.com/en/embedded-software/stm32cubel0.html#get-software). Install first the "STM32Cube MCU Package for STM32L0 series 1.20.0" in the folder "~/STM32Cube/Repository". Second copy the "Patch for STM32CubeL0" over the installad package. If you know the solution for configuring the STM32CubeIDE so that it automatically downloads the necessary packages, please mention it in an issue of this repo.
 
-Get the sources by using git or download the software as a zip file.
+Get the sources by using git or download the software as a zip file. Here the procedure is described based on a zip file.
 
 Place the unzipped sources in your working directory of STM32CubeIDE.
 
 For clearity rename the source folder to MJSGadget - dB meter. 
 
-Start STM32CubeIDE, If this is the first time that STM32CubeIDE is used, choose the 'Import Project' option. Otherwise, 
--Select File -> Open Projects from File System. Select your source folder MJSGadget - dB Meter. 
--Uncheck the "Search for nested projects". Leave the rest of the settings in the "Import Projects from File System or Archive" unchanged. 
--Click Finish
+Start STM32CubeIDE 
+If this is the first time that STM32CubeIDE is used, choose the 'Import Project' option. Otherwise, 
+- Select File -> Open Projects from File System. Select your source folder MJSGadget - dB Meter. 
+- Uncheck the "Search for nested projects". Leave the rest of the settings in the "Import Projects from File System or Archive" unchanged. 
+- Click Finish
 
-If you are not logged in to ST in the IDE, do that first. 
+If you are not logged in to ST in the IDE, do that first. (Under Ubuntu Linux this is an issue for me. For this reason, the firmware was manually installed earlier in this procedure.)
 
-In the Project Explorer double click on the file 'MJSGadget*.ioc'. (On linux, when the Pinout view is not shown, close the tab and reopen the ioc file.)
-Choose 'Continue' in the 'New STM32Cube firmware version available' dialog. 
-After the MJSGadget*.ioc window has opened, click (in the left column) on 'Middleware and Software Packs'. 
+In the Project Explorer double click on the file 'MJSGadget  - dB meter.ioc'.* (On linux, when the Pinout view is not shown, close the tab and reopen the ioc file.)*
+When show, choose 'Continue' in the 'New STM32Cube firmware version available' dialog. 
+After the 'MJSGadget - dB meter.ioc' window has opened, click (in the left column) on 'Middleware and Software Packs'. 
 Click on USB_DEVICE. If everything is correct, there is a green check mark in front of USB_DEVICE. 
 
-Click in the ribbon on the button 'Device Configuration Tool Code Generation' (icon with yellow wheel) 
+Click in the ribbon of the IDE on the button 'Device Configuration Tool Code Generation' (icon with yellow wheel) 
 
 Click Yes in the "Open Associated Perpective?"dialog.
 
@@ -55,28 +63,26 @@ After the configuration process unfortunately, a number of necessary files are d
 
 Therefore, perform the following steps:
 
-Go to the folder C:\Users\<user>\STM32Cube\Repository\STM32Cube_FW_L0_V1.12.2\Drivers\CMSIS\DSP
-Select the folder Include and use Ctrl-C to copy the contents
-In the Project Explorer select the folder Drivers/CMSIS/DSP and use Ctrl-V
-Go to the folder C:\Users\<user>\STM32Cube\Repository\STM32Cube_FW_L0_V1.12.2\Drivers\CMSIS
-Select the folder Lib and use Ctrl-C to copy the contents.
-In the Project Explorer select the folder Drivers/CMSIS and use Ctrl-V
-(For Linux the folders can be found under ~/STM32Cube/Repository/STM32Cube_FW_L0_V1.12.0/Drivers/CMSIS.)
+- Go to the folder C:\Users\<user>\STM32Cube\Repository\STM32Cube_FW_L0_V1.12.2\Drivers\CMSIS\DSP
+- Select the folder Include and use Ctrl-C to copy the contents
+- In the Project Explorer select the folder Drivers/CMSIS/DSP and use Ctrl-V
+- Go to the folder C:\Users\<user>\STM32Cube\Repository\STM32Cube_FW_L0_V1.12.2\Drivers\CMSIS
+- Select the folder Lib and use Ctrl-C to copy the contents.
+- In the Project Explorer select the folder Drivers/CMSIS and use Ctrl-V
+- (For Linux the folders can be found under ~/STM32Cube/Repository/STM32Cube_FW_L0_V1.12.0/Drivers/CMSIS.)
 
 Execute Project -> Clean.
+
 Check 'Start a build immediately' and choose 'Clean'.
 
-## Known issues
-- If the OM runs on battery power and the boot button is pressed, it can take up to half a minute before the device is fully operational and the LED display starts when using a Sensirion sen5x sensor.
-- If 3 red LEDs illuminate repeatedly during start-up, the reset button must be pressed for approximately 3 seconds. This ensures that the ESP has sufficient time to reset. Then check whether the WiFi connection still works correctly. The OM must have uploaded the first values ​​for temperature and humidity within one minute. If in doubt, the procedure for connecting to the home network can be carried out again.
-- The system must be reset twice to reach optimal energy saving mode.
-- If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
+#### version 4.31 
+Building on fresh Ubuntu verified. Readme instruction supplemented and corrected. Some files renamed to lower case and aligned with the sourcefiles.
 
-#### version 4.31 Building on fresh Ubuntu verified. Readme instruction supplemented and corrected. Some files renamed to lower case and aligned with the sourcefiles.
+#### version 4.3 
+Various fixes to better handle error handling in different conditions. Feedback when the user button is pressed by the VOC LED, which then lights up white briefly. The 128x64 OLED display is optionally added to the I2C2 bus. This option is disabled by default in the build.
 
-#### version 4.3 Various fixes to better handle error handling in different conditions. Feedback when the user button is pressed by the VOC LED, which then lights up white briefly. The 128x64 OLED display is optionally added to the I2C2 bus. This option is disabled by default in the build.
-
-#### version 4.2 optional display can be compiled for local display of values. (still in development) The define directive "#define SSD1306" is located at about line 24 in ssd1306_128x64_i2c.h
+#### version 4.2 
+Optional display can be compiled for local display of values. (still in development) The define directive "#define SSD1306" is located at about line 24 in ssd1306_128x64_i2c.h
 
 #### version 4.01
 Correction for LED color on low battery and some clean up.
@@ -99,6 +105,12 @@ Source code parts moved from main.x to measurement.x. Auto reboot on incorrect s
 
 #### Version 3.4 
 NOx and VOC from sen55 is included in measurement. For this it is necessary that the sen55 has a longer runtime, this needs a USB powersupply. NOx is after 6 hours of operation reliable, VOC after about an hour. With battery operation the values for NOx and VOC reads zero from the sen55.
+
+## Known issues
+- If the OM runs on battery power and the boot button is pressed, it can take up to half a minute before the device is fully operational and the LED display starts when using a Sensirion sen5x sensor.
+- If 3 red LEDs illuminate repeatedly during start-up, the reset button must be pressed for approximately 3 seconds. This ensures that the ESP has sufficient time to reset. Then check whether the WiFi connection still works correctly. The OM must have uploaded the first values for temperature and humidity within one minute. If in doubt, the procedure for connecting to the home network can be carried out again.
+- The system must be reset twice to reach optimal energy saving mode.
+- If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
 
 
 # License
