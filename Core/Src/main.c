@@ -302,7 +302,7 @@ int main(void)
       }
       if ( ((charge >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
         if (!sen5x_Get_sen5x_enable_state()&& usbPluggedIn ) {
-          sen5x_enable(0);
+          sen5x_enable(0);  // this forces the sen5x to enable when powered
         }
         sen5x_statemachine();
       }
@@ -465,7 +465,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     setuserToggle();
     if (GetPMSensorPresence()) {
       Sensor.PM_measurementEnabled = true;
-//      setsen5xReadTimer(100);
       sen5x_Set_sen5x_state(false);  // sounds contradictory, but this enables sen5x immediate
     }
   }

@@ -194,10 +194,12 @@ void setNOx(uint16_t nox) {
 }
 
 void resetMaxMeasurementValues() {
-  MeasVal.PM2p5max = 0.0f;
-  MeasVal.PM10p0max = 0.0f;
+  if (sen5x_Get_sen5x_enable_state()) {
+    MeasVal.PM2p5max = 0.0f;
+    MeasVal.PM10p0max = 0.0f;
+    MeasVal.airNOxmax = 0;
+  }
   MeasVal.VOCIndexmax = 0;
-  MeasVal.airNOxmax = 0;
 }
 
 void SetConfigMode(){
@@ -288,18 +290,56 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
 // Callback for UART error
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   if (huart == EspUart) {
-    if (huart->ErrorCode != 4) {
-      Debug("A callback error has occurred, errorcode %d", huart->ErrorCode);
+    if (huart->ErrorCode == 4) {
+      return;
+    }
+    Debug("A callback error has occurred, errorcode %0X", huart->ErrorCode);
+    switch (huart->ErrorCode) {
+      case HAL_UART_TX_HALFCOMPLETE_CB_ID:
+        Error("ESP connection UART Tx Half Complete Callback ID");
+        break;
+      case HAL_UART_TX_COMPLETE_CB_ID:
+        Error("ESP connection UART Tx Complete Callback ID");
+        break;
+      case HAL_UART_RX_HALFCOMPLETE_CB_ID:
+        Error("ESP connection UART Rx Half Complete Callback ID");
+        break;
+      case HAL_UART_RX_COMPLETE_CB_ID:
+        Error("ESP connection UART Rx Complete Callback ID");
+        break;
+      case HAL_UART_ERROR_CB_ID:
+        Error("ESP connection UART Error Callback ID");
+        break;
+      case HAL_UART_ABORT_COMPLETE_CB_ID:
+        Error("ESP connection UART Abort Complete Callback ID");
+        break;
+      case HAL_UART_ABORT_TRANSMIT_COMPLETE_CB_ID:
+        Error("ESP connection UART Abort Transmit Complete Callback ID");
+        break;
+      case HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID:
+        Error("ESP connection UART Abort Receive Complete Callback ID");
+        break;
+      case HAL_UART_WAKEUP_CB_ID:
+        Error("ESP connection UART Wakeup Callback ID");
+        break;
+      case HAL_UART_MSPINIT_CB_ID:
+        Error("ESP connection UART MspInit callback ID");
+        break;
+      case HAL_UART_MSPDEINIT_CB_ID:
+        Error("ESP connection UART MspDeInit callback ID");
+        break;
+      default:
+        Error("ESP connection UART Unknown error");
     }
   }
 }
-void uint8ArrayToString(char *destination, uint8_t data[])
-{
-  for (int i = 0; i < 12; i++)
-  {
+
+void uint8ArrayToString(char *destination, uint8_t data[]) {
+  for (int i = 0; i < 12; i++) {
     sprintf(&destination[i * 2], "%02x", data[i]);
   }
 }
+
 uint16_t CreateMessage(bool onBeurs){
   static char Buffer[25];
   static uint8_t tempConfig[IdSize];
@@ -335,46 +375,48 @@ uint16_t CreateMessage(bool onBeurs){
   index = strlen(message);
 
   uint8ArrayToString(Buffer, tempConfig);
-  sprintf(&message[index], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
+  sprintf(&message[index], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, humidConfig);
-  sprintf(&message[index], "{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
+  sprintf(&message[index], ",{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[index], "{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
+  sprintf(&message[index], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
   index = strlen(message);
 
   uint8ArrayToString(Buffer, vocConfig);
-  sprintf(&message[index], "{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
+  sprintf(&message[index], ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
   index = strlen(message);
 
   if(!onBeurs){
     uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[index], "{\"name\":\"battery voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"},", uid[2], (char*)nameConfig, Buffer, batteryCharge);
+    sprintf(&message[index], ",{\"name\":\"battery voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
     index = strlen(message);
 
     uint8ArrayToString(Buffer, solarConfig);
-    sprintf(&message[index], "{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"},", uid[2], (char*)nameConfig, Buffer, solarCharge);
+    sprintf(&message[index], ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
     index = strlen(message);
 
-    uint8ArrayToString(Buffer, noxConfig);
-    sprintf(&message[index], "{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
-    index = strlen(message);
+    if ((product_name[4] == '5') && Check_USB_PowerOn()) {  // the NOx has only sense in case of continuous operation
+      uint8ArrayToString(Buffer, noxConfig);
+      sprintf(&message[index], ",{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
+      index = strlen(message);
+    }
+    if (sen5x_Get_sen5x_enable_state()) {
+      uint8ArrayToString(Buffer, PM2Config);
+      sprintf(&message[index], ",{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
+      index = strlen(message);
 
-    uint8ArrayToString(Buffer, PM2Config);
-    sprintf(&message[index], "{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"},", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
-    index = strlen(message);
-
-    uint8ArrayToString(Buffer, PM10Config);
-    sprintf(&message[index], "{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
-    index = strlen(message);
-
+      uint8ArrayToString(Buffer, PM10Config);
+      sprintf(&message[index], ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
+      index = strlen(message);
+    }
   }
   else{
     uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[index], "{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
+    sprintf(&message[index], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
     index = strlen(message);
   }
 #else

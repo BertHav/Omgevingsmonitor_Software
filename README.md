@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.32](#version432)\
 [version 4.31](#version431)\
 [version 4.3](#version43)\
 [version 4.2](#version42)\
@@ -86,6 +87,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.32 <a name="version432"></a>
+Optimizing the datagram to be send and when operating on battery send only PM when PM measurement is active. Preventing cleared values upload during the cycle PM measurement is not executed. NOx values are only uploaded when operated on USB power.
 
 ## version 4.31 <a name="version431"></a>
 Building on fresh Ubuntu verified. Readme instruction supplemented and corrected. Some files renamed to lower case and aligned with the sourcefiles.
