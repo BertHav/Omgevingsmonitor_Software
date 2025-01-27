@@ -49,10 +49,11 @@ bool ESPTransmitDone = false;
 static uint32_t uid[3];
 static uint32_t start;
 static uint32_t stop;
+static uint16_t txLength = 0;
 static uint8_t oldEspState = 255;
 float batteryCharge = 0.0;
 float solarCharge = 0.0;
-static char message[1152];
+static char message[144];
 static const char APIBeurs[] = "\"https://deomgevingsmonitor.nl//api/set_device_data.php\"";
 static const char API[] = "\"https://api.opensensemap.org/boxes/";
 static AT_Commands ATCommandArray[10];
@@ -340,7 +341,9 @@ void uint8ArrayToString(char *destination, uint8_t data[]) {
   }
 }
 
-uint16_t CreateMessage(bool onBeurs){
+uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
+  static bool status = false;
+  static bool retstat = true;
   static char Buffer[25];
   static uint8_t tempConfig[IdSize];
   static uint8_t humidConfig[IdSize];
@@ -369,58 +372,92 @@ uint16_t CreateMessage(bool onBeurs){
   }
   setCharges();
 #ifdef LONGDATAGRAM
-  memset(message, '\0', 1152);
+//  memset(message, '\0', 144); \\ unnecessary sprintf terminates with \0
   uint16_t index = 0;
   sprintf(&message[index], "[");
-  index = strlen(message);
 
   uint8ArrayToString(Buffer, tempConfig);
-  sprintf(&message[index], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
+  sprintf(&message[1], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
   index = strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
 
   uint8ArrayToString(Buffer, humidConfig);
-  sprintf(&message[index], ",{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
-  index = strlen(message);
+  sprintf(&message[0], ",{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
+  index += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
 
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[index], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
-  index = strlen(message);
+  sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
+  index += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
 
   uint8ArrayToString(Buffer, vocConfig);
-  sprintf(&message[index], ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
-  index = strlen(message);
+  sprintf(&message[0], ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
+  index += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
 
   if(!onBeurs){
     uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[index], ",{\"name\":\"battery voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
-    index = strlen(message);
+    sprintf(&message[0], ",{\"name\":\"battery voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
     uint8ArrayToString(Buffer, solarConfig);
-    sprintf(&message[index], ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
-    index = strlen(message);
+    sprintf(&message[0], ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
     if ((product_name[4] == '5') && Check_USB_PowerOn()) {  // the NOx has only sense in case of continuous operation
       uint8ArrayToString(Buffer, noxConfig);
-      sprintf(&message[index], ",{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
-      index = strlen(message);
+      sprintf(&message[0], ",{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
     }
     if (sen5x_Get_sen5x_enable_state()) {
       uint8ArrayToString(Buffer, PM2Config);
-      sprintf(&message[index], ",{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
-      index = strlen(message);
+      sprintf(&message[0], ",{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
 
       uint8ArrayToString(Buffer, PM10Config);
-      sprintf(&message[index], ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
-      index = strlen(message);
+      sprintf(&message[0], ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
+//      index += strlen(message);
+//      if (send) {
+//        status = ESP_Send((uint8_t*)message, strlen(message));
+//        retstat &= status;
+//      }
     }
   }
   else{
     uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[index], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
-    index = strlen(message);
+    sprintf(&message[0], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
   }
 #else
-  memset(message, '\0', 255);
+//  memset(message, '\0', 255);
     uint16_t index = 0;
     sprintf(&message[index], "[");
     index = strlen(message);
@@ -428,29 +465,54 @@ uint16_t CreateMessage(bool onBeurs){
 
     sprintf(&message[index], "{\"Temperature\":%.2f},", Temperature);
     index = strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
 
-    sprintf(&message[index], "{\"Humidity\":%.1f},", Humidity);
-    index = strlen(message);
+    sprintf(&message[0], "{\"Humidity\":%.1f},", Humidity);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
 
-    sprintf(&message[index], "{\"Sound\":%.2f},", dBA);
-    index = strlen(message);
+    sprintf(&message[0], "{\"Sound\":%.2f},", dBA);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
 
-    sprintf(&message[index], "{\"VOC\":%d},", VOCIndex);
-    index = strlen(message);
+    sprintf(&message[0], "{\"VOC\":%d},", VOCIndex);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
 
-    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},", batteryCharge);
-    index = strlen(message);
+    sprintf(&message[0], "{\"BatteryVoltage\":%.2f},", batteryCharge);
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
 
-    sprintf(&message[index], "{\"SolarVoltage\":%.2f}", solarCharge);
+    sprintf(&message[0], "{\"SolarVoltage\":%.2f}", solarCharge);
 #endif
-  sprintf(&message[index], "]");
-  Debug("Length of datagram: %d", strlen(message));
-  return strlen(message);
+  sprintf(&message[strlen(message)], "]");
+  index += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
+  *txstat = retstat;
+  return index;
 }
 
 void StartProg(){
@@ -693,21 +755,28 @@ bool WEBSERVER(){
 
 //These are the commands necesarry for sending data.
 bool HTTPCPOST(){
-  char atCommandBuff[256];
-  memset(atCommandBuff, '\0', 256);
-  uint16_t length = CreateMessage(beurs);
+//  char atCommandBuff[256];
+  bool txresult = false;
+
+//  memset(atCommandBuff, '\0', 256);
+  uint16_t length = CreateMessage(beurs, &txresult, false);
   if(beurs){
-    sprintf(atCommandBuff, "AT+HTTPCPOST=%s,%d,1,\"content-type: application/json\"\r\n", APIBeurs, length);
+//    sprintf(atCommandBuff, "AT+HTTPCPOST=%s,%d,1,\"content-type: application/json\"\r\n", APIBeurs, length);
+    sprintf(message, "AT+HTTPCPOST=%s,%d,1,\"content-type: application/json\"\r\n", APIBeurs, length);
   }
   else{
     static uint8_t boxConfig[IdSize];
     static char Buffer[25];
     ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
     uint8ArrayToString(Buffer, boxConfig);
-    sprintf(atCommandBuff, "AT+HTTPCPOST=%s%s/data\",%d,1,\"content-type: application/json\"\r\n", API, Buffer, length);
+//    sprintf(atCommandBuff, "AT+HTTPCPOST=%s%s/data\",%d,1,\"content-type: application/json\"\r\n", API, Buffer, length);
+    sprintf(message, "AT+HTTPCPOST=%s%s/data\",%d,1,\"content-type: application/json\"\r\n", API, Buffer, length);
   }
-  uint16_t len = strlen(atCommandBuff);
-  if(ESP_Send((uint8_t*)atCommandBuff, len)){
+//  uint16_t len = strlen(atCommandBuff);
+  uint16_t len = strlen(message);
+  Debug("length of message (former atCommandBuff) during header tx: %d bool value of tx result %d", len, txresult);
+//  if(ESP_Send((uint8_t*)atCommandBuff, len)){
+  if(ESP_Send((uint8_t*)message, len)){
     return true;
   }
   else{
@@ -716,6 +785,8 @@ bool HTTPCPOST(){
 }
 
 bool SENDDATA(){
+  bool result = false;
+/*
   uint16_t len = strlen(message);
   if(ESP_Send((uint8_t*)message, len)) {
     return true;
@@ -723,6 +794,10 @@ bool SENDDATA(){
   else{
     return false;
   }
+*/
+  txLength = CreateMessage(beurs, &result, true);
+  Debug("SENDDATA ESP_Send result = %d, transmitted data %d chars", result, txLength);
+  return result;
 }
 
 bool SLEEP(){

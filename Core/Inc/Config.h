@@ -23,6 +23,6 @@
 #define ChargerStatConfigAddr EEPromStartAddr + (IdSize * 11)
 #define CustomNameConfigAddr EEPromStartAddr + (IdSize * 12)
 
-#define CustomNameMaxLength 30
+#define CustomNameMaxLength 32
 
 #endif

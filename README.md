@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.33](#version433)\
 [version 4.32](#version432)\
 [version 4.31](#version431)\
 [version 4.3](#version43)\
@@ -88,6 +89,9 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.33 <a name="version433"></a>
+Memory for message array optimized in ESP.c. Typo corrected in PC_Config. Customname is limited to 32 chars (was 30). Invalid directories removed from project file.
+ 
 ## version 4.32 <a name="version432"></a>
 Optimizing the datagram to be send and when operating on battery send only PM when PM measurement is active. Preventing cleared values upload during the cycle PM measurement is not executed. NOx values are only uploaded when operated on USB power.
 

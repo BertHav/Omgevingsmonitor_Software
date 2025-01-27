@@ -19,7 +19,7 @@ void Process_PC_Config(uint8_t* data) //, uint16_t length)
     uint32_t length = GetUsbRxDataSize();
     if (length > 5)
     {
-        uint8_t* message = (unsigned char*)strstr((const char*)data, PREABMLE);
+        uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE);
         if(message != NULL)// && strlen((const char*)message) > 5)
         {
             received.Command = message[1];
@@ -114,7 +114,7 @@ void ProcessCmd(Receive_MSG msg)
 void Create_Message(uint8_t command, uint8_t *payload, uint8_t payloadLength)
 {
     static uint8_t message[TOTAL_BUFFER_SIZE];
-    message[0] = (uint8_t)PREABMLE[0];
+    message[0] = (uint8_t)PREAMBLE[0];
     message[1] = command;
     message[2] = payloadLength;
     memcpy(&message[3], payload, payloadLength);
