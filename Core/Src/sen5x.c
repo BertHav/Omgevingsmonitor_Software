@@ -26,10 +26,12 @@ static bool sen5x_Enable = false;
 unsigned char product_name[8];
 uint8_t sen5xSamples = 0;
 uint8_t sen5xErrors = 0;
+/*
 static uint16_t pm2p5;
 static uint16_t pm10p0;
 static uint16_t s5xvoci;
 static uint16_t s5xnoxi;
+*/
 uint32_t sen5xReadTimer = 0;
 sen5x_states PMsamplesState = LIGHT_OUT;
 SEN5X_DateTypeDef sen5x_data;
@@ -290,41 +292,28 @@ void sen5x_printvalues(void) {
         printf("sen5x Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
   }
   if (sen5x_data.voc_index != 0x7fff) {
-        printf("sen55 VOC index: %.1f\r\n", sen5x_data.voc_index / 10.0f);
+        printf("sen55 VOC index: %d\r\n", sen5x_data.voc_index / 10);
   }
   if (sen5x_data.nox_index != 0x7fff) {
-        printf("sen55 NOx index: %.1f\r\n", sen5x_data.nox_index / 10.0f);
+        printf("sen55 NOx index: %d\r\n", sen5x_data.nox_index / 10);
   }
 }
 
-
 void sen5xStore() {
   if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
-    if (pm2p5 != sen5x_data.mass_concentration_pm2p5) {
-      pm2p5 = sen5x_data.mass_concentration_pm2p5;
-      setPM2p5(pm2p5);
-    }
+    setPM2p5(sen5x_data.mass_concentration_pm2p5);
   }
   if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
-    if (pm10p0 != sen5x_data.mass_concentration_pm10p0) {
-      pm10p0 = sen5x_data.mass_concentration_pm10p0;
-      setPM10(pm10p0);
-    }
+    setPM10(sen5x_data.mass_concentration_pm10p0);
   }
   if (((product_name[4] == '4') || (product_name[4] == '5'))) {
     if (!VOCNOx || usbPluggedIn) {
       if (sen5x_data.voc_index != 0x7fff) {
-        if (s5xvoci != (sen5x_data.voc_index / 10)) {
-          s5xvoci = sen5x_data.voc_index / 10;
-          SetVOCindicator(s5xvoci);
-          setVOC(s5xvoci);
-        }
+        SetVOCindicator(sen5x_data.voc_index / 10);
+        setVOC(sen5x_data.voc_index / 10);
       }
-    }
-    if (sen5x_data.nox_index != 0x7fff) {
-      if(s5xnoxi != sen5x_data.nox_index / 10) {
-        s5xnoxi = sen5x_data.nox_index / 10;
-        setNOx(s5xnoxi);
+      if (sen5x_data.nox_index != 0x7fff) {
+        setNOx(sen5x_data.nox_index / 10);
       }
     }
   }

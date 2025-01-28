@@ -344,7 +344,6 @@ void uint8ArrayToString(char *destination, uint8_t data[]) {
 uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   static bool status = false;
   static bool retstat = true;
-  static char Buffer[25];
   static uint8_t tempConfig[IdSize];
   static uint8_t humidConfig[IdSize];
   static uint8_t soundConfig[IdSize];
@@ -355,6 +354,9 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   static uint8_t PM2Config[IdSize];
   static uint8_t PM10Config[IdSize];
   static uint8_t nameConfig[CustomNameMaxLength];
+#ifdef LONGDATAGRAM
+  static char Buffer[25];
+#endif
   ReadUint8ArrayEEprom(TempConfigAddr, tempConfig, IdSize);
   ReadUint8ArrayEEprom(HumidConfigAddr, humidConfig, IdSize);
   ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
@@ -371,9 +373,9 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
     strncpy((char*)nameConfig, user, 5);
   }
   setCharges();
+  uint16_t index = 0;
 #ifdef LONGDATAGRAM
 //  memset(message, '\0', 144); \\ unnecessary sprintf terminates with \0
-  uint16_t index = 0;
   sprintf(&message[index], "[");
 
   uint8ArrayToString(Buffer, tempConfig);
@@ -392,14 +394,6 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
     retstat &= status;
   }
 
-  uint8ArrayToString(Buffer, soundConfig);
-  sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
-  index += strlen(message);
-  if (send) {
-    status = ESP_Send((uint8_t*)message, strlen(message));
-    retstat &= status;
-  }
-
   uint8ArrayToString(Buffer, vocConfig);
   sprintf(&message[0], ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndexmax);
   index += strlen(message);
@@ -408,15 +402,15 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
     retstat &= status;
   }
 
-  if(!onBeurs){
-    uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[0], ",{\"name\":\"battery voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
-    index += strlen(message);
-    if (send) {
-      status = ESP_Send((uint8_t*)message, strlen(message));
-      retstat &= status;
-    }
+  uint8ArrayToString(Buffer, soundConfig);
+  sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
+  index += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
 
+  if(!onBeurs){
     uint8ArrayToString(Buffer, solarConfig);
     sprintf(&message[0], ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
     index += strlen(message);
@@ -445,66 +439,58 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
 
       uint8ArrayToString(Buffer, PM10Config);
       sprintf(&message[0], ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
-//      index += strlen(message);
-//      if (send) {
-//        status = ESP_Send((uint8_t*)message, strlen(message));
-//        retstat &= status;
-//      }
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
     }
   }
-  else{
-    uint8ArrayToString(Buffer, batteryConfig);
-    sprintf(&message[0], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
-  }
+  uint8ArrayToString(Buffer, batteryConfig);
+  sprintf(&message[0], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
+
 #else
 //  memset(message, '\0', 255);
-    uint16_t index = 0;
+    uint8_t arridx = 0;
     sprintf(&message[index], "[");
     index = strlen(message);
 
 
-    sprintf(&message[index], "{\"Temperature\":%.2f},", Temperature);
+    sprintf(&message[index], "{\"Temperature\":%.2f},", MeasVal.Temperature);
     index = strlen(message);
-    if (send) {
-      status = ESP_Send((uint8_t*)message, strlen(message));
-      retstat &= status;
-    }
 
 
-    sprintf(&message[0], "{\"Humidity\":%.1f},", Humidity);
+    sprintf(&message[index], "{\"Humidity\":%.1f},", MeasVal.Humidity);
+    index += strlen(message);
+
+
+    sprintf(&message[index], "{\"Sound\":%.2f},", MeasVal.dBApeak);
+    index += strlen(message);
+
+
+    sprintf(&message[index], "{\"VOC\":%d},", MeasVal.VOCIndexmax);
+    index += strlen(message);
+
+
+    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},", batteryCharge);
     index += strlen(message);
     if (send) {
       status = ESP_Send((uint8_t*)message, strlen(message));
       retstat &= status;
     }
 
+    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f}", solarCharge);
+    arridx += strlen(message);
 
-    sprintf(&message[0], "{\"Sound\":%.2f},", dBA);
-    index += strlen(message);
-    if (send) {
-      status = ESP_Send((uint8_t*)message, strlen(message));
-      retstat &= status;
-    }
+    sprintf(&message[arridx], "{\"PM2p5\":%.2f}", MeasVal.PM2p5max);
+    arridx += strlen(message);
 
+    sprintf(&message[arridx], "{\"PM10\":%.2f}", MeasVal.PM10p0max);
+    arridx += strlen(message);
+    index +=arridx;
 
-    sprintf(&message[0], "{\"VOC\":%d},", VOCIndex);
-    index += strlen(message);
-    if (send) {
-      status = ESP_Send((uint8_t*)message, strlen(message));
-      retstat &= status;
-    }
-
-
-    sprintf(&message[0], "{\"BatteryVoltage\":%.2f},", batteryCharge);
-    index += strlen(message);
-    if (send) {
-      status = ESP_Send((uint8_t*)message, strlen(message));
-      retstat &= status;
-    }
-
-
-    sprintf(&message[0], "{\"SolarVoltage\":%.2f}", solarCharge);
-#endif
+    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);
+    #endif
   sprintf(&message[strlen(message)], "]");
   index += strlen(message);
   if (send) {

@@ -326,10 +326,12 @@ int main(void)
       }
     }
 #ifdef USBLOGGING
+
     int len = vcp_recv (u1_rx_buff, 3);
     if (len > 0) {
       check_cli_command();
     }
+
 #endif
     /* USER CODE END WHILE */
 

@@ -1,4 +1,3 @@
-"./Core/Src/EEProm.o"
 "./Core/Src/ESP.o"
 "./Core/Src/I2CSensors.o"
 "./Core/Src/PC_Config.o"
@@ -7,6 +6,7 @@
 "./Core/Src/adc.o"
 "./Core/Src/display.o"
 "./Core/Src/dma.o"
+"./Core/Src/eeprom.o"
 "./Core/Src/efficient_10log10.o"
 "./Core/Src/fonts.o"
 "./Core/Src/gpio.o"

@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.34](#version434)\
 [version 4.33](#version433)\
 [version 4.32](#version432)\
 [version 4.31](#version431)\
@@ -89,6 +90,10 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.34 <a name="version434"></a>
+Fix for datagram when on batterypower and sen55 is attached. Nodered datagram fix
+
+
 ## version 4.33 <a name="version433"></a>
 Memory for message array optimized in ESP.c. Typo corrected in PC_Config. Customname is limited to 32 chars (was 30). Invalid directories removed from project file.
  
@@ -130,6 +135,7 @@ NOx and VOC from sen55 is included in measurement. For this it is necessary that
 - If 3 red LEDs illuminate repeatedly during start-up, the reset button must be pressed for approximately 3 seconds. This ensures that the ESP has sufficient time to reset. Then check whether the WiFi connection still works correctly. The OM must have uploaded the first values for temperature and humidity within one minute. If in doubt, the procedure for connecting to the home network can be carried out again.
 - The system must be reset twice to reach optimal energy saving mode.
 - If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
+- USBLOGGING works only with the Debug build.
 
 ## License <a name="License"></a>
 Parts are licensed under GNU GENERAL PUBLIC LICENSE Version 3 and GNU AFFERO GENERAL PUBLIC LICENSE Version 3AGPL-3.0

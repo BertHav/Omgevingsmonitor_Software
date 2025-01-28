@@ -16,6 +16,7 @@
   *
   ******************************************************************************
   */
+//#define USBLOGGING enabled
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -52,10 +53,9 @@
 #define APP_TX_DATA_SIZE  1024
 /* USER CODE BEGIN EXPORTED_DEFINES */
 
-//#define USBLOGGING enabled
-
+#ifdef USBLOGGING
  #define RX_BUFFER_MAX_WRITE_INDEX (APP_RX_DATA_SIZE - CDC_DATA_FS_MAX_PACKET_SIZE)
-
+#endif
  /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -68,6 +68,7 @@
   */
 
 /* USER CODE BEGIN EXPORTED_TYPES */
+#ifdef USBLOGGING
  typedef struct VCP_FIFO_TYPE
  {
    uint8_t* data;  // Will point to the Cube-generated Tx or Rx buffer
@@ -75,6 +76,7 @@
    int  rd;    // Read index
    int  lb;    // Additional index
  } VCP_FIFO;
+#endif
 /* USER CODE END EXPORTED_TYPES */
 
 /**
