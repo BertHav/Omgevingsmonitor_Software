@@ -90,6 +90,10 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.35 <a name="version434"></a>
+Version to demonstrate the difference in overhead that deomgevingsmonitor.nl causes compared to opensensemap.org based on the definition #define OPENSENSEMAP in ESP.h. 
+To maintain full compatibility, this definition is disabled. 
+
 ## version 4.34 <a name="version434"></a>
 Fix for datagram when on batterypower and sen55 is attached. Nodered datagram fix
 
