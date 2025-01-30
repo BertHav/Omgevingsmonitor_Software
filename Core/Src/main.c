@@ -253,6 +253,9 @@ int main(void)
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
   deviceTimeOut = HAL_GetTick() + 25000;
   priorUSBpluggedIn = !Check_USB_PowerOn(); // force the status of the SGP40
+  if (!priorUSBpluggedIn) {
+    printf_USB("input commmand followed by Enter or type Helpme\r\n");
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -333,6 +336,9 @@ int main(void)
     }
 
 #endif
+    if (Check_USB_PowerOn() && !ReconfigSet) {
+      Process_USB_input(GetUsbRxPointer());
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

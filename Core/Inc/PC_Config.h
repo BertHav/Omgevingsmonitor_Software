@@ -46,6 +46,7 @@ typedef struct
 } Receive_MSG;
 
 void Process_PC_Config(uint8_t* data);//, uint16_t length);
+bool Process_USB_input(uint8_t* data);
 void Create_Message(uint8_t command, uint8_t payload[], uint8_t payloadLength);
 void printf_USB(const char* message, ...);
 

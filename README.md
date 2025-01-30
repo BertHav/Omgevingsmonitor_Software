@@ -2,6 +2,8 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.36](#version436)\
+[version 4.35](#version435)\
 [version 4.34](#version434)\
 [version 4.33](#version433)\
 [version 4.32](#version432)\
@@ -90,7 +92,10 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
-## version 4.35 <a name="version434"></a>
+## version 4.35 <a name="version435"></a>
+The ability to correct a sensor ID via USB. Type helpme into the usn virtual com port for an explanation.
+
+## version 4.35 <a name="version435"></a>
 Version to demonstrate the difference in overhead that deomgevingsmonitor.nl causes compared to opensensemap.org based on the definition #define OPENSENSEMAP in ESP.h. 
 To maintain full compatibility, this definition is disabled. 
 

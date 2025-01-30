@@ -178,6 +178,8 @@ typedef struct {
 
 extern bool ESPTransmitDone;
 extern bool EspTurnedOn;
+extern bool ReconfigSet;
+void uint8ArrayToString(char *destination, uint8_t data[]);
 bool GetReconfigMode();
 void ESP_Init(UART_HandleTypeDef* espUart);
 ESP_States ESP_Upkeep(void);
