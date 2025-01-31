@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.37](#version437)\
 [version 4.36](#version436)\
 [version 4.35](#version435)\
 [version 4.34](#version434)\
@@ -92,7 +93,10 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
-## version 4.35 <a name="version435"></a>
+## version 4.37 <a name="version437"></a>
+Pin swapping of UART1 disabled to be compatible with FTDI pinout.
+
+## version 4.36 <a name="version436"></a>
 The ability to correct a sensor ID via USB. Type helpme into the usn virtual com port for an explanation.
 
 ## version 4.35 <a name="version435"></a>

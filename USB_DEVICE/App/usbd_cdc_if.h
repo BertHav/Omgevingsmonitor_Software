@@ -56,7 +56,7 @@
 #ifdef USBLOGGING
  #define RX_BUFFER_MAX_WRITE_INDEX (APP_RX_DATA_SIZE - CDC_DATA_FS_MAX_PACKET_SIZE)
 #endif
- /* USER CODE END EXPORTED_DEFINES */
+/* USER CODE END EXPORTED_DEFINES */
 
 /**
   * @}
@@ -153,3 +153,4 @@ void vcp_service();
 #endif
 
 #endif /* __USBD_CDC_IF_H__ */
+
