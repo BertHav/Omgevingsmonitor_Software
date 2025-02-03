@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.38](#version438)\
 [version 4.37](#version437)\
 [version 4.36](#version436)\
 [version 4.35](#version435)\
@@ -92,6 +93,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.38 <a name="version438"></a>
+Bug fix for continious usb powered systems with a sen5x attached. System stalls PM measurements after fan cleaning.
 
 ## version 4.37 <a name="version437"></a>
 Pin swapping of UART1 disabled to be compatible with FTDI pinout.

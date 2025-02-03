@@ -494,6 +494,7 @@ void sen5x_statemachine() {
         Info("executing fan cleaning");
         sen5xReadTimer = HAL_GetTick() + 10000;  // fan cleaning takes 10 seconds
         fanCleaningDone = true;
+        sen5x_lightup_measurement();
       }
       PMsamplesState = SAMPLES_TAKEN;
       break;
