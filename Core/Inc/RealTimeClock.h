@@ -25,6 +25,7 @@ extern uint8_t month;
 extern uint8_t year;
 
 /*==============================================================================*/
+#define ESP_DELAY_TIME_AFTER_STM_WAKEUP 4500
 /* Useful Constants */
 #define SECS_PER_MIN  ((uint32_t)(60UL))
 #define SECS_PER_HOUR ((uint32_t)(3600UL))

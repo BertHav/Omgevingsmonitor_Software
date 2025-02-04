@@ -20,7 +20,14 @@
 #define SEN5X_FAN_BLOCKED_ERROR 0x00000010
 #define SEN5X_NO_RESPONSE       0X80000000
 
-#define SEN5X_START_UP_TIME 28 // with third sample is 30 sec
+#define SEN5X_START_UP_TIME 28 // with third sample is 30 sec, this is a time in second, not ticks!
+#define SEN5X_SAMPLE_INTERVAL 1000 // time in ticks, about 1,2s
+#define SEN5X_FAN_CLEANING_PERIOD 10000 // 10 -12 seconds, duration of fan cleaning cycle it is determined by the device.
+#define MONDAY 1
+
+// due to disabled interrupts from sound calculation a HAL tick is about 1,2 ms
+#define SEN5X_STARTUP_DELAY 22800 //about 28 seconds
+#define SEN5X_DISPLAY_DISABLED_MSG 3141592 // about every hour, or about a million pi ;)
 
 typedef enum {
   S5X_DISABLED,

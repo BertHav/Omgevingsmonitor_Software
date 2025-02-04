@@ -35,6 +35,7 @@ void configCheck();
 void SetAllREDLED();
 Battery_Status Battery_Upkeep();
 Battery_Status powerCheck();
+Battery_Status batteryChargeCheck();
 void powerDisplay(Battery_Status status);
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue);   // Sets Status LED to (RGB) color
 uint16_t Calculate_LED_ON();

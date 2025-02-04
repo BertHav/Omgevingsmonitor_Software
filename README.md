@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.39](#version439)\
 [version 4.38](#version438)\
 [version 4.37](#version437)\
 [version 4.36](#version436)\
@@ -94,6 +95,9 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.39 <a name="version439"></a>
+Some hardcoded values moved to definitions, when battery fully charged PM measurement is enabled every cycle on batterypower (15 minutes) When charge is below 4.0V, PM measurement is only executed every 30 minutes. IDs stored in EEPROM can be shown on UART and USB 
+
 ## version 4.38 <a name="version438"></a>
 Bug fix for continious usb powered systems with a sen5x attached. System stalls PM measurements after fan cleaning.
 
@@ -108,7 +112,7 @@ Version to demonstrate the difference in overhead that deomgevingsmonitor.nl cau
 To maintain full compatibility, this definition is disabled. 
 
 ## version 4.34 <a name="version434"></a>
-Fix for datagram when on batterypower and sen55 is attached. Nodered datagram fix
+Fix for datagram when on batterypower and sen55 is attached. NodeRED datagram fix
 
 
 ## version 4.33 <a name="version433"></a>

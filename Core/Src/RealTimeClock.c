@@ -23,13 +23,13 @@ typedef struct {
 
 bool firstTimeUpdate = true;
 static Clock myUpTime = {.Day = 0, .Hour = 0, .Minutes = 0, .Seconds = 0};
-static const char *dayNames[7] = {  "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}; // 1 to 7
-static const char *monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // 1 to 12
+static const char *dayNames[7] = {  "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}; // 0..6 -> 1 to 7
+static const char *monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // 0..11 -> 1 to 12
 static RTC_HandleTypeDef * RealTime_Handle;
 static uint32_t posixBootTime = 0;
 
 //char systemUptime[16] = {0};
-char strbuf[24] = {0}; //22-jan-24 23h:12m:23s
+char strbuf[24] = {0}; //fi length -> 22-jan-24 23h:12m:23s
 
 uint32_t makeTime(RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
 void breakPosixTime(uint32_t timeInput, RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
@@ -280,7 +280,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
     showTime();
     set_light_on_state();
     if (!userToggle) {
-      RTC_SetWakeUpTimer(SEN5X_START_UP_TIME); // go sleep for 27 + 3s measurement time is approx 30 seconds
+      RTC_SetWakeUpTimer(SEN5X_START_UP_TIME); // go sleep for 28 + 3s measurement time is approx 30 seconds
       Debug("Entering STOP mode for %d seconds", SEN5X_START_UP_TIME);
 #ifdef SSD1306
       stop_I2C2();
@@ -301,12 +301,12 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   ResetDBACalculator();  // reset the DBA average calculation
   ResetSGP40samplecounter();
   setsen5xSamplecounter(0);
-  setESPTimeStamp(4500);
+  setESPTimeStamp(ESP_DELAY_TIME_AFTER_STM_WAKEUP);
   setSGP40TimeStamp(0);
   setHIDSTimeStamp(0);
   setMICTimeStamp(0);
   ESPTransmitDone = false;
-  deviceTimeOut = HAL_GetTick() + 3000;
+  deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
 }
 
 void InitClock(RTC_HandleTypeDef* h_hrtc){

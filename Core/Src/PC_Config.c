@@ -4,6 +4,7 @@
 #include "../Inc/Config.h"
 #include "utils.h"
 #include "ESP.h"
+#include "statusCheck.h"
 
 Receive_MSG received;
 uint8_t result = 0;
@@ -62,7 +63,6 @@ void ProcessCmd(Receive_MSG msg)
     {
         case BoxConfigCmd:  // 0
             WriteUint8ArrayEepromSafe(BoxConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-            Debug("BoxConfigAddr 0x%X, msg.Payload %s, msg.PayloadLength: %d, IdSize: %d", BoxConfigAddr, *msg.Payload, msg.PayloadLength, IdSize);
         break;
         case TempConfigCmd:  // 1
             WriteUint8ArrayEepromSafe(TempConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
@@ -78,11 +78,9 @@ void ProcessCmd(Receive_MSG msg)
         break;
         case dBaConfigCmd:  // 5 wille be airpressure ??
             WriteUint8ArrayEepromSafe(dBaConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-            Debug("dBaConfigAddr 0x%X, msg.Payload %s, msg.PayloadLength: %d, IdSize: %d", dBaConfigAddr, *msg.Payload, msg.PayloadLength, IdSize);
         break;
         case dBcConfigCmd: // 5 will be dBAConfigCMD
             WriteUint8ArrayEepromSafe(dBAConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-            Debug("dBAConfigAddr 0x%X, msg.Payload %s, msg.PayloadLength: %d, IdSize: %d", dBAConfigAddr, *msg.Payload, msg.PayloadLength, IdSize);
         break;
         case CustomNameConfigCmd:  // 7
             WriteUint8ArrayEepromSafe(CustomNameConfigAddr, msg.Payload, msg.PayloadLength, CustomNameMaxLength);
@@ -166,7 +164,18 @@ void printf_USB(const char* message, ...)
   CDC_Transmit_FS((uint8_t*)string, strlen(string));
 }
 
-void PC_USB_show_Keys() {
+void PC_selectout(char *msg, bool usb_out) {
+  if (usb_out){
+    printf_USB(msg);
+  }
+  else {
+    printf(msg);
+  }
+  HAL_Delay(10); //wait for the host poll of the USB buffer
+}
+
+void PC_show_Keys() {
+  static bool usb_out= false;
   static uint8_t boxConfig[IdSize];
   static uint8_t tempConfig[IdSize];
   static uint8_t humidConfig[IdSize];
@@ -180,59 +189,87 @@ void PC_USB_show_Keys() {
   static uint8_t nameConfig[CustomNameMaxLength];
 
   static char Buffer[25];
+  static char msg[64];
+  if(Check_USB_PowerOn()){
+    usb_out = true;
+  }
+  else {
+    usb_out = false;
+  }
+  sprintf(msg, "Overview of stored keys:\r\n");
+  PC_selectout(&msg[0], usb_out);
   ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
   uint8ArrayToString(Buffer, boxConfig);
-  printf_USB("Overview of stored keys:\r\n");
-  printf_USB("Box id:----------------------- %s\r\n", Buffer);
+  sprintf(msg, "Box id ----------------------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(TempConfigAddr, tempConfig, IdSize);
   uint8ArrayToString(Buffer, tempConfig);
-  printf_USB("1 - Temperature sensor id:---- %s\r\n", Buffer);
+  sprintf(msg, "1 - Temperature sensor id: --: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(HumidConfigAddr, humidConfig, IdSize);
   uint8ArrayToString(Buffer, humidConfig);
-  printf_USB("2 - Humidity sensor id:------- %s\r\n", Buffer);
+  sprintf(msg, "2 - Humidity sensor id ------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(NOxIndexConfigAddr, noxConfig, IdSize);
   uint8ArrayToString(Buffer, noxConfig);
-  printf_USB("3 - NOx sensor id:------------ %s\r\n", Buffer);
+  sprintf(msg, "3 - NOx sensor id -----------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(VocIndexConfigAddr, vocConfig, IdSize);
   uint8ArrayToString(Buffer, vocConfig);
-  printf_USB("4 - VOC sensor id:------------ %s\r\n", Buffer);
+  sprintf(msg, "4 - VOC sensor id -----------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(dBaConfigAddr, soundConfig, IdSize);
   uint8ArrayToString(Buffer, soundConfig);
-  printf_USB("5 is former dBa unused\r\n");
-  printf_USB("5 - Air pressure sensor id:--- %s\r\n", Buffer);
+  sprintf(msg, "5 is former dBa unused\r\n");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "5 - Air pressure sensor id --: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
   uint8ArrayToString(Buffer, soundConfig);
-  printf_USB("6 is former dBc\r\n");
-  printf_USB("6 - Sound dBA sensor id:------ %s\r\n", Buffer);
+  sprintf(msg, "6 is former dBc\r\n");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "6 - Sound dBA sensor id -----: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
-  printf_USB("7 - Stored name:-------------- %s\r\n", (char*)nameConfig);
+  sprintf(msg, "7 - Stored name -------------: ");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)nameConfig);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(SolVoltConfigAddr, solarConfig, IdSize);
   uint8ArrayToString(Buffer, solarConfig);
-  printf_USB("8 - Solar voltage sensor id:-- %s\r\n", Buffer);
+  sprintf(msg, "8 - Solar voltage sensor id -: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(BatVoltConfigAddr, batteryConfig, IdSize);
   uint8ArrayToString(Buffer, batteryConfig);
-  printf_USB("9 - Battery voltage sensor id: %s\r\n", Buffer);
+  sprintf(msg, "9 - Battery voltage sensor id: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(PM10ConfigAddr, PM10Config, IdSize);
   uint8ArrayToString(Buffer, PM10Config);
-  printf_USB(": - PM10 sensor id:----------- %s\r\n", Buffer);
+  sprintf(msg, ": - PM10 sensor id ----------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(PM2ConfigAddr, PM2Config, IdSize);
   uint8ArrayToString(Buffer, PM2Config);
-  printf_USB("; - PM2p5 sensor id:---------- %s\r\n", Buffer);
-  HAL_Delay(50);
+  sprintf(msg, "; - PM2p5 sensor id ---------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
+
   printf_USB("\r\nOnly the last two nibbles are necessary.\r\n");
-  HAL_Delay(50);
+
   printf_USB("Command example for air pressure => #5,6a\r\n");
+
+  if (!usb_out) {
+    printf("A key can only be changed via USB input.\r\n");
+  }
 }
 
 bool Process_USB_input(uint8_t* data) {
@@ -242,7 +279,7 @@ bool Process_USB_input(uint8_t* data) {
   if (length > 5) {  //#2,34
     printf_USB("USB input: %s\r\n", (const char*)data);
     uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE);  // zoek op #
-    if(message != NULL) { // && strlen((const char*)message) > 5)
+    if(message != NULL) {
       received.Command = (message[1] & 0x0F);
       if (message[2] == ',') {
         for (uint8_t i=3; i < 5; i++) {
@@ -250,7 +287,7 @@ bool Process_USB_input(uint8_t* data) {
             result = (result << 4) | (isdigit(message[i]) ? message[i] - '0' : toupper(message[i]) - 'A' + 10);
           }
           else {
-            printf_USB("Ongeldig hexadecimaal teken: '%c'\r\n", message[i]);
+            printf_USB("Invalid hexadecimal character: '%c'\r\n", message[i]);
             return false; // Of een andere foutwaarde
           }
         }
@@ -261,19 +298,19 @@ bool Process_USB_input(uint8_t* data) {
         uint8ArrayToString(Buffer, received.Payload);
         ProcessCmd(received);
         ResetUsbRxDataSize();
-        PC_USB_show_Keys();
+        PC_show_Keys();
         for (uint8_t i=0; i < 8; i++) {
           data[i] = '\0';
         }
         return true;
       }
       else {
-        printf_USB("Invalid input command comma not found\r\n");
+        printf_USB("Invalid input; Command comma not found\r\n");
         ResetUsbRxDataSize();
       }
     }
     else {
-      PC_USB_show_Keys();
+      PC_show_Keys();
       ResetUsbRxDataSize();
     }
     for (uint8_t i=0; i < 8; i++) {

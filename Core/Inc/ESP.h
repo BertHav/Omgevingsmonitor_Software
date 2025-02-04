@@ -33,8 +33,10 @@
 //#define ESP_AT_COMMANDS_COUNT 4
 #define ESP_WIFI_RETRY_TIME 500
 #define ESP_WIFI_WAIT_RESPONSE_TIME_FACTOR 20
+#define ESP_1ST_DATAGRAM_AFTER_NTP_INIT 28000; // ticks afer NTP init request before the first measurement datagram is send
 #define ESP_UNTIL_NEXT_SEND 240000  // about every 5 minutes
 #define ESP_UNTIL_NEXT_RETRANSMIT_SEND 50000  //when failed try it next minute
+#define ESP_NTP_INIT_DELAY 20000;  // ticks before the NTP request starts
 #define ESP_UNTIL_NEXT_NTP 75398223  //about every 24 hours
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""

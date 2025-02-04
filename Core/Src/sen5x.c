@@ -10,6 +10,7 @@
 #include "sen5x_i2c.h"
 #include "sensirion_common.h"
 #include "sensirion_i2c.h"
+#include "statusCheck.h"
 #include "utils.h"
 #include "i2c.h"
 #include "RealTimeClock.h"
@@ -54,12 +55,17 @@ void setsen5xSamplecounter(uint8_t samples) {
 
 bool sen5x_enable(uint32_t sleepTime) {
   if (IsPMSensorEnabled()) {
+    if (batteryChargeCheck() == BATTERY_FULL) {
+      sen5x_Enable = true;
+    }
+    else {
     sen5x_Enable = !sen5x_Enable;
+    }
     if (sen5x_Enable) {
       setsen5xReadTimer(0);
     }
     else {
-      //The ticker starts after 880*100, is about one and a half minute effective this turn the sen5x device will not start
+      //The ticker starts after 880*100, effective, this cycle the sen5x device will not start
       setsen5xReadTimer(HAL_GetTick() + (sleepTime*100));
     }
     Info("This cycle the sen5x is: %s", sen5x_Enable?"enabled":"disabled");
@@ -425,10 +431,10 @@ void sen5x_statemachine() {
       Error("sen5x device is disabled due to too many errors");
       SetPMSensorStatus(false);
       DisablePMSensor();
-      sen5xReadTimer = HAL_GetTick() + 3141592; //some more less then an hour a message when continue operated.
+      sen5xReadTimer = HAL_GetTick() + SEN5X_DISPLAY_DISABLED_MSG; //some more less then an hour a message when continue operated.
       break;
     case LIGHT_OUT:
-      sen5xReadTimer = HAL_GetTick() + 22800; // about every 30s when started up
+      sen5xReadTimer = HAL_GetTick() + SEN5X_STARTUP_DELAY; // wait about 30s when started up
       set_light_on_state();
       break;
     case CHECK_SEN5X:
@@ -447,7 +453,7 @@ void sen5x_statemachine() {
           else {
             Info("sen5x reset executed");
           }
-          sen5xReadTimer = HAL_GetTick() + 200;
+          sen5xReadTimer = HAL_GetTick();
         }
         else {
           if (sen5xErrors != 0) {
@@ -480,7 +486,7 @@ void sen5x_statemachine() {
           sen5x_printvalues(); // print the values
           Info("!!==Values are bogus, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
 #endif
-          HAL_Delay(1000);
+//          HAL_Delay(1000);
         }
       }
       if (usbPluggedIn || (sen5xSamples > 1)) {
@@ -489,10 +495,10 @@ void sen5x_statemachine() {
       break;
     case CLEAN_FAN:
       // start the cleaning procedure once a week
-      if ((RTC_GetWeekday() == 1) && !fanCleaningDone) {
+      if ((RTC_GetWeekday() == MONDAY ) && !fanCleaningDone) {
         sen5x_start_fan_cleaning();
         Info("executing fan cleaning");
-        sen5xReadTimer = HAL_GetTick() + 10000;  // fan cleaning takes 10 seconds
+        sen5xReadTimer = HAL_GetTick() + SEN5X_FAN_CLEANING_PERIOD;  // fan cleaning takes 10 seconds
         fanCleaningDone = true;
         sen5x_lightup_measurement();
       }
@@ -514,7 +520,7 @@ void sen5x_statemachine() {
         PMsamplesState = CHECK_SEN5X;
       }
       ResetPMIndicator();
-      sen5xReadTimer = HAL_GetTick() + 1000;
+      sen5xReadTimer = HAL_GetTick() + SEN5X_SAMPLE_INTERVAL;
     }
   }
 }

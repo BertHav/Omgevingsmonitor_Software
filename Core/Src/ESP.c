@@ -68,8 +68,8 @@ uint8_t ATCounter = 0;
 static uint8_t errorcntr = 0;
 static uint8_t timeoutcntr = 0;
 static uint32_t ESPTimeStamp = 0;
-static uint32_t ESPNTPTimeStamp = 20000;
-static uint32_t savedESPTimeStamp = 28000;
+static uint32_t ESPNTPTimeStamp = ESP_NTP_INIT_DELAY;  // ticks before the NTP request starts
+static uint32_t savedESPTimeStamp = ESP_1ST_DATAGRAM_AFTER_NTP_INIT ; // ticks afer NTP init request before the first measurement datagram is send
 static uint8_t retry = 0;
 
 

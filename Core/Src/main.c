@@ -103,20 +103,18 @@ void SetTestDone(){
   testDone = true;
   HAL_Delay(500);
   SetDBLED(false, false, true);
-  SetStatusLED(4000, 4000, 3000);
-  SetVocLED(4000, 4000, 3000);
+  SetStatusLED(LED_OFF, LED_OFF, LED_ON);
+  SetVocLED(LED_OFF, LED_OFF, LED_ON);
   HAL_Delay(500);
-  SetDBLED(false, false, false);
-  SetStatusLED(4000, 4000, 4000);
-  SetVocLED(4000, 4000, 4000);
+  SetLEDsOff();
   InitDone();
 }
 
 void FlashLEDs(){
   for (uint8_t i=0; i<5 ; i++){
     SetDBLED(true, true, true);
-    SetStatusLED(4000, 4000, 3000);
-    SetVocLED(4000, 4000, 3000);
+    SetStatusLED(LED_OFF, LED_OFF, LED_ON);
+    SetVocLED(LED_OFF, LED_OFF, LED_ON);
     HAL_Delay(250);
     SetLEDsOff();
     HAL_Delay(250);
@@ -234,7 +232,7 @@ int main(void)
   charge = Battery_Upkeep();
   if(charge == BATTERY_CRITICAL) {
     SetAllREDLED();
-    Info("Battery voltage %.02fV", ReadBatteryVoltage());
+    Info("Battery voltage is critical: %.02fV", ReadBatteryVoltage());
 #ifndef STLINK_V3PWR
     Enter_Standby_Mode(); // Battery is empty we are going in deep sleep, nearly off and no wakeup from RTC
 #endif
@@ -251,7 +249,7 @@ int main(void)
     errorHandler(__func__, __LINE__, __FILE__);
   }
   Device_Init(&hi2c1, &hi2s2, &hadc, &huart4);
-  deviceTimeOut = HAL_GetTick() + 25000;
+  deviceTimeOut = HAL_GetTick() + DEVICE_INIT_TIMEOUT;
   priorUSBpluggedIn = !Check_USB_PowerOn(); // force the status of the SGP40
   if (!priorUSBpluggedIn) {
     printf_USB("input commmand followed by Enter or type Helpme\r\n");
@@ -263,7 +261,7 @@ int main(void)
   while (1) {
     if(TimestampIsReached(batteryReadTimer)){
       charge = Battery_Upkeep();
-      batteryReadTimer  = HAL_GetTick() + 50000;
+      batteryReadTimer  = HAL_GetTick() + BATTERY_READ_CYCLE;
       showTime();
 
     }
@@ -334,7 +332,10 @@ int main(void)
     if (len > 0) {
       check_cli_command();
     }
-
+#else
+    if (u1_rx_buff[0] != '\0') {
+      check_cli_command();
+    }
 #endif
     if (Check_USB_PowerOn() && !ReconfigSet) {
       Process_USB_input(GetUsbRxPointer());
@@ -415,6 +416,9 @@ void check_cli_command() {
       printf("VerboseLevel set to all\r\n");
       SetVerboseLevel(VERBOSE_ALL);
       break;
+    case (uint8_t)'e':
+      PC_show_Keys();  // show the eeprom stored content conditional on USART or USB
+    break;
     case (uint8_t)'f':
       forceNTPupdate();  // sync the time now
     break;
@@ -445,6 +449,7 @@ void check_cli_command() {
       Error("Error unknown request from Serial UART1 (TTY)\r\n");
       printf("Possible commands:\r\n\r\n");
       printf("a - VerboseLevel set to all\r\n");
+      printf("e - show EEPROM\r\n");
       printf("f - Force NTP time synchronization\r\n");
       printf("i - VerboseLevel set to info\r\n");
       printf("m - VerboseLevel set to minimal\r\n");
@@ -456,12 +461,13 @@ void check_cli_command() {
 #endif
   break;
   }
+  u1_rx_buff[0] = '\0';
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
-  check_cli_command();
+//  check_cli_command();
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1); //Re-arm the interrupt
 }
 
@@ -488,10 +494,12 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  SetAllREDLED();
   __disable_irq();
   while (1)
   {
     Error("Trapped in Error_Handler, wait for reset");
+
     HAL_Delay(2500);
   }
   /* USER CODE END Error_Handler_Debug */
