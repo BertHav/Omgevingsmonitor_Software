@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.40](#version440)\
 [version 4.39](#version439)\
 [version 4.38](#version438)\
 [version 4.37](#version437)\
@@ -94,6 +95,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.40 <a name="version440"></a>
+Comment for NTP corrected
 
 ## version 4.39 <a name="version439"></a>
 Some hardcoded values moved to definitions, when battery fully charged PM measurement is enabled every cycle on batterypower (15 minutes) When charge is below 4.0V, PM measurement is only executed every 30 minutes. IDs stored in EEPROM can be shown on UART and USB 

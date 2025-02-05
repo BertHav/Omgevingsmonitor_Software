@@ -271,6 +271,12 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
     }
 #endif
     if (reset) {
+      //switch off the ESP and reset the system
+      HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
+      HAL_Delay(1);
+      HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
+      HAL_Delay(1);
+      HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
       SetAllREDLED();
       HAL_NVIC_SystemReset();
     }

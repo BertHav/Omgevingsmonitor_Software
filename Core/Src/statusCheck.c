@@ -184,14 +184,15 @@ return;
 
 void SetAllREDLED() {
 // Fire all LEDs to red independent of usertoggle or power status and reboot
-  TIM2 -> CCR1 = 0;
-  TIM2 -> CCR3 = 4000;
-  TIM2 -> CCR4 = 4000;
-  TIM3 -> CCR1 = 0;
-  TIM3 -> CCR2 = 4000;
-  TIM3 -> CCR3 = 4000;
-
-  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false);
+  TIM2 -> CCR1 = LED_ON;
+  TIM2 -> CCR3 = LED_OFF;
+  TIM2 -> CCR4 = LED_OFF;
+  TIM3 -> CCR1 = LED_ON;
+  TIM3 -> CCR2 = LED_OFF;
+  TIM3 -> CCR3 = LED_OFF;
+  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false); //red on
+  HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
+  HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
   HAL_Delay(1000);
 }
 
