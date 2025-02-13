@@ -7,6 +7,8 @@
 #include "measurement.h"
 #include "wsenHIDS.h"
 #include "sgp40.h"
+#include "aht20.h"
+#include "bmp280.h"
 #include "microphone.h"
 #include "sen5x.h"
 #include "sound_measurement.h"
@@ -15,10 +17,18 @@
 
 EnabledMeasurements Sensor;
 DevicePresent SensorProbe;
+i2cLock SensorLock;
+static uint8_t SensorHasLock;
+static uint8_t SGPstate;
+static uint8_t HIDSstate;
+static uint8_t AHTstate;
+static uint8_t BMPstate;
 
 void testInit(){
   SensorProbe.HT_Present = false;
   SensorProbe.VOC_Present = false;
+  SensorProbe.AHT20_Present = false;
+  SensorProbe.BMP280_Present = false;
   SensorProbe.PM_Present = false;
   SensorProbe.MIC_Present = false;
   SensorProbe.ESP_Present = false;
@@ -73,6 +83,14 @@ void SetHTSensorStatus(bool setting) {
   Sensor.HT_measurementEnabled =  setting;
 }
 
+void SetAHT20SensorStatus(bool setting) {
+  Sensor.HT_measurementEnabled =  setting;
+}
+
+void SetBMP280SensorStatus(bool setting) {
+  Sensor.HT_measurementEnabled =  setting;
+}
+
 void SetVOCSensorStatus(bool setting) {
   if (SensorProbe.SGP_Enabled) {
     Sensor.VOC_measurementEnabled = setting;
@@ -104,6 +122,22 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     // HT Device is connected, turning led on GREEN.
     SensorProbe.HT_Present = true;
     Debug("Humidity / Temperature sensor initialised.");
+  }
+  if(!AHT20_DeviceConnected()) {
+     Error("AHT20 Humidity / Temperature sensor NOT connected!");
+     SensorProbe.AHT20_Present = false;
+     Sensor.AHT20_measurementEnabled = false;
+  }else {
+    SensorProbe.AHT20_Present = true;
+    Debug("AHT20 Humidity / Temperature sensor initialised.");
+  }
+  if(!BMP280_DeviceConnected()) {
+     Error("Air pressure / Temperature sensor NOT connected!");
+     SensorProbe.BMP280_Present = false;
+     Sensor.BMP280_measurementEnabled = false;
+  }else {
+    SensorProbe.BMP280_Present = true;
+    Debug("Air pressure / Temperature sensor initialised.");
   }
   if(!SGP_DeviceConnected()) {
     SensorProbe.VOC_Present = false;
@@ -156,6 +190,8 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
   }
   Info("SensorProbe.HT_Present: %s", SensorProbe.HT_Present?"yes":"no");
   Info("SensorProbe.VOC_Present: %s", SensorProbe.VOC_Present?"yes":"no");
+  Info("SensorProbe.AHT20_Present: %s", SensorProbe.AHT20_Present?"yes":"no");
+  Info("SensorProbe.BMP280_Present: %s", SensorProbe.BMP280_Present?"yes":"no");
   Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
   Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
   ESP_Init(espUart);
@@ -182,9 +218,9 @@ void Device_Test(){
     ESP_WakeTest();  // calls in ESP.c  back to SetESPMeasurementDone()
   }
   if((SensorProbe.ESP_Present && SensorProbe.MIC_Present) || TimestampIsReached(deviceTimeOut)){
-    Info("Test completed");
     Info("ESP function: %s", SensorProbe.ESP_Present?"passed": "failed");
     Info("MIC function: %s", SensorProbe.MIC_Present?"passed": "failed");
+    Info("Test completed");
 #ifdef  SSD1306
     if (Check_USB_PowerOn() || userToggle) {
       display2ndmsg2ndline();
@@ -198,6 +234,12 @@ bool AllDevicesReady() {
   if (TimestampIsReached(deviceTimeOut)) {
     if (HIDSstate == HIDS_STATE_WAIT) {
       Sensor.HT_measurementEnabled = false;
+    }
+    if (AHTstate == AHT_STATE_WAIT) {
+      Sensor.AHT20_measurementEnabled = false;
+    }
+    if (BMPstate == BMP_STATE_WAIT) {
+      Sensor.BMP280_measurementEnabled = false;
     }
     if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {
       Sensor.VOC_measurementEnabled = false;
@@ -220,6 +262,12 @@ void EnabledConnectedDevices() {
   if (SensorProbe.HT_Present) {
     Sensor.HT_measurementEnabled = true;
   }
+  if (SensorProbe.AHT20_Present) {
+    Sensor.AHT20_measurementEnabled = true;
+  }
+  if (SensorProbe.BMP280_Present) {
+    Sensor.BMP280_measurementEnabled = true;
+  }
   if ((SensorProbe.VOC_Present) && (SensorProbe.SGP_Enabled)) {
     Sensor.VOC_measurementEnabled = true;
   }
@@ -235,6 +283,31 @@ void DisableConnectedDevices() {
   Debug("Devices disabled");
   Sensor.HT_measurementEnabled = false;
   Sensor.VOC_measurementEnabled = false;
+  Sensor.AHT20_measurementEnabled = false;
+  Sensor.BMP280_measurementEnabled = false;
   Sensor.PM_measurementEnabled = false;
   Sensor.MIC_measurementEnabled = false;
+}
+
+void setSensorLock(uint8_t sensor) {
+  SensorHasLock = sensor;
+}
+
+uint8_t getSensorLock() {
+  return SensorHasLock;
+}
+
+void UpkeepI2Csensors() {
+  if (Sensor.HT_measurementEnabled) {
+    HIDSstate = HIDS_Upkeep();
+  }
+  if (Sensor.VOC_measurementEnabled) {
+    SGPstate = SGP_Upkeep();
+  }
+  if (Sensor.AHT20_measurementEnabled) {
+    AHTstate = AHT_Upkeep();
+  }
+  if (Sensor.BMP280_measurementEnabled) {
+    BMPstate = BMP_Upkeep();
+  }
 }

@@ -16,17 +16,28 @@
 #include <stdbool.h>
 #include "I2CSensors.h"
 
+typedef enum {
+    FREE,
+    HIDS,
+    SGP40,
+    AHT20,
+    BMP280
+} i2cLock;
 
 typedef struct {
     bool HT_measurementEnabled;
     bool VOC_measurementEnabled;
     bool PM_measurementEnabled;
     bool MIC_measurementEnabled;
+    bool AHT20_measurementEnabled;
+    bool BMP280_measurementEnabled;
 } EnabledMeasurements;
 
 typedef struct {
   bool HT_Present;
   bool VOC_Present;
+  bool AHT20_Present;
+  bool BMP280_Present;
   bool PM_Present;
   bool MIC_Present;
   bool ESP_Present;
@@ -35,7 +46,16 @@ typedef struct {
 
 extern EnabledMeasurements Sensor;
 extern DevicePresent SensorProbe;
+extern i2cLock SensorLock;
+//extern uint8_t SensorHasLock;
+/*
+extern uint8_t HIDSstate;
+extern uint8_t SGPstate;
+ */
 
+void UpkeepI2Csensors();
+void setSensorLock(uint8_t sensor);
+uint8_t getSensorLock();
 bool AllDevicesReady();
 void Device_Test();
 void SetESPMeasurementDone();

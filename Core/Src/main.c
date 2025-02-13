@@ -46,6 +46,8 @@
 #include "wsenHIDS.h"
 #include "usbd_cdc_if.h"
 #include "ssd1306_128x64_i2c.h"
+#include "aht20.h"
+#include "bmp280.h"
 
 /* USER CODE END Includes */
 
@@ -73,8 +75,6 @@
   bool batteryEmpty = false;
   static bool priorUSBpluggedIn = false;
   static bool stlinkpwr = true;
-  uint8_t SGPstate;
-  uint8_t HIDSstate;
   uint8_t MICstate;
   uint8_t ESPstate;
   bool waitforSamples = false;
@@ -254,6 +254,9 @@ int main(void)
   if (Check_USB_PowerOn()) {
     printf_USB("input command followed by Enter or type Helpme\r\n");
   }
+#ifdef STLINK_V3PWR
+  sen5x_Power_Off(); // to prevent the sen5x and the ESP is during init of the ESP
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -292,12 +295,7 @@ int main(void)
         }
         priorUSBpluggedIn = usbPluggedIn;
       }
-      if (SGPstate != SGP_STATE_START_MEASUREMENTS && SGPstate != SGP_STATE_WAIT_FOR_COMPLETION && Sensor.HT_measurementEnabled) {
-        HIDSstate = HIDS_Upkeep();
-      }
-      if (HIDSstate != HIDS_STATE_START_MEASUREMENTS && HIDSstate != HIDS_STATE_WAIT_FOR_COMPLETION && Sensor.VOC_measurementEnabled) {
-        SGPstate = SGP_Upkeep();
-      }
+      UpkeepI2Csensors();
       if (Sensor.MIC_measurementEnabled) {
         MICstate = Mic_Upkeep();
       }
@@ -332,11 +330,11 @@ int main(void)
     if (len > 0) {
       check_cli_command();
     }
-#else
+#endif
     if (u1_rx_buff[0] != '\0') {
       check_cli_command();
     }
-#endif
+
     if (Check_USB_PowerOn() && !ReconfigSet) {
       Process_USB_input(GetUsbRxPointer());
     }

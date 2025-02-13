@@ -220,7 +220,7 @@ static uint8_t CalculateCRC(uint8_t *data, uint8_t length) {
       }
     }
   }
-  //  Info("SGP_CRC calculated value: 0x%X", crc);
+//    Info("SGP_CRC calculated value: 0x%X", crc);
   return crc;
 }
 
@@ -312,14 +312,19 @@ SGP40State SGP_Upkeep(void) {
     break;
 
   case SGP_STATE_START_MEASUREMENTS:
-    SGP_StartMeasurement();
+    if (getSensorLock() != FREE) {
+      break;
+    }
+    setSensorLock(SGP40);
     SetMeasurementIndicator();
+    SGP_StartMeasurement();
     SGPState = SGP_STATE_WAIT_FOR_COMPLETION;
     break;
 
   case SGP_STATE_WAIT_FOR_COMPLETION:
     if(SGP_GetMeasurementValues(&vocIndex)) {
       SGPState = SGP_STATE_PROCESS_RESULTS;
+      setSensorLock(FREE);
     }
     break;
 
@@ -350,6 +355,9 @@ SGP40State SGP_Upkeep(void) {
   default:
     // Handle unexpected state
     SGPState = SGP_STATE_INIT;
+    if (getSensorLock() == SGP40) {
+      setSensorLock(FREE);
+    }
     break;
   }
   return SGPState;

@@ -8,6 +8,8 @@
 #include "wsenHIDS.h"
 #include "sgp40.h"
 #include "ESP.h"
+#include "measurement.h"
+
 
 static float humid = 0.0;
 static float temp = 0.0;
@@ -44,7 +46,7 @@ static bool WriteRegister(uint8_t address, uint8_t* buffer, uint8_t nrBytes) {
   return false;
 }
 
-static uint8_t CalculateCRC(uint8_t* data, uint8_t length) {
+uint8_t CalculateCRC(uint8_t* data, uint8_t length) {
   uint8_t crc = HIDS_CRC_INIT_VALUE;
 
   for (uint8_t i = 0; i < length; i++) {
@@ -61,8 +63,7 @@ static uint8_t CalculateCRC(uint8_t* data, uint8_t length) {
       }
     }
   }
-
-//  Debug("CRC calculated value: 0x%X", crc);
+//  Debug("HIDS CRC calculated value: 0x%X", crc);
   return crc;
 }
 
@@ -264,6 +265,7 @@ wsenHIDSState HIDS_Upkeep(void) {
 
     case HIDS_STATE_START_MEASUREMENTS:
       SetMeasurementIndicator();
+      setSensorLock(HIDS);
       HIDS_StartMeasurement();
       HIDSState = HIDS_STATE_WAIT_FOR_COMPLETION;
       break;
@@ -271,6 +273,7 @@ wsenHIDSState HIDS_Upkeep(void) {
     case HIDS_STATE_WAIT_FOR_COMPLETION:
       if(HIDS_GetMeasurementValues(&humid, &temp)) {
         HIDSState = HIDS_STATE_PROCESS_RESULTS;
+        setSensorLock(FREE);
       }
       break;
 

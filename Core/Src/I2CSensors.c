@@ -13,18 +13,22 @@
 #include <sgp40.h>
 #include "I2CSensors.h"
 #include "wsenHIDS.h"
+#include "aht20.h"
+#include "bmp280.h"
 
 static I2C_HandleTypeDef* SensorI2C = NULL;
 
 static bool ReadI2C(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 static bool WriteI2C(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
+static bool ReadI2CMem(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes);
+static bool WriteI2CMem(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes);
 
 void I2CSensors_Init(I2C_HandleTypeDef* sensorI2C) {
     SensorI2C = sensorI2C;
-//    HT_Init(ReadI2C, WriteI2C);
     HIDS_Init(ReadI2C, WriteI2C);
-//    Gas_Init(ReadI2C, WriteI2C);
     SGP_Init(ReadI2C, WriteI2C);
+    AHT_Init(ReadI2C, WriteI2C);
+    BMP_Init(ReadI2CMem, WriteI2CMem);
 }
 
 static bool ReadI2C(uint8_t address, uint8_t* buffer, uint8_t nrBytes) {
@@ -41,4 +45,21 @@ static bool WriteI2C(uint8_t address, uint8_t* buffer, uint8_t nrBytes) {
         return false;
     }
     return true;
+}
+
+static bool ReadI2CMem(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes) {
+//  HAL_StatusTypeDef status = HAL_I2C_Mem_Read_DMA(SensorI2C, (address << 1), MemAddress, MemSize, buffer, nrBytes);
+  HAL_StatusTypeDef status = HAL_I2C_Mem_Read(SensorI2C, (address << 1), MemAddress, MemSize, buffer, nrBytes,100);
+   if (status != HAL_OK) {
+     return false;
+   }
+   return true;
+}
+
+static bool WriteI2CMem(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes) {
+   HAL_StatusTypeDef status = HAL_I2C_Mem_Write_DMA(SensorI2C, (address << 1), MemAddress, MemSize, buffer, nrBytes);
+   if (status != HAL_OK) {
+     return false;
+   }
+   return true;
 }
