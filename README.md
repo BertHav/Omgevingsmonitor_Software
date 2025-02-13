@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.50](#version450)\
 [version 4.40](#version440)\
 [version 4.39](#version439)\
 [version 4.38](#version438)\
@@ -95,6 +96,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.50 <a name="version450"></a>
+Added support for AHT20 en BMP280 Digital Pressure Sensor, I2C locking changed for 4 sensors 
 
 ## version 4.40 <a name="version440"></a>
 Comment for NTP corrected
