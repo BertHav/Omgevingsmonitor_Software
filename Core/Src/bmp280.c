@@ -8,6 +8,7 @@
 #include "bmp280.h"
 #include "utils.h"
 #include "measurement.h"
+#include "ESP.h"
 
 static I2CWriteMEM WriteMemFunction = NULL;
 static I2CReadMEM ReadMemFunction = NULL;
@@ -33,6 +34,10 @@ static bool ReadMemRegister(uint16_t MemAddress, uint16_t MemSize, uint8_t* buff
     return ReadMemFunction(bmp280I2Caddr, MemAddress, MemSize, buffer, nrBytes);
   }
   return false;
+}
+
+void setBMP280TimeStamp(uint32_t ticks) {
+  BMP280TimeStamp = HAL_GetTick() + ticks;
 }
 
 static void BMP280_reset() {
@@ -308,6 +313,7 @@ BMP280State BMP_Upkeep(void) {
     float airtemp, airhpa;
     airtemp = BMP280_calc_temperature();
     airhpa = BMP280_calc_pressure();
+    sethPa(airhpa);
     Info("BMP280 airtemperature: %2.2fC barometric value: %.2fhPa", airtemp, airhpa);
     BMPState = BMP_STATE_WAIT;
     BMP280TimeStamp = HAL_GetTick() + 3000;

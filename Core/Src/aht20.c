@@ -58,6 +58,10 @@ uint8_t CalculateCRC(uint8_t* data, uint8_t length) {
   return crc;
 }
 
+void setAHT20TimeStamp(uint32_t ticks) {
+  AHT20TimeStamp = HAL_GetTick() + ticks;
+}
+
 void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   ReadFunction = readFunction;
   WriteFunction = writeFunction;

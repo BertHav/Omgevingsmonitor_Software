@@ -60,6 +60,7 @@ bool AllDevicesReady();
 void Device_Test();
 void SetESPMeasurementDone();
 bool IsSGPPresent();
+bool IsBMP280SensorPresent();
 void SetVOCSensorDIS_ENA(bool setting);
 bool IsPMSensorEnabled();
 bool IsMICSensorEnabled();

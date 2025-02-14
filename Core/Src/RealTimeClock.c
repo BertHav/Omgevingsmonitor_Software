@@ -6,6 +6,8 @@
 #include "ESP.h"
 #include "sgp40.h"
 #include "wsenHIDS.h"
+#include "AHT20.h"
+#include "BMP280.h"
 #include "statusCheck.h"
 #include <string.h>
 #include <stdlib.h>
@@ -302,8 +304,10 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   ResetSGP40samplecounter();
   setsen5xSamplecounter(0);
   setESPTimeStamp(ESP_DELAY_TIME_AFTER_STM_WAKEUP);
-  setSGP40TimeStamp(0);
+  setSGP40TimeStamp(30);
   setHIDSTimeStamp(0);
+  setAHT20TimeStamp(60);
+  setBMP280TimeStamp(90);
   setMICTimeStamp(0);
   ESPTransmitDone = false;
   deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;

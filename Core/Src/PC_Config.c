@@ -76,8 +76,8 @@ void ProcessCmd(Receive_MSG msg)
         case VocIndexConfigCmd:  // 4
             WriteUint8ArrayEepromSafe(VocIndexConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-        case dBaConfigCmd:  // 5 wille be airpressure ??
-            WriteUint8ArrayEepromSafe(dBaConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        case dBaConfigCmd:  // 5 will be airpressure => hPaconfigCMD hPaConfigAddr ??
+            WriteUint8ArrayEepromSafe(hPaConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case dBcConfigCmd: // 5 will be dBAConfigCMD
             WriteUint8ArrayEepromSafe(dBAConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
@@ -223,7 +223,7 @@ void PC_show_Keys() {
   sprintf(msg, "4 - VOC sensor id -----------: %s\r\n", Buffer);
   PC_selectout(&msg[0], usb_out);
 
-  ReadUint8ArrayEEprom(dBaConfigAddr, soundConfig, IdSize);
+  ReadUint8ArrayEEprom(hPaConfigAddr, soundConfig, IdSize);
   uint8ArrayToString(Buffer, soundConfig);
   sprintf(msg, "5 is former dBa unused\r\n");
   PC_selectout(&msg[0], usb_out);
@@ -266,6 +266,8 @@ void PC_show_Keys() {
   printf_USB("\r\nOnly the last two nibbles are necessary.\r\n");
 
   printf_USB("Command example for air pressure => #5,6a\r\n");
+  printf_USB("Command example for a full key for air pressure => $5,67af09374cdef30007b35055\r\n");
+
 
   if (!usb_out) {
     printf("A key can only be changed via USB input.\r\n");
@@ -274,26 +276,50 @@ void PC_show_Keys() {
 
 bool Process_USB_input(uint8_t* data) {
   static uint8_t boxConfig[IdSize];
+  static uint8_t len;
   uint32_t length = GetUsbRxDataSize();
-  static char Buffer[25];
+  static uint8_t r = 0;
+  static char Buffer[32];
   if (length > 5) {  //#2,34
     printf_USB("USB input: %s\r\n", (const char*)data);
     uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE);  // zoek op #
+    if (message == NULL) {
+      message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
+    }
     if(message != NULL) {
       received.Command = (message[1] & 0x0F);
       if (message[2] == ',') {
-        for (uint8_t i=3; i < 5; i++) {
+        if (message[0] == '#') {
+          len = 5;
+        }
+        else {
+          len = 27;
+        }
+        for (uint8_t i=3; i < len; i++) {
+          printf_USB("handling character %c as nr: %d for pos: %d\r\n", message[i], i, r);
           if (isxdigit(message[i])) {
             result = (result << 4) | (isdigit(message[i]) ? message[i] - '0' : toupper(message[i]) - 'A' + 10);
+            if (len == 27) {
+
+              if ((i % 2) == 0) {
+                message[r] = result;
+                r++;
+              }
+            }
           }
           else {
-            printf_USB("Invalid hexadecimal character: '%c'\r\n", message[i]);
+            printf_USB("Invalid hexadecimal character: '%c at position %d'\r\n", message[i], i);
             return false; // Of een andere foutwaarde
           }
         }
-        ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
-        boxConfig[11] = result; //overwrite the last byte
-        memcpy(received.Payload, boxConfig, IdSize);
+        if (len == 5) {
+          ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
+          boxConfig[11] = result; //overwrite the last byte
+          memcpy(received.Payload, boxConfig, IdSize);
+        }
+        else {
+          memcpy(received.Payload, message, IdSize);
+        }
         received.PayloadLength = IdSize;
         uint8ArrayToString(Buffer, received.Payload);
         ProcessCmd(received);

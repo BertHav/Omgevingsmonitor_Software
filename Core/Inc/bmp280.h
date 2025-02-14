@@ -90,6 +90,7 @@ typedef bool (*I2CReadMEM)(uint8_t address, uint16_t MemAddress, uint16_t MemSiz
 typedef bool (*I2CWriteMEM)(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes);
 
 void BMP_Init(I2CReadMEM readMemFunction, I2CWriteMEM writeMemFunction);
+void setBMP280TimeStamp(uint32_t ticks);
 BMP280State BMP_Upkeep(void);
 void BMP280_set_modus(uint8_t modus);
 bool BMP280_DeviceConnected();

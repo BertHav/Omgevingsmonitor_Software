@@ -73,6 +73,8 @@ typedef struct
   float dBA;
   float dBApeak;
   float dBAaverage;
+  float hPaValue;
+  float hPaValuemax;
 } MeasurementValues;
 
 extern MeasurementValues MeasVal;
@@ -190,6 +192,7 @@ void ESP_Sleep(void);
 void ESP_DeInit(void);
 void ESP_WakeTest();
 void setVOC(uint16_t voc);
+void sethPa(float hPa);
 void setHIDS(float temp, float humid);
 void setMic(float dB, float dBmax, float dBAavg);
 void setPM2p5(uint16_t PM2);

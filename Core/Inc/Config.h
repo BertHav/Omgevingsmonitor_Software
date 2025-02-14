@@ -15,7 +15,7 @@
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
 #define NOxIndexConfigAddr EEPromStartAddr + (IdSize * 3)
 #define VocIndexConfigAddr EEPromStartAddr + (IdSize * 4)
-#define dBaConfigAddr EEPromStartAddr + (IdSize * 5)
+#define hPaConfigAddr EEPromStartAddr + (IdSize * 5)
 #define dBAConfigAddr EEPromStartAddr + (IdSize * 6)
 #define PM2ConfigAddr EEPromStartAddr + (IdSize * 7)
 #define PM10ConfigAddr EEPromStartAddr + (IdSize * 8)

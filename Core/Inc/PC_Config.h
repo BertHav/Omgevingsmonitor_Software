@@ -19,6 +19,7 @@
 #define ERROR_CMD 255
 
 #define PREAMBLE "#"
+#define PREAMBLE_F "$"
 
 #define BoxConfigCmd 0
 #define TempConfigCmd 1

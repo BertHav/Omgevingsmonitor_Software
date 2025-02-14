@@ -51,8 +51,8 @@ bool IsHTSensorEnabled() {
   return Sensor.HT_measurementEnabled;
 }
 
-bool IsSGPSensorEnabled() {
-  return SensorProbe.SGP_Enabled;
+bool IsBMP280SensorPresent() {
+  return SensorProbe.BMP280_Present;
 }
 
 bool IsSGPPresent() {

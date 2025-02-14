@@ -144,6 +144,19 @@ void setVOC(uint16_t voc) {
 #endif
 }
 
+void sethPa(float hPa) {
+  MeasVal.hPaValue = hPa;
+  if (hPa > MeasVal.hPaValuemax) {
+    MeasVal.hPaValuemax = hPa;
+  }
+#ifdef SSD1306
+//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
+//    displayhPa();
+//  }
+#endif
+}
+
+
 void setMic(float dB, float dBmax, float dBAavg){
   MeasVal.dBA = dB;
   MeasVal.dBApeak = dBmax;
@@ -354,6 +367,7 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   static uint8_t humidConfig[IdSize];
   static uint8_t soundConfig[IdSize];
   static uint8_t vocConfig[IdSize];
+  static uint8_t hPaConfig[IdSize];
   static uint8_t batteryConfig[IdSize];
   static uint8_t solarConfig[IdSize];
   static uint8_t noxConfig[IdSize];
@@ -367,6 +381,7 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   ReadUint8ArrayEEprom(HumidConfigAddr, humidConfig, IdSize);
   ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
   ReadUint8ArrayEEprom(VocIndexConfigAddr, vocConfig, IdSize);
+  ReadUint8ArrayEEprom(hPaConfigAddr, hPaConfig, IdSize);
   ReadUint8ArrayEEprom(BatVoltConfigAddr, batteryConfig, IdSize);
   ReadUint8ArrayEEprom(SolVoltConfigAddr, solarConfig, IdSize);
   ReadUint8ArrayEEprom(NOxIndexConfigAddr, noxConfig, IdSize);
@@ -418,6 +433,20 @@ index = strlen(message);
   if (send) {
     status = ESP_Send((uint8_t*)message, strlen(message));
     retstat &= status;
+  }
+
+  if (IsBMP280SensorPresent()) {
+    uint8ArrayToString(Buffer, hPaConfig);
+#ifdef OPENSENSEMAP
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.hPaValuemax);
+#else
+    sprintf(&message[0], ",{\"name\":\"hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.hPaValuemax);
+#endif
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
   }
 
   uint8ArrayToString(Buffer, soundConfig);

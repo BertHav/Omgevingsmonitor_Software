@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.51](#version451)\
 [version 4.50](#version450)\
 [version 4.40](#version440)\
 [version 4.39](#version439)\
@@ -96,6 +97,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.51 <a name="version451"></a>
+The airpressure value is now uploaded to opensensemap.org. The hPa sensor created afterwards in opensensemap can be added by connecting a terminal program directly to the USB-C connector of the OmgevingsMonitor. Enter a number of characters, for example, HelpMe. If the sensor key in opensensemap.org is completely different, the command $5,here_the_sensorid can be executed. For a key where only the last two characters differ from the boxid, #5,xx can be used. 
 
 ## version 4.50 <a name="version450"></a>
 Added support for AHT20 en BMP280 Digital Pressure Sensor, I2C locking changed for 4 sensors 
