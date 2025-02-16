@@ -62,6 +62,7 @@ static void BMP280_get_calibration() {
   dig.P7 = (int16_t)((((int16_t)bmpData[19]) << 8) + (int16_t)bmpData[18]);
   dig.P8 = (int16_t)((((int16_t)bmpData[21]) << 8) + (int16_t)bmpData[20]);
   dig.P9 = (int16_t)((((int16_t)bmpData[23]) << 8) + (int16_t)bmpData[22]);
+  Debug("BMP280 calibration data:");
   Debug("bmpData[1] 0x%02X, bmpData[0] 0x%02X, dig.T1 = %d", bmpData[1], bmpData[0], dig.T1);
   Debug("bmpData[3] 0x%02X, bmpData[2] 0x%02X, dig.T1 = %d", bmpData[3], bmpData[2], dig.T2);
   Debug("bmpData[5] 0x%02X, bmpData[4] 0x%02X, dig.T1 = %d", bmpData[5], bmpData[4], dig.T3);
@@ -111,10 +112,6 @@ bool BMP280_DeviceConnected() {
 void BMP_Init(I2CReadMEM readMemFunction, I2CWriteMEM writeMemFunction) {
   ReadMemFunction = readMemFunction;
   WriteMemFunction = writeMemFunction;
-  if (BMP280_probe() == 0) {
-    return;
-  }
-// register hier de sensor om mee te doen in de meetcyclus
 }
 
 
@@ -283,6 +280,7 @@ BMP280State BMP_Upkeep(void) {
       uint8_t locktype = getSensorLock();
       Debug("Lock is not from BMP280, but from %s",
           locktype==FREE?"FREE":locktype==HIDS?"HIDS":locktype==SGP40?"SGP40":locktype==AHT20?"AHT20":locktype==BMP280?"BMP280":"unknown");
+      BMP280TimeStamp = HAL_GetTick() + 97;
       break;
     }
     if (getSensorLock() == FREE) {
@@ -313,10 +311,16 @@ BMP280State BMP_Upkeep(void) {
     float airtemp, airhpa;
     airtemp = BMP280_calc_temperature();
     airhpa = BMP280_calc_pressure();
-    sethPa(airhpa);
-    Info("BMP280 airtemperature: %2.2fC barometric value: %.2fhPa", airtemp, airhpa);
+    if ((airhpa > 850.0) && (airhpa < 1100)) {
+      sethPa(airhpa);
+      Info("BMP280 airtemperature: %2.2fC barometric value: %.2fhPa", airtemp, airhpa);
+      BMP280TimeStamp = HAL_GetTick() + 60000;
+    }
+    else {
+      Error("BMP280 value out of valid range, not stored/used");
+      BMP280TimeStamp = HAL_GetTick() + 2000;
+    }
     BMPState = BMP_STATE_WAIT;
-    BMP280TimeStamp = HAL_GetTick() + 3000;
     break;
 
   case BMP_STATE_WAIT:
@@ -333,7 +337,7 @@ BMP280State BMP_Upkeep(void) {
     else {
       BMPState = BMP_STATE_START_MEASUREMENTS;
     }
-    BMP280TimeStamp = HAL_GetTick() + 60000;
+    BMP280TimeStamp = HAL_GetTick() + 23;
     break;
 
   default:

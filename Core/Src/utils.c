@@ -6,8 +6,9 @@
  */
 #include "main.h"
 #include "utils.h"
- #include "usbd_cdc_if.h"
+#include "usbd_cdc_if.h"
 #include "PC_Config.h"
+#include "PowerUtils.h"
 //#include "../Inc/PC_Config.h"
 
 // Default verbose level

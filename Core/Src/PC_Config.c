@@ -168,9 +168,9 @@ void PC_selectout(char *msg, bool usb_out) {
   if (usb_out){
     printf_USB(msg);
   }
-  else {
+//  else {
     printf(msg);
-  }
+//  }
   HAL_Delay(10); //wait for the host poll of the USB buffer
 }
 
@@ -264,43 +264,52 @@ void PC_show_Keys() {
   PC_selectout(&msg[0], usb_out);
 
   printf_USB("\r\nOnly the last two nibbles are necessary.\r\n");
-
+  HAL_Delay(10);
   printf_USB("Command example for air pressure => #5,6a\r\n");
-  printf_USB("Command example for a full key for air pressure => $5,67af09374cdef30007b35055\r\n");
-
-
+  HAL_Delay(10);
+  printf_USB("For the full key variant copy and paste the key sequence");
+  HAL_Delay(10);
+  printf_USB("from opensensemap.org in your account to this input.\r\n");
+  HAL_Delay(10);
+  printf_USB("Command example for a full key for air pressure =>");
+  HAL_Delay(10);
+  printf_USB(" $5,67af09374cdef30007b35055\r\n");
+  HAL_Delay(10);
   if (!usb_out) {
-    printf("A key can only be changed via USB input.\r\n");
+    printf("A key can only be changed by USB input.\r\n");
   }
 }
 
 bool Process_USB_input(uint8_t* data) {
   static uint8_t boxConfig[IdSize];
-  static uint8_t len;
+  static uint32_t len = 5;
   uint32_t length = GetUsbRxDataSize();
   static uint8_t r = 0;
-  static char Buffer[32];
-  if (length > 5) {  //#2,34
+//  uint8_t* message;
+  static char Buffer[24];
+  uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
+  if ((length == 1) && (message != NULL) && (len != 27)){
+      Debug("Switching to input length of 27 for full opensensemap keylength");
+      len = 27;
+  }
+  if (length > len) {
+//    printf_USB("minimum required USB input reached: %s\r\n", (const char*)data);
     printf_USB("USB input: %s\r\n", (const char*)data);
-    uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE);  // zoek op #
-    if (message == NULL) {
-      message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
+    message = (unsigned char*)data;
+    if (message[0] == '$') {
+      len = 27;
     }
-    if(message != NULL) {
+    if((message[0] == '#') || (message[0] == '$')) {
       received.Command = (message[1] & 0x0F);
       if (message[2] == ',') {
-        if (message[0] == '#') {
-          len = 5;
-        }
-        else {
-          len = 27;
-        }
         for (uint8_t i=3; i < len; i++) {
-          printf_USB("handling character %c as nr: %d for pos: %d\r\n", message[i], i, r);
+//          printf_USB("handling character %c as nr: %d for pos: %d\r\n", message[i], i, r);
+          HAL_Delay(10);
           if (isxdigit(message[i])) {
             result = (result << 4) | (isdigit(message[i]) ? message[i] - '0' : toupper(message[i]) - 'A' + 10);
+//            printf_USB("Result is 0x%2X\r\n", result);
+            HAL_Delay(10);
             if (len == 27) {
-
               if ((i % 2) == 0) {
                 message[r] = result;
                 r++;
@@ -309,6 +318,7 @@ bool Process_USB_input(uint8_t* data) {
           }
           else {
             printf_USB("Invalid hexadecimal character: '%c at position %d'\r\n", message[i], i);
+            ResetUsbRxDataSize();
             return false; // Of een andere foutwaarde
           }
         }
@@ -325,7 +335,7 @@ bool Process_USB_input(uint8_t* data) {
         ProcessCmd(received);
         ResetUsbRxDataSize();
         PC_show_Keys();
-        for (uint8_t i=0; i < 8; i++) {
+        for (uint8_t i=0; i < 32; i++) {
           data[i] = '\0';
         }
         return true;
@@ -336,10 +346,11 @@ bool Process_USB_input(uint8_t* data) {
       }
     }
     else {
+      len = 5;
       PC_show_Keys();
       ResetUsbRxDataSize();
     }
-    for (uint8_t i=0; i < 8; i++) {
+    for (uint8_t i=0; i < 32; i++) {
       data[i] = '\0';
     }
 

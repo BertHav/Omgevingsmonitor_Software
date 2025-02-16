@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.52](#version452)\
 [version 4.51](#version451)\
 [version 4.50](#version450)\
 [version 4.40](#version440)\
@@ -97,6 +98,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.52 <a name="version452"></a>
+Minor improvements/fixes. It was necessary that the entire key length input was contained within 1 USB host poll. Because only a cut & paste led to a successful change in EEPROM, this has been adjusted. All logging regarding keys is also sent to the serial log port. The logging output of a line to USB is now always sent within a maximum of 1 USB-A host poll period in the default configuration (no USB logging selected during compilation). This prevents distorted output.
 
 ## version 4.51 <a name="version451"></a>
 The airpressure value is now uploaded to opensensemap.org. The hPa sensor created afterwards in opensensemap can be added by connecting a terminal program directly to the USB-C connector of the OmgevingsMonitor. Enter a number of characters, for example, HelpMe. If the sensor key in opensensemap.org is completely different, the command $5,here_the_sensorid can be executed. For a key where only the last two characters differ from the boxid, #5,xx can be used. 

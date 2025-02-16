@@ -19,7 +19,7 @@ static bool calibrated = false;
 static I2CReadCb ReadFunction = NULL;
 static I2CWriteCB WriteFunction = NULL;
 static uint8_t airtemphumraw[7];
-AHT20State AHTState = AHT_STATE_INIT;
+AHT20State AHTState = AHT_STATE_START_MEASUREMENTS; // init is done by probing
 
 static uint8_t CalculateCRC(uint8_t* data, uint8_t length);
 
@@ -67,11 +67,8 @@ void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   WriteFunction = writeFunction;
 }
 
-bool AHT20_DeviceConnected() {
-  return WriteRegister(03, AHT20_start, 3);
-}
+
 bool AHT20_init(void) {
-  Debug("Init AHT20");
   AHT20TimeStamp = HAL_GetTick() + 50;
   return WriteRegister(AHT20_ADDRESS, AHT20_start, 3);
 }
@@ -81,18 +78,33 @@ bool AHT20_calibration_start() {
   if (!response) {
     Error("AHT20 Write error during calibaration");
   }
-  AHT20TimeStamp = HAL_GetTick() + 40;
+  AHT20TimeStamp = HAL_GetTick() + 50;
   return response;
 }
 
 bool AHT20_calibration_complete(void) {
-  if (!ReadRegister(AHT20_ADDRESS, airtemphumraw, 2)) {
-    Error("AHT20 Read error during calibaration");;
+  airtemphumraw[0] = 0; // clear the buffer
+  if (!ReadRegister(AHT20_ADDRESS, airtemphumraw, 1)) {
+    Error("AHT20 Read error during calibaration");
+    return false;
   }
-//  Debug("status of AHT20 [0]= 0x%02x [1]=0x%02x", airtemphumraw[0], airtemphumraw[1]);
+  HAL_Delay(10);  // wait to be sure for completing the DMA transfer :(
+  if (airtemphumraw[0] ==0xff) {
+    airtemphumraw[0] = 0;
+  }
+//  Debug("status of AHT20 [0]= 0x%02x", airtemphumraw[0]);
   AHT20TimeStamp = HAL_GetTick() + 200;
-  return (airtemphumraw[1] & 0x08);
+  return (airtemphumraw[0] & 0x08);
 }
+
+ bool AHT20_DeviceConnected() {
+   Debug("Init & probing AHT20");
+   AHT20_init();
+   HAL_Delay(50);
+   AHT20_calibration_start();
+   HAL_Delay(50);
+   return AHT20_calibration_complete();
+ }
 
 bool AHT20_StartMeasurement(void) {
   bool response = WriteRegister(AHT20_ADDRESS, AHT20_measure, 3);
@@ -219,11 +231,11 @@ AHT20State AHT_Upkeep(void) {
       return AHTState;
     }
 //    BMP280_setAirTemPHum(airtemp, airhum);
-    AHTState = AHT_WAIT_STATE_MODE;
+    AHTState = AHT_STATE_WAIT;
     AHT20TimeStamp = HAL_GetTick() + 60000;  // about every 1 minute
     break;
 
-  case AHT_WAIT_STATE_MODE:
+  case AHT_STATE_WAIT:
 //    ResetMeasurementIndicator();
     AHTState = AHT_STATE_START_MEASUREMENTS;
   break;

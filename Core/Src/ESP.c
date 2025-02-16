@@ -213,6 +213,7 @@ void resetMaxMeasurementValues() {
     MeasVal.PM10p0max = 0.0f;
     MeasVal.airNOxmax = 0;
   }
+  MeasVal.hPaValuemax = 0.0;
   MeasVal.VOCIndexmax = 0;
 }
 
