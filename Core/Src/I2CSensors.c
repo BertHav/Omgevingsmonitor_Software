@@ -13,8 +13,8 @@
 #include <sgp40.h>
 #include "I2CSensors.h"
 #include "wsenHIDS.h"
-#include "aht20.h"
 #include "bmp280.h"
+#include "aht2x.h"
 
 static I2C_HandleTypeDef* SensorI2C = NULL;
 

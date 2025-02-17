@@ -4,10 +4,10 @@
  *  Created on: Jun 10, 2024
  *      Author: Joris Blankestijn
  */
+#include <aht2x.h>
 #include "measurement.h"
 #include "wsenHIDS.h"
 #include "sgp40.h"
-#include "aht20.h"
 #include "bmp280.h"
 #include "microphone.h"
 #include "sen5x.h"
@@ -123,14 +123,6 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     SensorProbe.HT_Present = true;
     Debug("Humidity / Temperature sensor initialised.");
   }
-  if(!AHT20_DeviceConnected()) {
-     Error("AHT20 Humidity / Temperature sensor NOT connected!");
-     SensorProbe.AHT20_Present = false;
-     Sensor.AHT20_measurementEnabled = false;
-  }else {
-    SensorProbe.AHT20_Present = true;
-    Debug("AHT20 Humidity / Temperature sensor initialised.");
-  }
   if(!BMP280_DeviceConnected()) {
      Error("Air pressure / Temperature sensor NOT connected!");
      SensorProbe.BMP280_Present = false;
@@ -148,6 +140,14 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     SensorProbe.SGP_Enabled = true;
     SensorProbe.VOC_Present = true;
     Debug("SGP sensor initialised.");
+  }
+  if(!AHT20_DeviceConnected()) {
+     Error("AHT20 Humidity / Temperature sensor NOT connected!");
+     SensorProbe.AHT20_Present = false;
+     Sensor.AHT20_measurementEnabled = false;
+  }else {
+    SensorProbe.AHT20_Present = true;
+    Debug("AHT20 Humidity / Temperature sensor initialised.");
   }
   if(SensorProbe.VOC_Present && SensorProbe.HT_Present){
     SetDBLED(false, true, false);

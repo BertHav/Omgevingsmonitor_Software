@@ -1,15 +1,16 @@
 /*
- * bmp280.h
+ * aht2x.h
  *
  *  Created on: Feb 9, 2025
  *      Author: itsme
  */
 
-#ifndef INC_AHT20_H_
-#define INC_AHT20_H_
+#ifndef INC_AHT2X_H_
+#define INC_AHT2X_H_
 
 #include "math.h"
 #include "stm32l0xx_hal.h"
+#include "stdbool.h"
 
 #define AHT20_ADDRESS 0x38
 #define AHT20_INIT    0xBE
@@ -42,4 +43,4 @@ void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction);
 AHT20State AHT_Upkeep(void);
 bool AHT20_DeviceConnected();
 
-#endif /* INC_AHT20_H_ */
+#endif /* INC_AHT2X_H_ */

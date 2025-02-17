@@ -1,3 +1,4 @@
+#include <aht2x.h>
 #include "rtc.h"
 #include "RealTimeClock.h"
 #include "sen5x.h"
@@ -6,7 +7,6 @@
 #include "ESP.h"
 #include "sgp40.h"
 #include "wsenHIDS.h"
-#include "AHT20.h"
 #include "BMP280.h"
 #include "statusCheck.h"
 #include <string.h>

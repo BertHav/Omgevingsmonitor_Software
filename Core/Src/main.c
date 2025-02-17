@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <aht2x.h>
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -46,7 +47,6 @@
 #include "wsenHIDS.h"
 #include "usbd_cdc_if.h"
 #include "ssd1306_128x64_i2c.h"
-#include "aht20.h"
 #include "bmp280.h"
 
 /* USER CODE END Includes */

@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.53](#version453)\
 [version 4.52](#version452)\
 [version 4.51](#version451)\
 [version 4.50](#version450)\
@@ -98,6 +99,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.53 <a name="version453"></a>
+aht20.% renamed to aht2x.%. Version should support AHT20 and AHT21.
 
 ## version 4.52 <a name="version452"></a>
 Minor improvements/fixes. It was necessary that the entire key length input was contained within 1 USB host poll. Because only a cut & paste led to a successful change in EEPROM, this has been adjusted. All logging regarding keys is also sent to the serial log port. The logging output of a line to USB is now always sent within a maximum of 1 USB-A host poll period in the default configuration (no USB logging selected during compilation). This prevents distorted output.

@@ -4,8 +4,7 @@
  *  Created on: Feb 9, 2025
  *      Author: itsme
  */
-#include <stdbool.h>
-#include "aht20.h"
+#include "aht2x.h"
 #include "utils.h"
 #include "wsenHIDS.h"  // for CRC8
 #include "measurement.h"
@@ -13,7 +12,9 @@
 static uint8_t AHT20_start[3]      = {AHT20_INIT,0x08,0x00};
 static uint8_t AHT20_soft_reset[1] = {AHT20_RESET};
 static uint8_t AHT20_measure[3]    = {AHT20_MEASURE,0x33,0x00};
-static uint8_t AHT20_calibrated[1] = {AHT20_STATUS};
+static uint8_t AHT20_status[1] = {AHT20_STATUS};
+static uint8_t AHT20_INIT_1[3] =  {0x1B, 0x00, 0x00};  // the magic from AOSONG
+
 static uint32_t AHT20TimeStamp = 0;
 static bool calibrated = false;
 static I2CReadCb ReadFunction = NULL;
@@ -65,16 +66,59 @@ void setAHT20TimeStamp(uint32_t ticks) {
 void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
   ReadFunction = readFunction;
   WriteFunction = writeFunction;
+  return ;
 }
 
+void AHT20_register_reset(uint8_t addr){
+  AHT20_INIT_1[0] = addr;
+  WriteRegister(AHT20_ADDRESS, AHT20_INIT_1, 3);
+  HAL_Delay(10);
+  ReadRegister(AHT20_ADDRESS, airtemphumraw, 3);
+  HAL_Delay(10);
+  airtemphumraw[0] = 0xB0;
+  Debug("AHT20 Magic from AOSONG, Readed values from AHTxx device 2nd=0x%02X, 3rd=0x%02X", airtemphumraw[2], airtemphumraw[3]);
+  WriteRegister(AHT20_ADDRESS, airtemphumraw, 3);
+  HAL_Delay(10);
+}
+
+void AHT20_Start_Init(void)
+{
+  AHT20_register_reset(0x1b);
+  AHT20_register_reset(0x1c);
+  AHT20_register_reset(0x1e);
+}
 
 bool AHT20_init(void) {
-  AHT20TimeStamp = HAL_GetTick() + 50;
-  return WriteRegister(AHT20_ADDRESS, AHT20_start, 3);
+//  if (IsDeviceReady(AHT20_ADDRESS)) {
+//    Debug("AHTxx device responds on address 0x%02X", AHT20_ADDRESS);
+    AHT20TimeStamp = HAL_GetTick() + 50;
+    WriteRegister(AHT20_ADDRESS, AHT20_status, 1);
+    HAL_Delay(5);
+    airtemphumraw[0] = 0; // clear the buffer
+    ReadRegister(AHT20_ADDRESS, airtemphumraw, 1);
+    HAL_Delay(5);
+    Debug("AHT20 Value of statusregister: 0x%02X", airtemphumraw[0]);
+    if ((airtemphumraw[0] & 0x18) != 0x18) {
+      WriteRegister(AHT20_ADDRESS, AHT20_start, 3);
+      HAL_Delay(10);
+      AHT20_Start_Init();
+    }
+    return true;
+//  }
+//  return false;
+}
+
+uint8_t AHT20_read_status() {
+  WriteRegister(AHT20_ADDRESS, AHT20_status, 1);
+  HAL_Delay(5);
+  airtemphumraw[0] = 0;
+  ReadRegister(AHT20_ADDRESS, airtemphumraw, 1);
+  HAL_Delay(5);
+  return airtemphumraw[0];
 }
 
 bool AHT20_calibration_start() {
-  bool response = WriteRegister(AHT20_ADDRESS, AHT20_calibrated, 1);
+  bool response = WriteRegister(AHT20_ADDRESS, AHT20_status, 1);
   if (!response) {
     Error("AHT20 Write error during calibaration");
   }
@@ -100,9 +144,9 @@ bool AHT20_calibration_complete(void) {
  bool AHT20_DeviceConnected() {
    Debug("Init & probing AHT20");
    AHT20_init();
-   HAL_Delay(50);
+   HAL_Delay(10);
    AHT20_calibration_start();
-   HAL_Delay(50);
+   HAL_Delay(10);
    return AHT20_calibration_complete();
  }
 
@@ -117,6 +161,10 @@ bool AHT20_StartMeasurement(void) {
 }
 
 bool AHT20_GetMeasurementValues() {
+  if ((AHT20_read_status() & 0x80)==0x80) {
+    Debug("AHT20 Device busy, waiting for results");
+    return false;
+  }
   bool response = ReadRegister(AHT20_ADDRESS, airtemphumraw, 7);
   AHT20TimeStamp = HAL_GetTick() + 100;
   return response;

@@ -4,7 +4,7 @@
 "./Core/Src/PowerUtils.o"
 "./Core/Src/RealTimeClock.o"
 "./Core/Src/adc.o"
-"./Core/Src/aht20.o"
+"./Core/Src/aht2x.o"
 "./Core/Src/bmp280.o"
 "./Core/Src/display.o"
 "./Core/Src/dma.o"
