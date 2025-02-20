@@ -24,22 +24,20 @@
 
 
 typedef enum {
-    AHT_STATE_INIT,
-    AHT_START_CALIBRATION,
-    AHT_CALIBRATED,
+    AHT_STATE_OFF,
     AHT_STATE_START_MEASUREMENTS,
     AHT_STATE_WAIT_FOR_COMPLETION,
     AHT_STATE_PROCESS_RESULTS,
     AHT_STATE_WAIT_FOR_READY,
-    AHT_STATE_OFF,
     AHT_STATE_WAIT
 } AHT20State;
 
+typedef bool (*I2CReadDir)(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 typedef bool (*I2CReadCb)(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 typedef bool (*I2CWriteCB)(uint8_t address, uint8_t* buffer, uint8_t nrBytes);
 
 void setAHT20TimeStamp(uint32_t ticks);
-void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction);
+void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction, I2CReadDir readDirFunction);
 AHT20State AHT_Upkeep(void);
 bool AHT20_DeviceConnected();
 

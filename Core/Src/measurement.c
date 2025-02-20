@@ -9,6 +9,7 @@
 #include "wsenHIDS.h"
 #include "sgp40.h"
 #include "bmp280.h"
+#include "ENS160.h"
 #include "microphone.h"
 #include "sen5x.h"
 #include "sound_measurement.h"
@@ -23,11 +24,13 @@ static uint8_t SGPstate;
 static uint8_t HIDSstate;
 static uint8_t AHTstate;
 static uint8_t BMPstate;
+static uint8_t ENSstate;
 
 void testInit(){
   SensorProbe.HT_Present = false;
   SensorProbe.VOC_Present = false;
   SensorProbe.AHT20_Present = false;
+  SensorProbe.ENS160_Present = false;
   SensorProbe.BMP280_Present = false;
   SensorProbe.PM_Present = false;
   SensorProbe.MIC_Present = false;
@@ -37,6 +40,9 @@ void testInit(){
   Sensor.VOC_measurementEnabled = true;
   Sensor.PM_measurementEnabled = true;
   Sensor.MIC_measurementEnabled = true;
+  Sensor.AHT_measurementEnabled = true;
+  Sensor.BMP_measurementEnabled = true;
+  Sensor.ENS_measurementEnabled = true;
 }
 
 bool GetPMSensorPresence(){
@@ -51,8 +57,16 @@ bool IsHTSensorEnabled() {
   return Sensor.HT_measurementEnabled;
 }
 
+bool IsAHT20SensorPresent() {
+  return SensorProbe.AHT20_Present;
+}
+
 bool IsBMP280SensorPresent() {
   return SensorProbe.BMP280_Present;
+}
+
+bool IsENS160SensorPresent() {
+  return SensorProbe.ENS160_Present;
 }
 
 bool IsSGPPresent() {
@@ -84,11 +98,15 @@ void SetHTSensorStatus(bool setting) {
 }
 
 void SetAHT20SensorStatus(bool setting) {
-  Sensor.HT_measurementEnabled =  setting;
+  Sensor.AHT_measurementEnabled =  setting;
 }
 
 void SetBMP280SensorStatus(bool setting) {
-  Sensor.HT_measurementEnabled =  setting;
+  Sensor.BMP_measurementEnabled =  setting;
+}
+
+void SetENS160SensorStatus(bool setting) {
+  Sensor.ENS_measurementEnabled =  setting;
 }
 
 void SetVOCSensorStatus(bool setting) {
@@ -126,7 +144,7 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
   if(!BMP280_DeviceConnected()) {
      Error("Air pressure / Temperature sensor NOT connected!");
      SensorProbe.BMP280_Present = false;
-     Sensor.BMP280_measurementEnabled = false;
+     Sensor.BMP_measurementEnabled = false;
   }else {
     SensorProbe.BMP280_Present = true;
     Debug("Air pressure / Temperature sensor initialised.");
@@ -141,10 +159,19 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     SensorProbe.VOC_Present = true;
     Debug("SGP sensor initialised.");
   }
+  if(!ENS_DeviceConnected()) {
+    SensorProbe.ENS160_Present = false;
+     Error("ENS device not connected!");
+     Sensor.ENS_measurementEnabled = false;
+  }
+  else{
+    SensorProbe.ENS160_Present = true;
+    Debug("ENS sensor initialised.");
+  }
   if(!AHT20_DeviceConnected()) {
      Error("AHT20 Humidity / Temperature sensor NOT connected!");
      SensorProbe.AHT20_Present = false;
-     Sensor.AHT20_measurementEnabled = false;
+     Sensor.AHT_measurementEnabled = false;
   }else {
     SensorProbe.AHT20_Present = true;
     Debug("AHT20 Humidity / Temperature sensor initialised.");
@@ -192,6 +219,7 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
   Info("SensorProbe.VOC_Present: %s", SensorProbe.VOC_Present?"yes":"no");
   Info("SensorProbe.AHT20_Present: %s", SensorProbe.AHT20_Present?"yes":"no");
   Info("SensorProbe.BMP280_Present: %s", SensorProbe.BMP280_Present?"yes":"no");
+  Info("SensorProbe.ENS160_Present: %s", SensorProbe.ENS160_Present?"yes":"no");
   Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
   Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
   ESP_Init(espUart);
@@ -236,10 +264,13 @@ bool AllDevicesReady() {
       Sensor.HT_measurementEnabled = false;
     }
     if (AHTstate == AHT_STATE_WAIT) {
-      Sensor.AHT20_measurementEnabled = false;
+      Sensor.AHT_measurementEnabled = false;
     }
     if (BMPstate == BMP_STATE_WAIT) {
-      Sensor.BMP280_measurementEnabled = false;
+      Sensor.BMP_measurementEnabled = false;
+    }
+    if (ENSstate == ENS_STATE_WAIT) {
+      Sensor.ENS_measurementEnabled = false;
     }
     if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {
       Sensor.VOC_measurementEnabled = false;
@@ -263,10 +294,13 @@ void EnabledConnectedDevices() {
     Sensor.HT_measurementEnabled = true;
   }
   if (SensorProbe.AHT20_Present) {
-    Sensor.AHT20_measurementEnabled = true;
+    Sensor.AHT_measurementEnabled = true;
   }
   if (SensorProbe.BMP280_Present) {
-    Sensor.BMP280_measurementEnabled = true;
+    Sensor.BMP_measurementEnabled = true;
+  }
+  if (SensorProbe.ENS160_Present) {
+    Sensor.ENS_measurementEnabled = true;
   }
   if ((SensorProbe.VOC_Present) && (SensorProbe.SGP_Enabled)) {
     Sensor.VOC_measurementEnabled = true;
@@ -283,8 +317,9 @@ void DisableConnectedDevices() {
   Debug("Devices disabled");
   Sensor.HT_measurementEnabled = false;
   Sensor.VOC_measurementEnabled = false;
-  Sensor.AHT20_measurementEnabled = false;
-  Sensor.BMP280_measurementEnabled = false;
+  Sensor.AHT_measurementEnabled = false;
+  Sensor.BMP_measurementEnabled = false;
+  Sensor.ENS_measurementEnabled = false;
   Sensor.PM_measurementEnabled = false;
   Sensor.MIC_measurementEnabled = false;
 }
@@ -304,10 +339,13 @@ void UpkeepI2Csensors() {
   if (Sensor.VOC_measurementEnabled) {
     SGPstate = SGP_Upkeep();
   }
-  if (Sensor.AHT20_measurementEnabled) {
+  if (Sensor.AHT_measurementEnabled) {
     AHTstate = AHT_Upkeep();
   }
-  if (Sensor.BMP280_measurementEnabled) {
+  if (Sensor.BMP_measurementEnabled) {
     BMPstate = BMP_Upkeep();
+  }
+  if (Sensor.ENS_measurementEnabled) {
+    BMPstate = ENS_Upkeep();
   }
 }

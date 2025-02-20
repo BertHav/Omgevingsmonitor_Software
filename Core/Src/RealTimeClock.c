@@ -49,14 +49,14 @@ void showTime() {
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
 }
 
-/*
-void setBootTime(void) {
+
+uint32_t calculateNextNTPTime(void) {
   RTC_TimeTypeDef currentTime;
   RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
-  posixBootTime = makeTime(&currentDate, &currentTime);
+  return makeTime(&currentDate, &currentTime);
 }
-*/
+
 
 void UpdateSystemUptime() {
   RTC_TimeTypeDef currentTime;

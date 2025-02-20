@@ -14,7 +14,6 @@
 #include "utils.h"
 #include "i2c.h"
 #include "RealTimeClock.h"
-#include "statusCheck.h"
 #include "ESP.h"
 #include "measurement.h"
 #include "ssd1306_128x64_i2c.h"

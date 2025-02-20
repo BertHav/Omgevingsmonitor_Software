@@ -44,6 +44,7 @@ void RTC_SetTime(RTC_TimeTypeDef* sTime);
 void RTC_SetDate(RTC_DateTypeDef* sDate);
 //void RTC_GetTime(uint8_t *weekday, uint8_t *day, uint8_t *month, uint8_t *year, uint8_t *hours, uint8_t *minutes, uint8_t *seconds);
 void RTC_GetTime(RTC_TimeTypeDef* gTime, RTC_DateTypeDef* gDate);
+uint32_t calculateNextNTPTime(void);
 uint8_t RTC_GetWeekday(void);
 // Functie om een alarm in te stellen
 void RTC_SetAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds);

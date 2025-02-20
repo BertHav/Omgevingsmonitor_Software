@@ -1417,8 +1417,9 @@ ESP_States ESP_Upkeep(void) {
         }
         else if (Mode == AT_MODE_GETTIME) {
             setTime = false;
-            ESPNTPTimeStamp = HAL_GetTick()+ESP_UNTIL_NEXT_NTP;
-            Info("Time synchronized by NTP, next NTP should be called at tick: %lu", ESPNTPTimeStamp);
+            ESPNTPTimeStamp = calculateNextNTPTime();
+            ESPNTPTimeStamp += ESP_UNTIL_NEXT_NTP;
+            Info("Time synchronized by NTP, next NTP should be called in %lu seconds", ESP_UNTIL_NEXT_NTP);
             ESPTimeStamp = savedESPTimeStamp;
             clearDMABuffer();
             stop = HAL_GetTick();
@@ -1475,7 +1476,7 @@ ESP_States ESP_Upkeep(void) {
           EspState = ESP_STATE_INIT;
         }
       }
-      else if (TimestampIsReached(ESPNTPTimeStamp)) {
+      else if (calculateNextNTPTime() > ESPNTPTimeStamp) {
         if(Mode == AT_MODE_SEND ) {
            Mode = AT_MODE_GETTIME;
            EspState = ESP_STATE_INIT;

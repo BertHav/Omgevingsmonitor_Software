@@ -21,7 +21,8 @@ typedef enum {
     HIDS,
     SGP40,
     AHT20,
-    BMP280
+    BMP280,
+    ENS160
 } i2cLock;
 
 typedef struct {
@@ -29,14 +30,16 @@ typedef struct {
     bool VOC_measurementEnabled;
     bool PM_measurementEnabled;
     bool MIC_measurementEnabled;
-    bool AHT20_measurementEnabled;
-    bool BMP280_measurementEnabled;
+    bool AHT_measurementEnabled;
+    bool BMP_measurementEnabled;
+    bool ENS_measurementEnabled;
 } EnabledMeasurements;
 
 typedef struct {
   bool HT_Present;
   bool VOC_Present;
   bool AHT20_Present;
+  bool ENS160_Present;
   bool BMP280_Present;
   bool PM_Present;
   bool MIC_Present;
@@ -60,7 +63,9 @@ bool AllDevicesReady();
 void Device_Test();
 void SetESPMeasurementDone();
 bool IsSGPPresent();
+bool IsAHT20SensorPresent();
 bool IsBMP280SensorPresent();
+bool IsENS160SensorPresent();
 void SetVOCSensorDIS_ENA(bool setting);
 bool IsPMSensorEnabled();
 bool IsMICSensorEnabled();

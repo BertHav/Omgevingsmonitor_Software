@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.54](#version454)\
 [version 4.53](#version453)\
 [version 4.52](#version452)\
 [version 4.51](#version451)\
@@ -99,6 +100,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.54 <a name="version454"></a>
+ENS160 sensor added. Basic frame work is included. The usefulness of this sensor can be disputed as long as it is in the housing. Converting the values ​​of the GPR registers to the respective gases is of little use without a good reference environment.
 
 ## version 4.53 <a name="version453"></a>
 aht20.% renamed to aht2x.%. Version should support AHT20 and AHT21.

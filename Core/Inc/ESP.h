@@ -37,7 +37,7 @@
 #define ESP_UNTIL_NEXT_SEND 240000  // about every 5 minutes
 #define ESP_UNTIL_NEXT_RETRANSMIT_SEND 50000  //when failed try it next minute
 #define ESP_NTP_INIT_DELAY 0;  // getting time is part of the ESP startup procedure, executed direct after ESP init
-#define ESP_UNTIL_NEXT_NTP 75398223  //about every 24 hours
+#define ESP_UNTIL_NEXT_NTP 75398  //about every 24 hours
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""
 #define ESP_SEND_HUMID "\"humid\""
