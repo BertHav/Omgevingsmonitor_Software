@@ -419,7 +419,7 @@ ENS160State ENS_Upkeep(void) {
       uint8_t locktype = getSensorLock();
       Debug("Lock is not from ENS160, but from %s",
           locktype==FREE?"FREE":locktype==HIDS?"HIDS":locktype==SGP40?"SGP40":locktype==AHT20?"AHT20":locktype==ENS160?"ENS160":"unknown");
-      ENS160TimeStamp = HAL_GetTick() + 97;
+      ENS160TimeStamp = HAL_GetTick() + 333;
       break;
     }
     setSensorLock(ENS160);
