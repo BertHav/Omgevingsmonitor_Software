@@ -16,7 +16,9 @@
   *
   ******************************************************************************
   */
+
 //#define USBLOGGING enabled
+
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/

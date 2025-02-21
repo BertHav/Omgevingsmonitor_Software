@@ -19,8 +19,8 @@
 #include "ssd1306_128x64_i2c.h"
 
 #define LONGMESSAGES true  // show long messages f.i. the datagram on debug UART
-#define LONGDATAGRAM  // use opensensemap
-//#define OPENSENSEMAP
+#define LONGDATAGRAM  // use beurs or opensensemap, if not defined use nodeRed
+//#define OPENSENSEMAP // use optimum diagram for opensensemap
 
 #define ESP_MAX_UART_RETRIES 2
 #define ESP_MAX_BUFFER_SIZE 256
