@@ -36,6 +36,10 @@ static bool ReadMemRegister(uint16_t MemAddress, uint16_t MemSize, uint8_t* buff
   return false;
 }
 
+void setENS160TimeStamp(uint32_t ticks) {
+  ENS160TimeStamp = HAL_GetTick() + ticks;
+}
+
 void ENS160_set_addr(uint8_t slaveaddr) {
   hwsw._slaveaddr = slaveaddr; //ENS160_I2CADDR_1;
 }
@@ -163,7 +167,7 @@ bool ENS160_initCustomMode(uint16_t stepNum) {
 	  hwsw._stepCount = stepNum;
 		
 		result = setMode(ENS160_OPMODE_IDLE);
-		result &= clearCommand();
+		result &= ENS160_clearCommand();
 
 		result &= WriteMemRegister(ENS160_REG_COMMAND, 1, &data, 1);
 	} else {
@@ -177,18 +181,25 @@ bool ENS160_initCustomMode(uint16_t stepNum) {
 // Init I2C communication, resets ENS160 and checks its PART_ID. Returns false on I2C problems or wrong PART_ID.
 bool ENS_DeviceConnected() {
 //  HAL_Delay(ENS160_BOOTING);                   // Wait to boot after reset
-  hwsw._slaveaddr = ENS160_I2CADDR_1;
   bool _available = true;            // ENS160 available
-  _available &= ENS160_reset();
-  _available &= ENS160_checkPartID();
+  hwsw._slaveaddr = ENS160_I2CADDR_0;
+  for (uint8_t tl= 0; tl < 2; tl++) {
+    _available &= ENS160_reset();
+    _available &= ENS160_checkPartID();
+    if (!_available) {
+      Info("ENS160 trying alternate address");
+      hwsw._slaveaddr = ENS160_I2CADDR_1;
+      _available = true;            // next try, ENS160 available?
+    }
+  }
 
   if (_available) {
     _available &= ENS160_setMode(ENS160_OPMODE_IDLE);
     _available &= ENS160_clearCommand();
     _available &= ENS160_getFirmware();
-  }
-  if (debugENS160) {
-    Debug("ENS160 in idle mode");
+    if (debugENS160) {
+      Debug("ENS160 in idle mode");
+    }
   }
   return _available;
 }
@@ -451,10 +462,7 @@ ENS160State ENS_Upkeep(void) {
     break;
 
   case ENS_STATE_WAIT:
-    ENSState = ENS_STATUS_CHECK;
-    if (usbPluggedIn || userToggle) {
       if (getSensorLock() != FREE) {
-        ENSState = ENS_STATE_WAIT;
         break;
       }
       setSensorLock(ENS160);
@@ -465,7 +473,7 @@ ENS160State ENS_Upkeep(void) {
         Debug("ENS160 switched to standard operating mode %s", result?"done.":"failed.");
         setSensorLock(FREE);
       }
-    }
+      ENSState = ENS_STATUS_CHECK;
     break;
 
 

@@ -263,13 +263,13 @@ bool AllDevicesReady() {
     if (HIDSstate == HIDS_STATE_WAIT) {
       Sensor.HT_measurementEnabled = false;
     }
-    if (AHTstate == AHT_STATE_WAIT) {
+    if ((AHTstate == AHT_STATE_WAIT) || !SensorProbe.AHT20_Present) {
       Sensor.AHT_measurementEnabled = false;
     }
-    if (BMPstate == BMP_STATE_WAIT) {
+    if ((BMPstate == BMP_STATE_WAIT) || !SensorProbe.BMP280_Present) {
       Sensor.BMP_measurementEnabled = false;
     }
-    if (ENSstate == ENS_STATE_WAIT) {
+    if ((ENSstate == ENS_STATE_WAIT) || !SensorProbe.ENS160_Present) {
       Sensor.ENS_measurementEnabled = false;
     }
     if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {
@@ -282,8 +282,8 @@ bool AllDevicesReady() {
       Sensor.MIC_measurementEnabled = false;
     }
     if (ESPstate == ESP_STATE_RESET) {
-      return !(Sensor.HT_measurementEnabled || Sensor.VOC_measurementEnabled ||
-          Sensor.PM_measurementEnabled || Sensor.MIC_measurementEnabled);
+      return !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
+          Sensor.ENS_measurementEnabled | Sensor.PM_measurementEnabled | Sensor.MIC_measurementEnabled);
     }
   }
   return false;
@@ -346,6 +346,6 @@ void UpkeepI2Csensors() {
     BMPstate = BMP_Upkeep();
   }
   if (Sensor.ENS_measurementEnabled) {
-    BMPstate = ENS_Upkeep();
+    ENSstate = ENS_Upkeep();
   }
 }

@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.55](#version455)\
 [version 4.54](#version454)\
 [version 4.53](#version453)\
 [version 4.52](#version452)\
@@ -101,8 +102,11 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.55 <a name="version455"></a>
+Some bugfixes, auto detect alternate address ENS160.
+
 ## version 4.54 <a name="version454"></a>
-ENS160 sensor added. Basic frame work is included. The usefulness of this sensor can be disputed as long as it is in the housing. Converting the values ​​of the GPR registers to the respective gases is of little use without a good reference environment.
+ENS160 sensor added. Basic frame work is included. The usefulness of this sensor can be disputed as long as it is in the housing. Converting the values ​​of the GPR registers to the respective gases is of little use without a good reference environment. The values ​​of the AHT21 on the same PCB are used for the temperature compensation of the ENS160.
 
 ## version 4.53 <a name="version453"></a>
 aht20.% renamed to aht2x.%. Version should support AHT20 and AHT21.

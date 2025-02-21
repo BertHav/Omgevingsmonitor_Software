@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "i2c.h"
 #include "display.h"
-
+#include "ENS160.h"
 
 typedef struct {
   uint16_t Day;
@@ -308,6 +308,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   setHIDSTimeStamp(0);
   setAHT20TimeStamp(60);
   setBMP280TimeStamp(90);
+  setENS160TimeStamp(90);
   setMICTimeStamp(0);
   ESPTransmitDone = false;
   deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;

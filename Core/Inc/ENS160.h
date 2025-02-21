@@ -173,11 +173,7 @@ bool ENS_DeviceConnected(void);
 ENS160State ENS_Upkeep(void);
 void ENS160_set_debug(bool debug);
 bool ENS160_set_envdata(float t, float h);
-
-bool reset(); 		                               		// Sends a reset to the ENS160. Returns false on I2C problems.
-bool checkPartID();							// Reads the part ID and confirms valid sensor
-bool clearCommand();							// Initialize idle mode and confirms
-bool getFirmware();							// Read firmware revisions
+void setENS160TimeStamp(uint32_t ticks);
 	
 		//Isotherm, HP0 252°C / HP1 350°C / HP2 250°C / HP3 324°C / measure every 1008ms
 //uint8_t _seq_steps[1][8] = {

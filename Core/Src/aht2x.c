@@ -175,7 +175,7 @@ bool AHT20_GetMeasurementValues() {
     HAL_Delay(10);
   }
   HAL_Delay(10);
-  for (uint8_t g = 0; g < 8; g++){
+  for (uint8_t g = 0; g < 7; g++){
     airtemphumraw[g] = 0;
   }
   bool response = ReadDirRegister(AHT20_ADDRESS, airtemphumraw, 7);

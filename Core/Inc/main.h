@@ -103,7 +103,7 @@ extern uint8_t ESPstate;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "4.54 BH"
+#define SRC_VERSION "4.55 BH"
 #define CURRENT_WEEK "2025w8-5"  // -x is daynumber of week i.e. monday = 1
 #define PUBLIC
 
