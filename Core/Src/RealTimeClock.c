@@ -300,15 +300,17 @@ void Enter_Stop_Mode(uint16_t sleepTime)
     }
   }
   showTime();
+  EnabledConnectedDevices();
   ResetDBACalculator();  // reset the DBA average calculation
   ResetSGP40samplecounter();
+  ResetENS160samplecounter();
   setsen5xSamplecounter(0);
   setESPTimeStamp(ESP_DELAY_TIME_AFTER_STM_WAKEUP);
   setSGP40TimeStamp(30);
-  setHIDSTimeStamp(0);
+  setHIDSTimeStamp(90);
   setAHT20TimeStamp(60);
   setBMP280TimeStamp(90);
-  setENS160TimeStamp(90);
+  setENS160TimeStamp(0);
   setMICTimeStamp(0);
   ESPTransmitDone = false;
   deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;

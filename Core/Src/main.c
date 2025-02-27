@@ -270,19 +270,19 @@ int main(void)
     }
     configCheck();
 #ifndef STLINK_V3PWR
-    //==== disable for power measurements in test condition
-        stlinkpwr = false;
-        if(charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
-          FlashLEDs();
-          Sensor.PM_measurementEnabled = false;
-        }
-        if(charge == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
-          batteryEmpty = true;
-          Enter_Standby_Mode(); // we are going in deep sleep, nearly off and no wakeup from RTC
-        }
-        else{
-          batteryEmpty = false;
-        }
+//==== disable for power measurements in test condition
+    stlinkpwr = false;
+    if (charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
+      FlashLEDs();
+      Sensor.PM_measurementEnabled = false;
+    }
+    if (charge == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
+       batteryEmpty = true;
+       Enter_Standby_Mode(); // we are going in deep sleep, nearly off and no wakeup from RTC
+    }
+    else{
+      batteryEmpty = false;
+    }
     //====
 #endif
     if (testDone && !ESP_Programming && !batteryEmpty) {
@@ -292,6 +292,10 @@ int main(void)
         }
         if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
           SetVOCSensorDIS_ENA(false);
+        }
+        if (!usbPluggedIn) {
+          Debug("Device time out set in main due to powerstatus shift");
+          deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
         }
         priorUSBpluggedIn = usbPluggedIn;
       }

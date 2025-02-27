@@ -13,7 +13,7 @@
 
 bool debugENS160 = false;
 uint32_t ENS160TimeStamp;
-
+static uint8_t enscnt = 0;
 static I2CReadMEM ReadMemFunction = NULL;
 static I2CWriteMEM WriteMemFunction = NULL;
 
@@ -36,6 +36,9 @@ static bool ReadMemRegister(uint16_t MemAddress, uint16_t MemSize, uint8_t* buff
   return false;
 }
 
+void ResetENS160samplecounter() {
+  enscnt = 0;
+}
 void setENS160TimeStamp(uint32_t ticks) {
   ENS160TimeStamp = HAL_GetTick() + ticks;
 }
@@ -397,17 +400,19 @@ ENS160State ENS_Upkeep(void) {
     if ((status & 0x0C) != 0) {
       switch (status >> 2) {
       case 1:
-        Debug("Warm-Up phase");
+        Debug("ENS160 Warm-Up phase");
         break;
       case 2:
-        Debug("Initial Start-UP phase");
+        Debug("ENS160 Initial Start-UP phase");
         break;
       case 3:
-        Debug("Invalid output");
+        Debug("ENS160 Invalid output");
         break;
       }
       if ((status & 0x03) == 0) {
-        ENS160TimeStamp = HAL_GetTick() + 5000;
+        ENS160TimeStamp = HAL_GetTick() + 1000;
+//        ENSState = ENS_LOW_POWER;
+//        ENSState = ENS_STATE_WAIT;
         break;
       }
     }
@@ -426,6 +431,7 @@ ENS160State ENS_Upkeep(void) {
     status = ENS160_readStatus();
     if ((status & 0x02) == 0) {
       ENS160TimeStamp = HAL_GetTick() + 500;
+//      Debug("ENS160 status register is: %d", status);
       setSensorLock(FREE);
       break;
     }
@@ -438,23 +444,27 @@ ENS160State ENS_Upkeep(void) {
     break;
 
   case ENS_STATE_PROCESS_RESULTS:
+    if (enscnt == 1){
     Info("ENS160 AQI: %d, TVOC: %dppb, eCO2: %dppm", pred._data_aqi, pred._data_tvoc, pred._data_eco2);
     Info("R HP0: %d Ohm, Baseline: %d", raw._hp0_rs, raw._hp0_bl);
     Info("R HP1: %d Ohm, Baseline: %d", raw._hp1_rs, raw._hp1_bl);
     Info("R HP2: %d Ohm, Baseline: %d", raw._hp2_rs, raw._hp2_bl);
     Info("R HP3: %d Ohm, Baseline: %d", raw._hp3_rs, raw._hp3_bl);
+    }
+    (enscnt == 5)?enscnt=0:enscnt++;
+    setENS160(pred._data_aqi, pred._data_tvoc, pred._data_eco2);
     ENSState = ENS_LOW_POWER;
     break;
 
   case ENS_LOW_POWER:
-    ENS160TimeStamp = HAL_GetTick() + 5000;
-    if (!usbPluggedIn && !userToggle) {
+    ENS160TimeStamp = HAL_GetTick() + 1000;
+    if (!usbPluggedIn && !userToggle && (enscnt >= 2)) {
       if (getSensorLock() != FREE) {
         break;
       }
       setSensorLock(ENS160);
       bool result = ENS160_setMode(ENS160_OPMODE_DEP_SLEEP);
-      Debug("ENS160 switched to deep sleep %s", result?"done.":"failed.");
+      Debug("ENS160 switched to deep sleep %s, sample counter is: %d", result?"done.":"failed.", enscnt);
       setSensorLock(FREE);
       ENS160TimeStamp = HAL_GetTick() + 45000;
     }
@@ -471,8 +481,8 @@ ENS160State ENS_Upkeep(void) {
       if (data == 0) {
         bool result = ENS160_setMode(ENS160_OPMODE_STD);
         Debug("ENS160 switched to standard operating mode %s", result?"done.":"failed.");
-        setSensorLock(FREE);
       }
+      setSensorLock(FREE);
       ENSState = ENS_STATUS_CHECK;
     break;
 

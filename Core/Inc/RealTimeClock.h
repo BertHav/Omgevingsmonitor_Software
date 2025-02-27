@@ -48,6 +48,7 @@ uint32_t calculateNextNTPTime(void);
 uint8_t RTC_GetWeekday(void);
 // Functie om een alarm in te stellen
 void RTC_SetAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds);
+uint32_t getPosixTime(void);
 
 // Functie om een wakeup timer in te stellen
 void RTC_SetWakeUpTimer(uint32_t secondsOfSleep);

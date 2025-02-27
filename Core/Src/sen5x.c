@@ -305,8 +305,14 @@ void sen5x_printvalues(void) {
 }
 
 void sen5xStore() {
+  if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
+    setPM1p0(sen5x_data.mass_concentration_pm1p0);
+  }
   if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
     setPM2p5(sen5x_data.mass_concentration_pm2p5);
+  }
+  if (sen5x_data.mass_concentration_pm4p0 != 0xFFFF) {
+    setPM4p0(sen5x_data.mass_concentration_pm4p0);
   }
   if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
     setPM10(sen5x_data.mass_concentration_pm10p0);
@@ -410,7 +416,7 @@ bool sen5x_check_for_errors(void){
 void set_light_on_state(void) {
   if (!sen5x_On) {
     sen5x_Power_On();
-    Debug("sen5x powered on, warming up for 30 sec.");
+    Debug("sen5x powered on, warming up.");
   }
   else {
     sen5xReadTimer = HAL_GetTick();

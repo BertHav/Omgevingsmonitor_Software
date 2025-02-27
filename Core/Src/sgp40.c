@@ -83,7 +83,9 @@ void SetSGP40_GasIndexAlgorithm_Sampling_Interval() {
   else {
     params.mSamplingInterval = 900.0f;
   }
-//  Debug("SGP40 GasIndexAlgorithm_Sampling_Interval is: %f", params.mSamplingInterval);
+//  float sampling_interval;
+//  GasIndexAlgorithm_get_sampling_interval(&params, &sampling_interval);
+//  Debug("SGP40 GasIndexAlgorithm_Sampling_Interval is: %f", sampling_interval);
 }
 
 void SGP_StartMeasurement(void) {
@@ -318,14 +320,19 @@ SGP40State SGP_Upkeep(void) {
     setSensorLock(SGP40);
     SetMeasurementIndicator();
     SGP_StartMeasurement();
+    setSensorLock(FREE);
     SGPState = SGP_STATE_WAIT_FOR_COMPLETION;
     break;
 
   case SGP_STATE_WAIT_FOR_COMPLETION:
+    if (getSensorLock() != FREE) {
+      break;
+    }
+    setSensorLock(SGP40);
     if(SGP_GetMeasurementValues(&vocIndex)) {
       SGPState = SGP_STATE_PROCESS_RESULTS;
-      setSensorLock(FREE);
     }
+    setSensorLock(FREE);
     break;
 
   case SGP_STATE_PROCESS_RESULTS:
@@ -334,7 +341,7 @@ SGP40State SGP_Upkeep(void) {
     break;
   case SGP_WAIT_STATE_MODE:
     SGPState = SGP_STATE_WAIT;
-    if ((sgp40samplecounter == 1) && (!usbPluggedIn)) {
+    if ((sgp40samplecounter >= 4) && (!usbPluggedIn)) {
       // During startup take 12 samples
       if (sgpinitdone) {
         SGP_SoftReset();

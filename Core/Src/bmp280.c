@@ -9,6 +9,8 @@
 #include "utils.h"
 #include "measurement.h"
 #include "ESP.h"
+#include "statusCheck.h"
+
 
 static I2CWriteMEM WriteMemFunction = NULL;
 static I2CReadMEM ReadMemFunction = NULL;
@@ -171,6 +173,7 @@ static bool BMP280_get_measurement_values() {
   else {
     Error("BMP280 Invalid read of barometric pressure, using previous value.");
     Debug("bmpData[0] 0x%02X, bmpData[1] 0x%02X, bmpData[3] 0x%02X, VALUE=0x%06X", bmpData[0], bmpData[1], bmpData[2], raw_mpa);
+    SetAllBlueLED();
   }
   if (bmpData[3] != 0x80) {
     raw_temp = (int32_t)((((uint32_t)bmpData[3]) << 12) + (((uint32_t)bmpData[4]) << 4) + (((uint32_t)bmpData[5]) >> 4));
@@ -178,6 +181,7 @@ static bool BMP280_get_measurement_values() {
   else {
     Error("BMP280 Invalid read of temperature, using previous value.");
     Debug("bmpData[3] 0x%02X, bmpData[4] 0x%02X, bmpData[5] 0x%02X, VALUE=0x%06X", bmpData[3], bmpData[4], bmpData[5], raw_temp);
+    SetAllBlueLED();
   }
 //  Debug("raw_mpa: %ld, raw_temp: %ld ", raw_mpa, raw_temp);
   return rslt;
@@ -314,11 +318,12 @@ BMP280State BMP_Upkeep(void) {
     if ((airhpa > 850.0) && (airhpa < 1100)) {
       sethPa(airhpa);
       Info("BMP280 airtemperature: %2.2fC barometric value: %.2fhPa", airtemp, airhpa);
+      setBMP280(airtemp, airhpa);
       BMP280TimeStamp = HAL_GetTick() + 60000;
     }
     else {
       Error("BMP280 value out of valid range, not stored/used");
-      BMP280TimeStamp = HAL_GetTick() + 2000;
+      BMP280TimeStamp = HAL_GetTick() + 10000;
     }
     BMPState = BMP_STATE_WAIT;
     break;

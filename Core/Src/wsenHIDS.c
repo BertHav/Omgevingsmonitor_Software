@@ -9,13 +9,14 @@
 #include "sgp40.h"
 #include "ESP.h"
 #include "measurement.h"
-
+#include "math.h"
+#include "RealTimeClock.h"
 
 static float humid = 0.0;
 static float temp = 0.0;
 
 
-static HIDSHeaterModes HeaterMode = HHM_HIGH_PRECISION_1S_200MW;
+static HIDSHeaterModes HeaterMode = HHM_HIGH_PRECISION_1S_110MW;
 static HIDSMeasureModes MeasureMode = HMM_HIGH_PRECISION;
 static I2CReadCb ReadFunction = NULL;
 static I2CWriteCB WriteFunction = NULL;
@@ -26,6 +27,7 @@ static uint8_t MeasureBuffer[HIDS_MEASURE_BUFFER_LENGTH] = {0};
 static uint32_t HIDS_NextRunTime = HIDS_SENSOR_INITIAL_INTERVAL;
 static uint32_t HIDS_Interval_ms = HIDS_SENSOR_INITIAL_INTERVAL;
 static uint32_t HIDS_MeasurementDuration = HIDS_SENSOR_INITIAL_INTERVAL;
+static uint32_t HIDS_LastHeaterInRTC = 0;
 static bool MeasurementDone = false;
 
 static uint32_t HIDSTimeStamp;
@@ -67,11 +69,17 @@ uint8_t CalculateCRC(uint8_t* data, uint8_t length) {
   return crc;
 }
 
+float HIDS_DewPointCalculation(float* humidity, float* temperature) {
+  float lambda = (((17.27 * *temperature) / (237.7 + *temperature)) + log(*humidity/100.0));
+  return ((237.7 * lambda) / (17.27 - lambda));
+}
+
 void HIDS_EnableHeater(void) {
   // During heater operation, the sensor’s specifications are not valid.
   uint8_t heaterReg = HeaterMode;
   WriteRegister(HIDS_I2C_ADDRESS, &heaterReg, 1);
   Info("Started the heater in mode: %d", heaterReg);
+  HIDS_LastHeaterInRTC = getPosixTime();
 }
 
 void HIDS_Init(I2CReadCb readFunction, I2CWriteCB writeFunction) {
@@ -264,24 +272,43 @@ wsenHIDSState HIDS_Upkeep(void) {
       break;
 
     case HIDS_STATE_START_MEASUREMENTS:
-      SetMeasurementIndicator();
+      if (getSensorLock() != FREE) {
+        break;
+      }
       setSensorLock(HIDS);
+      SetMeasurementIndicator();
       HIDS_StartMeasurement();
+      setSensorLock(FREE);
       HIDSState = HIDS_STATE_WAIT_FOR_COMPLETION;
       break;
 
     case HIDS_STATE_WAIT_FOR_COMPLETION:
+      if (getSensorLock() != FREE) {
+        break;
+      }
+      setSensorLock(HIDS);
       if(HIDS_GetMeasurementValues(&humid, &temp)) {
         HIDSState = HIDS_STATE_PROCESS_RESULTS;
-        setSensorLock(FREE);
       }
+      setSensorLock(FREE);
       break;
 
     case HIDS_STATE_PROCESS_RESULTS:
       Debug("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
       setHIDS(temp, humid);
       ResetMeasurementIndicator();
-      HIDSTimeStamp = HAL_GetTick() + ((Check_USB_PowerOn() || userToggle)?10000:1000);  // about every ten seconds when power is plugged
+      if (((temp - HIDS_DewPointCalculation(&humid, &temp)) < 1.0) && ((getPosixTime() - HIDS_LastHeaterInRTC) > 900)) {
+        Info("wsenHIDS The dew point is approaching, heater is started");
+        if (getSensorLock() != FREE) {
+          break;
+        }
+        HIDS_EnableHeater();
+        setSensorLock(FREE);
+        HIDSTimeStamp = HAL_GetTick() + 12000;
+      }
+      else {
+        HIDSTimeStamp = HAL_GetTick() + ((Check_USB_PowerOn() || userToggle)?10000:1000);  // about every ten seconds when power is plugged
+      }
       HIDSState = HIDS_STATE_WAIT;
       break;
 

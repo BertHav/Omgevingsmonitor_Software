@@ -169,6 +169,7 @@ typedef struct {
 //uint32_t getHP3BL();		// Get baseline resistance of HP3 of last measurement
 //uint8_t getMISR();			// Return status code of sensor
 
+void ResetENS160samplecounter();
 bool ENS_DeviceConnected(void);
 ENS160State ENS_Upkeep(void);
 void ENS160_set_debug(bool debug);

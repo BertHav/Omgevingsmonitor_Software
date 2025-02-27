@@ -26,14 +26,25 @@
 #define HumidConfigCmd 2
 #define NOxIndexConfigCmd 3
 #define VocIndexConfigCmd 4
-#define dBaConfigCmd 5
-#define dBcConfigCmd 6
+#define hPaConfigCmd 5
+#define dBAConfigCmd 6
 #define PM2ConfigCmd 7
 #define PM10ConfigCmd 8
 #define BatVoltConfigCmd 9
 #define SolVoltConfigCmd 10
-#define ChargerStatConfigCmd 11
+#define ChargerStatConfigCmd 11 // not used
 #define CustomNameConfigCmd 12
+#define PM1ConfigCmd 13
+#define PM4ConfigCmd 14
+#define AHTTempConfigCmd 15
+#define AHTHumidConfigCmd 16
+#define BMPTempConfigCmd 17
+#define ENSAQIConfigCmd 18
+#define ENSTVOCConfigCmd 19
+#define ENSeCO2ConfigCmd 20
+#define SSIDConfigCmd 21
+#define pwdConfigCmd 22
+
 #define ClearConfigCmd 253
 #define ClearEepromCmd 254
 #define ErrorCmd 255

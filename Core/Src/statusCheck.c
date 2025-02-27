@@ -196,6 +196,24 @@ void SetAllREDLED() {
   HAL_Delay(1000);
 }
 
+void SetAllBlueLED() {
+// Fire all LEDs to blue indicating barometric sensor in error independent of usertoggle or power status and reboot
+  for (uint8_t bl = 0; bl < 3; bl++) {
+    TIM2 -> CCR1 = LED_OFF;
+    TIM2 -> CCR3 = LED_OFF;
+    TIM2 -> CCR4 = LED_ON;
+    TIM3 -> CCR1 = LED_OFF;
+    TIM3 -> CCR2 = LED_OFF;
+    TIM3 -> CCR3 = LED_ON;
+    HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, true);   //red off
+    HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
+    HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, false);  // blue on
+    HAL_Delay(1000);
+    SetLEDsOff();
+    HAL_Delay(500);
+  }
+}
+
 void SetVOCindicator(uint16_t VOCi) {
 //  *vocIndex = VOCi;
 //  if(*vocIndex > 0 && *vocIndex <= 100){
@@ -269,6 +287,9 @@ void configCheck(){
     userToggle = !userToggle;
     if (userToggle) {
       EnabledConnectedDevices();
+    }
+    else {
+      deviceTimeOut = HAL_GetTick();
     }
     Debug("userToggle flipped to %sabled", userToggle?"en": "dis");
     userbuttonHeld = true;

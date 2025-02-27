@@ -257,7 +257,7 @@ AHT20State AHT_Upkeep(void) {
       AHTState = AHT20_ERROR;
       return AHTState;
     }
-//    setHIDS(airtemp, airhum);
+    setAHT2x(airtemp, airhum); //store to transmit
     ENS160_set_envdata(airtemp, airhum); // use the actual values to the gas sensor
     AHTState = AHT_STATE_WAIT;
     AHT20TimeStamp = HAL_GetTick() + 60000;  // about every 1 minute

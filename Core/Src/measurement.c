@@ -25,6 +25,7 @@ static uint8_t HIDSstate;
 static uint8_t AHTstate;
 static uint8_t BMPstate;
 static uint8_t ENSstate;
+static bool sensorsdisablereq = false;
 
 void testInit(){
   SensorProbe.HT_Present = false;
@@ -260,6 +261,10 @@ void Device_Test(){
 
 bool AllDevicesReady() {
   if (TimestampIsReached(deviceTimeOut)) {
+    if (!sensorsdisablereq) {
+      Debug("Requesting all device ready");
+      sensorsdisablereq = true;
+    }
     if (HIDSstate == HIDS_STATE_WAIT) {
       Sensor.HT_measurementEnabled = false;
     }
@@ -275,15 +280,25 @@ bool AllDevicesReady() {
     if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {
       Sensor.VOC_measurementEnabled = false;
     }
-    if (PMsamplesState == LIGHT_OUT) {
+    if ((PMsamplesState == LIGHT_OUT) || (PMsamplesState == CHECK_SEN5X)) {
       Sensor.PM_measurementEnabled = false;
     }
     if (MICstate == MIC_STATE_WAIT){
       Sensor.MIC_measurementEnabled = false;
     }
-    if (ESPstate == ESP_STATE_RESET) {
-      return !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
+    if ((ESPstate == ESP_STATE_RESET) || (ESPstate == ESP_STATE_INIT)) {
+      bool status = !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
           Sensor.ENS_measurementEnabled | Sensor.PM_measurementEnabled | Sensor.MIC_measurementEnabled);
+
+      if (!status) {
+//        Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
+//          Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled);
+      }
+      else {
+        Debug("All sensors in wait");
+      }
+
+      return status;
     }
   }
   return false;
@@ -311,10 +326,12 @@ void EnabledConnectedDevices() {
   if (SensorProbe.MIC_Present) {
     Sensor.MIC_measurementEnabled = true;
   }
+  deviceTimeOut = HAL_GetTick() + 1200000;
+  sensorsdisablereq = false;
+  Debug("Sensors enabled");
 }
 
 void DisableConnectedDevices() {
-  Debug("Devices disabled");
   Sensor.HT_measurementEnabled = false;
   Sensor.VOC_measurementEnabled = false;
   Sensor.AHT_measurementEnabled = false;
@@ -322,10 +339,12 @@ void DisableConnectedDevices() {
   Sensor.ENS_measurementEnabled = false;
   Sensor.PM_measurementEnabled = false;
   Sensor.MIC_measurementEnabled = false;
+  Debug("Sensors disabled");
 }
 
 void setSensorLock(uint8_t sensor) {
   SensorHasLock = sensor;
+  HAL_Delay(10); // be sure the DMA of the previous has completed
 }
 
 uint8_t getSensorLock() {
@@ -333,6 +352,7 @@ uint8_t getSensorLock() {
 }
 
 void UpkeepI2Csensors() {
+//  Debug("Upkeep I2C Sensors");
   if (Sensor.HT_measurementEnabled) {
     HIDSstate = HIDS_Upkeep();
   }

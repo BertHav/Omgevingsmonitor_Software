@@ -7,9 +7,9 @@
 
 #define IdSize 12
 
-#define ConfigSize (IdCount*IdSize) + CustomNameMaxLength
-//#define ConfigSize (IdCount*IdSize) + SSIDMaxLength
-
+#define CustomNameMaxLength 32
+#define SSIDMaxLength 32
+#define pwdMaxLength 63
 #define BoxConfigAddr EEPromStartAddr + (IdSize * 0)
 #define TempConfigAddr EEPromStartAddr + (IdSize * 1)
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
@@ -21,15 +21,18 @@
 #define PM10ConfigAddr EEPromStartAddr + (IdSize * 8)
 #define BatVoltConfigAddr EEPromStartAddr + (IdSize * 9)
 #define SolVoltConfigAddr EEPromStartAddr + (IdSize * 10)
-#define ChargerStatConfigAddr EEPromStartAddr + (IdSize * 11)
+#define ChargerStatConfigAddr EEPromStartAddr + (IdSize * 11) // not used
 #define CustomNameConfigAddr EEPromStartAddr + (IdSize * 12)
-#define CustomNameMaxLength 32
+#define PM1ConfigAddr CustomNameConfigAddr + CustomNameMaxLength
+#define PM4ConfigAddr PM1ConfigAddr + IdSize
+#define AHTTempConfigAddr PM4ConfigAddr + IdSize
+#define AHTHumidConfigAddr AHTTempConfigAddr + IdSize
+#define BMPTempConfigAddr AHTHumidConfigAddr + IdSize
+#define ENSAQIConfigAddr BMPTempConfigAddr + IdSize
+#define ENSTVOCConfigAddr ENSAQIConfigAddr + IdSize
+#define ENSeCO2ConfigAddr ENSTVOCConfigAddr + IdSize
+#define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
+#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
+#define ConfigSize pwdConfigAddr + pwdMaxLength - EEPromStartAddr
 
-/*
-#define SSIDConfigAddr EEPromStartAddr + (IdSize * 15)
-#define SSIDMaxLength 32
-
-#define pwdConfigAddr EEPromStartAddr + (IdSize * 18)
-#define pwdMaxLength 63
-*/
 #endif
