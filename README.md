@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.56](#version456)\
 [version 4.55](#version455)\
 [version 4.54](#version454)\
 [version 4.53](#version453)\
@@ -101,6 +102,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.56 <a name="version456"></a>
+Many small adjustments to improve reliability when switching operating modes. All output of sensors that can be additionally connected to the 3V3 I2C bus are uploaded in the case of a valid opensensemap key, which can be entered via USB.
 
 ## version 4.55 <a name="version455"></a>
 Some bugfixes, auto detect alternate address ENS160.
