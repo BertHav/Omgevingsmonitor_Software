@@ -68,6 +68,8 @@ typedef struct
   float PM4p0max;
   float PM10p0;
   float PM10p0max;
+  float sen55_humidity;
+  float sen55_temperature;
   float ambient_humidity;
   float ambient_temperature;
   float AHT2x_humidity;
@@ -219,6 +221,7 @@ void setPM2p5(uint16_t PM2);
 void setPM4p0(uint16_t PM4);
 void setPM10(uint16_t PM10);
 void setNOx(uint16_t nox);
+void SetSEN545temphum(float airtemp, float airhum);
 void SetConfigMode();
 void ESP_GetHT(float temp, float humid);
 void forceNTPupdate();

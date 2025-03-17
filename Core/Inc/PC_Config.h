@@ -44,6 +44,8 @@
 #define ENSeCO2ConfigCmd 20
 #define SSIDConfigCmd 21
 #define pwdConfigCmd 22
+#define SEN55TempConfigCmd 23
+#define SEN55HumidConfigCmd 24
 
 #define ClearConfigCmd 253
 #define ClearEepromCmd 254

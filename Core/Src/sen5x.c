@@ -318,6 +318,7 @@ void sen5xStore() {
     setPM10(sen5x_data.mass_concentration_pm10p0);
   }
   if (((product_name[4] == '4') || (product_name[4] == '5'))) {
+    SetSEN545temphum(sen5x_data.ambient_temperature, sen5x_data.ambient_humidity);
     if (!VOCNOx || usbPluggedIn) {
       if (sen5x_data.voc_index != 0x7fff) {
         SetVOCindicator(sen5x_data.voc_index / 10);

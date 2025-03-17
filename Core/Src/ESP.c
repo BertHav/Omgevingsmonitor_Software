@@ -141,7 +141,7 @@ void setVOC(uint16_t voc) {
 #endif
 }
 
-void setAHT2x(float airhum, float airtemp) {
+void setAHT2x(float airtemp, float airhum) {
   MeasVal.AHT2x_humidity = airhum;
   if (airhum > MeasVal.AHT2x_humiditymax) {
     MeasVal.AHT2x_humiditymax = airhum;
@@ -250,6 +250,11 @@ void setNOx(uint16_t nox) {
     displayNOx();
   }
 #endif
+}
+
+void SetSEN545temphum(float airtemp, float airhum) {
+  MeasVal.sen55_temperature = airtemp / 200.0f;
+  MeasVal.sen55_humidity = airhum / 100.0f;
 }
 
 void resetMaxMeasurementValues() {
@@ -411,11 +416,11 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   }
 }
 
-bool isKeyValid(uint8_t data[]) {
+bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
   if ((data[0] > 66) && (data[0] != 0xFF))
     return true;
   else {
-    printf("Error sensor seems to have no stored key: ");
+    printf("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
     for (int i = 0; i < 12; i++) {
       printf("%02x", data[i]);
     }
@@ -493,7 +498,7 @@ index = strlen(message);
 
   if (IsBMP280SensorPresent()) {
     ReadUint8ArrayEEprom(hPaConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer) && (MeasVal.hPaValuemax != 0.0)) {
+    if (isKeyValid(keybuffer, "BMP280", "hPa") && (MeasVal.hPaValuemax != 0.0)) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.hPaValuemax);
@@ -508,7 +513,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(BMPTempConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "BMP280", "Temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperaturemax);
@@ -564,9 +569,41 @@ index = strlen(message);
         retstat &= status;
       }
     }
+
+    ReadUint8ArrayEEprom(SEN55TempConfigAddr, keybuffer, IdSize);
+    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "temperature")) {
+      uint8ArrayToString(Buffer, keybuffer);
+#ifdef OPENSENSEMAP
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_temperature);
+#else
+      sprintf(&message[0], ",{\"name\":\"SEN54/5 temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_temperature);
+#endif
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
+    }
+
+    ReadUint8ArrayEEprom(SEN55HumidConfigAddr, keybuffer, IdSize);
+    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "humidity")) {
+      uint8ArrayToString(Buffer, keybuffer);
+#ifdef OPENSENSEMAP
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_humidity);
+#else
+      sprintf(&message[0], ",{\"name\":\"SEN54/5 humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_humidity);
+#endif
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
+    }
+
+
     if (sen5x_Get_sen5x_enable_state()) {
       ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer)) {
+      if (isKeyValid(keybuffer, "PM1", "particle")) {
         uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
         sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
@@ -593,7 +630,7 @@ index = strlen(message);
       }
 
       ReadUint8ArrayEEprom(PM4ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer)) {
+      if (isKeyValid(keybuffer, "PM4", "particle")) {
         uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
         sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
@@ -624,7 +661,7 @@ index = strlen(message);
 
   if (IsAHT20SensorPresent()) {
     ReadUint8ArrayEEprom(AHTTempConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "AHT2x", "temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperaturemax);
@@ -639,7 +676,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(AHTHumidConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "AHT2x", "humidity")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humiditymax);
@@ -656,7 +693,7 @@ index = strlen(message);
 
   if (IsENS160SensorPresent()) {
     ReadUint8ArrayEEprom(ENSAQIConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "air quality index")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.AQIndexmax);
@@ -671,7 +708,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(ENSTVOCConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "TVOC")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.TVOCIndex);
@@ -686,7 +723,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(ENSeCO2ConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "eCO2")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.eCO2Indexmax);

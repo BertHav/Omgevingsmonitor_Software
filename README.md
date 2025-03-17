@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.57](#version457)\
 [version 4.56](#version456)\
 [version 4.55](#version455)\
 [version 4.54](#version454)\
@@ -102,6 +103,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.57 <a name="version457"></a>
+Fixes for manually input keys from opensensemap.org. The USB input keeps buggy. But this is only for emergency key input without reprogramming the whole box or people who want to add sensors which are not supported in de default configuration. If the input hangs, just reset the box. Sensors of SEN54/55 added to upload to opensensemap.org.
 
 ## version 4.56 <a name="version456"></a>
 Many small adjustments to improve reliability when switching operating modes. All output of sensors that can be additionally connected to the 3V3 I2C bus are uploaded in the case of a valid opensensemap key, which can be entered via USB.

@@ -3,13 +3,13 @@
 
 #define EEPromStartAddr 0x08080000
 
-#define IdCount 18
+//#define IdCount 18
 
 #define IdSize 12
 
 #define CustomNameMaxLength 32
 #define SSIDMaxLength 32
-#define pwdMaxLength 63
+#define pwdMaxLength 64
 #define BoxConfigAddr EEPromStartAddr + (IdSize * 0)
 #define TempConfigAddr EEPromStartAddr + (IdSize * 1)
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
@@ -33,6 +33,9 @@
 #define ENSeCO2ConfigAddr ENSTVOCConfigAddr + IdSize
 #define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
 #define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
-#define ConfigSize pwdConfigAddr + pwdMaxLength - EEPromStartAddr
+#define SEN55TempConfigAddr pwdConfigAddr + pwdMaxLength
+#define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
+
+#define ConfigSize SEN55HumidConfigAddr + IdSize - EEPromStartAddr
 
 #endif
