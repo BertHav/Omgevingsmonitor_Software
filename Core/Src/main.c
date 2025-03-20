@@ -293,7 +293,7 @@ int main(void)
         if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
           SetVOCSensorDIS_ENA(false);
         }
-        if (!usbPluggedIn) {
+        if (!usbPluggedIn && (HAL_GetTick() > DEVICE_INIT_TIMEOUT)) {
           Debug("Device time out set in main due to powerstatus shift");
           deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
         }

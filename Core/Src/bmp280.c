@@ -261,7 +261,10 @@ BMP280State BMP_Upkeep(void) {
     if (getSensorLock() != FREE) {
       break;
     }
+    setSensorLock(BMP280);
     BMP280_reset();
+    HAL_Delay(10); // wait for deferred DMA transfers
+    setSensorLock(FREE);
     BMPState = BMP_SET_CONFIG;
     break;
 
@@ -270,17 +273,20 @@ BMP280State BMP_Upkeep(void) {
       break;
     }
     setSensorLock(BMP280);
-    HAL_Delay(10); // wait for defered DMA transfers
     if (BMP280_set_config()) {
       BMPState = BMP_STATE_START_MEASUREMENTS;
     }
     else {
-      BMPState = BMP_STATE_INIT;
+      Error("Error while configuring BMP280");
+      BMP280TimeStamp = HAL_GetTick() + 10000;
+      BMPState = BMP_STATE_WAIT ;
      }
+    HAL_Delay(10); // wait for deferred DMA transfers
+    setSensorLock(FREE);
   break;
 
   case BMP_STATE_START_MEASUREMENTS:
-    if ((getSensorLock() != FREE) && (getSensorLock() != BMP280)) {
+    if (getSensorLock() != FREE) {
       uint8_t locktype = getSensorLock();
       Debug("Lock is not from BMP280, but from %s",
           locktype==FREE?"FREE":locktype==HIDS?"HIDS":locktype==SGP40?"SGP40":locktype==AHT20?"AHT20":locktype==BMP280?"BMP280":"unknown");
@@ -296,19 +302,29 @@ BMP280State BMP_Upkeep(void) {
     }
     else {
       Error("Error while setting BMP280 to forced mode");
-      BMPState = BMP_STATE_INIT ;
+      BMP280TimeStamp = HAL_GetTick() + 10000;
+      BMPState = BMP_STATE_WAIT ;
     }
+    HAL_Delay(10);
+    setSensorLock(FREE);
     break;
 
   case BMP_READ_MEASUREMENT_ARRAY:
+    if (getSensorLock() != FREE) {
+      break;
+    }
+    HAL_Delay(10);
+    setSensorLock(BMP280);
     if (BMP280_get_measurement_values()) {
-      setSensorLock(FREE);
       BMPState = BMP_STATE_PROCESS_RESULTS;
     }
     else {
-      BMPState = BMP_STATE_INIT;
       Error("BMP280 Error during reading measurement results array");
+      BMP280TimeStamp = HAL_GetTick() + 10000;
+      BMPState = BMP_STATE_WAIT ;
     }
+    HAL_Delay(10);
+    setSensorLock(FREE);
   break;
 
   case BMP_STATE_PROCESS_RESULTS:
@@ -336,19 +352,22 @@ BMP280State BMP_Upkeep(void) {
     if (getSensorLock() != FREE) {
       break;
     }
+    setSensorLock(BMP280);
     if (BMP280_get_mode() == BMP280_NORMAL_MODE) {
       BMPState = BMP_READ_MEASUREMENT_ARRAY;
     }
     else {
       BMPState = BMP_STATE_START_MEASUREMENTS;
     }
+    HAL_Delay(10);
+    setSensorLock(FREE);
     BMP280TimeStamp = HAL_GetTick() + 23;
     break;
 
   default:
     // Handle unexpected state
     BMPState = BMP_STATE_INIT;
-    if (getSensorLock() != BMP280) {
+    if (getSensorLock() == BMP280) {
       setSensorLock(FREE);
     }
     break;

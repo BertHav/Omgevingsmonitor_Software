@@ -262,7 +262,7 @@ void Device_Test(){
 bool AllDevicesReady() {
   if (TimestampIsReached(deviceTimeOut)) {
     if (!sensorsdisablereq) {
-      Debug("Requesting all device ready");
+      Debug("Requesting all devices ready");
       sensorsdisablereq = true;
     }
     if (HIDSstate == HIDS_STATE_WAIT) {
@@ -289,15 +289,13 @@ bool AllDevicesReady() {
     if ((ESPstate == ESP_STATE_RESET) || (ESPstate == ESP_STATE_INIT)) {
       bool status = !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
           Sensor.ENS_measurementEnabled | Sensor.PM_measurementEnabled | Sensor.MIC_measurementEnabled);
-
       if (!status) {
-//        Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
-//          Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled);
+        Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d, Lock is from sensor column : %d (0 is FREE)",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
+          Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled, getSensorLock());
       }
       else {
         Debug("All sensors in wait");
       }
-
       return status;
     }
   }

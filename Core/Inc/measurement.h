@@ -19,10 +19,10 @@
 typedef enum {
     FREE,
     HIDS,
-    SGP40,
     AHT20,
     BMP280,
-    ENS160
+    ENS160,
+    SGP40
 } i2cLock;
 
 typedef struct {

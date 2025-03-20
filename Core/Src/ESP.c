@@ -1652,6 +1652,10 @@ ESP_States ESP_Upkeep(void) {
             clearDMABuffer();
             stop = HAL_GetTick();
             Info("Message time update in %lu ms", (stop-start));
+            if (HAL_GetTick() < DEVICE_INIT_TIMEOUT) { // during startup the sensors are active after getting time
+              deviceTimeOut = DEVICE_INIT_TIMEOUT;
+              EnabledConnectedDevices();
+            }
             EspState = ESP_STATE_DEINIT;
             Mode = AT_MODE_SEND;
           }

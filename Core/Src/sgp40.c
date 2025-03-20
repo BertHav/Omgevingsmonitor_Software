@@ -320,6 +320,7 @@ SGP40State SGP_Upkeep(void) {
     setSensorLock(SGP40);
     SetMeasurementIndicator();
     SGP_StartMeasurement();
+    HAL_Delay(10); // wait for deferred DMA transfers
     setSensorLock(FREE);
     SGPState = SGP_STATE_WAIT_FOR_COMPLETION;
     break;
@@ -332,6 +333,7 @@ SGP40State SGP_Upkeep(void) {
     if(SGP_GetMeasurementValues(&vocIndex)) {
       SGPState = SGP_STATE_PROCESS_RESULTS;
     }
+    HAL_Delay(10); // wait for deferred DMA transfers
     setSensorLock(FREE);
     break;
 

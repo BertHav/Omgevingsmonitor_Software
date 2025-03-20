@@ -250,8 +250,7 @@ Battery_Status powerCheck(){
 
 void powerDisplay(Battery_Status status){
   if(status == USB_PLUGGED_IN){
-    Debug("USB power detected, LED's are okay");
-
+    Debug("USB power detected, LED's are okay, battery: %fV, solar &dmV", ReadBatteryVoltage(), ReadSolarVoltage());
   }
   if(status == BATTERY_FULL){
     Debug("Battery fully charged");

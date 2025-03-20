@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.58](#version458)\
 [version 4.57](#version457)\
 [version 4.56](#version456)\
 [version 4.55](#version455)\
@@ -53,6 +54,13 @@ The dB LED has the following meaning, more or less in the order of the rainbow:
 - dBA >= 35 - dBA < 40 purple
 - dBA < 35 LED off, equals to noise level of the microphone
 
+Other LED indications different from the original meaning:
+3 flashing red LEDs, communication error with ESP32 => Reboot device by pressing reboot button for at least 3 seconds.
+3 flashing blu LEDs, error reading barometric sensor if installed. Without rebooting this can persist over a longer period.
+When operating on batterypower, the system wakes about every 15 minutes. When flashing green the charge status is ok, when flashing red the battery status is below 20%. Recharge by USB if possible.
+When operating on batterypower, and the system has been waken up by the boot button (i.e. the LEDs are active) pressing the user button the VOC LED lights up white for 1,5 sec to acknowledge the system switches to sleep mode.
+When een SEN54 or SEN55 is installed, pressing the userbuttton for at least 2 seconds PM measurement is disabled. Only VOC and in case of a connected SEN55 NOx is measured. The VOC LED flashes one time red for 400ms.
+
 ## Compiling and building <a name="Compiling"></a>
 The project was developed with STM32CubeIDE 1.16.1, but also builds in STM32CubeIDE Version: 1.17.0
 
@@ -103,6 +111,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.58 <a name="version458"></a>
+Bugfixing for BMP280 which prevented proper waking from sleep mode and returning to sleep mode.
 
 ## version 4.57 <a name="version457"></a>
 Fixes for manually input keys from opensensemap.org. The USB input keeps buggy. But this is only for emergency key input without reprogramming the whole box or people who want to add sensors which are not supported in de default configuration. If the input hangs, just reset the box. Sensors of SEN54/55 added to upload to opensensemap.org.
@@ -193,6 +204,7 @@ NOx and VOC from sen55 is included in measurement. For this it is necessary that
 - The system must be reset twice to reach optimal energy saving mode.
 - If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
 - USBLOGGING works only with the Debug build.
+- If 3 blue flashing LEDs the barometric sensor has an error on de I2C bus. Reason unknown.
 
 ## License <a name="License"></a>
 Parts are licensed under GNU GENERAL PUBLIC LICENSE Version 3 and GNU AFFERO GENERAL PUBLIC LICENSE Version 3AGPL-3.0
