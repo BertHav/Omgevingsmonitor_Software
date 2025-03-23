@@ -171,17 +171,19 @@ static bool BMP280_get_measurement_values() {
     raw_mpa = (int32_t)((((uint32_t)bmpData[0]) << 12) + (((uint32_t)bmpData[1]) << 4) + (((uint32_t)bmpData[2]) >> 4));
   }
   else {
-    Error("BMP280 Invalid read of barometric pressure, using previous value.");
+    Error("BMP280 Invalid read of barometric pressure.");
     Debug("bmpData[0] 0x%02X, bmpData[1] 0x%02X, bmpData[3] 0x%02X, VALUE=0x%06X", bmpData[0], bmpData[1], bmpData[2], raw_mpa);
     SetAllBlueLED();
+    return false;
   }
   if (bmpData[3] != 0x80) {
     raw_temp = (int32_t)((((uint32_t)bmpData[3]) << 12) + (((uint32_t)bmpData[4]) << 4) + (((uint32_t)bmpData[5]) >> 4));
   }
   else {
-    Error("BMP280 Invalid read of temperature, using previous value.");
+    Error("BMP280 Invalid read of temperature.");
     Debug("bmpData[3] 0x%02X, bmpData[4] 0x%02X, bmpData[5] 0x%02X, VALUE=0x%06X", bmpData[3], bmpData[4], bmpData[5], raw_temp);
     SetAllBlueLED();
+    return false;
   }
 //  Debug("raw_mpa: %ld, raw_temp: %ld ", raw_mpa, raw_temp);
   return rslt;

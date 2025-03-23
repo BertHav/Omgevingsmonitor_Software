@@ -36,6 +36,12 @@ char strbuf[24] = {0}; //fi length -> 22-jan-24 23h:12m:23s
 uint32_t makeTime(RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
 void breakPosixTime(uint32_t timeInput, RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
 
+#ifndef PUBLIC
+void getUptime(char* uptbuffer) {
+  sprintf(uptbuffer, "%d%02d.%02d", myUpTime.Day, myUpTime.Hour, myUpTime.Minutes);
+}
+#endif
+
 void showTime() {
   if (posixBootTime == 0) {
     return;

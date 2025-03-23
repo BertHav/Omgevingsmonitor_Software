@@ -440,7 +440,9 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   static bool retstat = true;
   static uint8_t nameConfig[CustomNameMaxLength];
   static uint8_t keybuffer[IdSize];
-
+#ifndef PUBLIC
+  static char uptimeBuf[14];
+#endif
 #ifdef LONGDATAGRAM
   static char Buffer[(IdSize*2)+1];
 #endif
@@ -495,6 +497,25 @@ index = strlen(message);
     status = ESP_Send((uint8_t*)message, strlen(message));
     retstat &= status;
   }
+
+#ifndef PUBLIC
+  ReadUint8ArrayEEprom(UptimeConfigAddr, keybuffer, IdSize);
+  if (isKeyValid(keybuffer, "Uptime", "dhhmm")) {
+    uint8ArrayToString(Buffer, keybuffer);
+    getUptime(uptimeBuf);
+
+#ifdef OPENSENSEMAP
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%s}", Buffer, uptimeBuf);
+#else
+    sprintf(&message[0], ",{\"name\":\"uptime\", \"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
+#endif
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
+  }
+#endif
 
   if (IsBMP280SensorPresent()) {
     ReadUint8ArrayEEprom(hPaConfigAddr, keybuffer, IdSize);

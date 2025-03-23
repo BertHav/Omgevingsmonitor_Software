@@ -35,7 +35,8 @@
 #define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
 #define SEN55TempConfigAddr pwdConfigAddr + pwdMaxLength
 #define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
+#define UptimeConfigAddr SEN55HumidConfigAddr + IdSize
 
-#define ConfigSize SEN55HumidConfigAddr + IdSize - EEPromStartAddr
+#define ConfigSize UptimeConfigAddr + IdSize - EEPromStartAddr
 
 #endif

@@ -133,7 +133,11 @@ void ProcessCmd(Receive_MSG msg)
         case SEN55HumidConfigCmd: // 24
           WriteUint8ArrayEepromSafe(SEN55HumidConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-
+#ifndef PUBLIC
+        case UptimeConfigCmd: // 25
+          WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        break;
+#endif
         case ClearConfigCmd: // 253
             ClearEEprom(EEPromStartAddr, ConfigSize);
         break;
@@ -239,6 +243,9 @@ void PC_show_Keys() {
   static uint8_t pwdConfig[pwdMaxLength];         // 22
   static uint8_t SEN55TempConfig[IdSize];         // 23
   static uint8_t SEN55HumidConfig[IdSize];        // 24
+#ifndef PUBLIC
+  static uint8_t UptimeConfig[IdSize];            // 25
+#endif
 
   static char Buffer[25];
   static char msg[70];
@@ -372,6 +379,13 @@ void PC_show_Keys() {
   sprintf(msg, "24 - SEN54/55 Humidity sensor id ---: %s\r\n", Buffer);
   PC_selectout(&msg[0], usb_out);
 
+#ifndef PUBLIC
+  ReadUint8ArrayEEprom(UptimeConfigAddr, UptimeConfig, IdSize);
+  uint8ArrayToString(Buffer, UptimeConfig);
+  sprintf(msg, "25 - Uptime sensor id --------------: %s\r\n", Buffer);
+  PC_selectout(&msg[0], usb_out);
+#endif
+
   printf_USB("\r\n!!NO LINE EDITING!!\r\n");
   HAL_Delay(10);
   printf_USB("If the key differs only the last two bytes,");
@@ -387,7 +401,7 @@ void PC_show_Keys() {
   printf_USB(" $05,67af09374cdef30007b35055\r\n");
   HAL_Delay(10);
   if (!usb_out) {
-    printf("A key can only be changed by USB input or the configuration programm.\r\n");
+    printf("A key can only be changed by USB input or the by configuration programm.\r\n");
   }
 }
 
@@ -397,7 +411,11 @@ uint8_t ascii_to_uint8(uint8_t *inchar) {
     return 100;
   }
   uint8_t value = (inchar[0] - '0') * 10 + (inchar[1] - '0');
+#ifndef PUBLIC
+  if (value > 25 || value == 21 || value == 22) {
+#else
   if (value > 24 || value == 21 || value == 22) {
+#endif
     printf_USB("Error: value out of range\r\n");
     return 100;
   }

@@ -33,6 +33,7 @@ extern uint8_t year;
 
 void ParseTime(char* buffer);
 // Functies voor het instellen en uitlezen van de tijd
+void getUptime(char* uptbuffer);
 void showTime();
 void setBootTime(void);
 void UpdateSystemUptime();

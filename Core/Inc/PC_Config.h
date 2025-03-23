@@ -46,6 +46,9 @@
 #define pwdConfigCmd 22
 #define SEN55TempConfigCmd 23
 #define SEN55HumidConfigCmd 24
+#ifndef PUBLIC
+#define UptimeConfigCmd 25
+#endif
 
 #define ClearConfigCmd 253
 #define ClearEepromCmd 254

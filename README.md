@@ -2,6 +2,8 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.60](#version460)\
+[version 4.59](#version459)\
 [version 4.58](#version458)\
 [version 4.57](#version457)\
 [version 4.56](#version456)\
@@ -111,6 +113,12 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.60 <a name="version460"></a>
+A possibility has been created to see the uptime of the OM in opensensemap. Because this is a primitive representation, this is not included in the standard build. It is necessary that the PUBLIC directive is commented out in main.h. By hiding the PUBLIC directive, a file cred.h is expected during the build that must contain the ssid and password of the local WLAN. For the content and format check cred_pub.h. This also ensures that the ESP loses the credentials after a configuration change, upload of new firmware or reset. It is necessary that a sensor is created in opensensemap. The key of this sensor must also be programmed in the OM. This programming can be done by connecting putty or teraterm to the USB-C connector of the OM. Type in helpme or a number of other random letters. The key is displayed at position 25.
+
+## version 4.59 <a name="version459"></a>
+Bugfix for blue LEDs during read error BMP280
 
 ## version 4.58 <a name="version458"></a>
 Bugfixing for BMP280 which prevented proper waking from sleep mode and returning to sleep mode.
