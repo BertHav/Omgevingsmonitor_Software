@@ -641,7 +641,7 @@ int16_t sen5x_read_device_status(uint32_t* device_status) {
 
     error = sensirion_i2c_write_data(SEN5X_I2C_ADDRESS, &buffer[0], offset);
     if (error) {
-        return error;
+        return 0xD206;
     }
 
     sensirion_i2c_hal_sleep_usec(20000);

@@ -107,7 +107,11 @@ void BinaryReleaseInfo() {
   Info("Build on: %s at %s", __DATE__, __TIME__);
   // Format: YY'w'WWv
   Info("Git: %s", CURRENT_WEEK);
-  Info("Software version: %s", SRC_VERSION);
+#ifdef DEBUG
+  Info("Software version: %s, Debug build", SRC_VERSION);
+#else
+  Info("Software version: %s, Release build", SRC_VERSION);
+#endif
 }
 
 //

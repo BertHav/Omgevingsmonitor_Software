@@ -24,6 +24,8 @@ typedef struct {
 
 
 bool firstTimeUpdate = true;
+uint8_t lasthour;
+uint8_t weekday;
 static Clock myUpTime = {.Day = 0, .Hour = 0, .Minutes = 0, .Seconds = 0};
 static const char *dayNames[7] = {  "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}; // 0..6 -> 1 to 7
 static const char *monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // 0..11 -> 1 to 12
@@ -49,6 +51,8 @@ void showTime() {
   RTC_TimeTypeDef currentTime;
   RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
+  lasthour = currentTime.Hours;
+  weekday = currentDate.WeekDay;
   UpdateSystemUptime();
   printf("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds\r\n",
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
@@ -194,13 +198,6 @@ Battery_Status status;
       }
     }
   }
-}
-
-uint8_t RTC_GetWeekday(void) {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
-  RTC_GetTime(&currentTime, &currentDate);
-  return currentDate.WeekDay;
 }
 
 uint32_t getPosixTime(void) {
