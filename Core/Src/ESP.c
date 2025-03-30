@@ -93,10 +93,12 @@ void forceNTPupdate() {
 void setESPTimeStamp(uint32_t delayms) {
   ESPTimeStamp = HAL_GetTick() + delayms;
 }
+
 void setCharges(){
   batteryCharge = ReadBatteryVoltage();
   solarCharge = ReadSolarVoltage() / 1000.0;
 }
+
 bool checkEEprom(){
   static uint8_t tempConfig[IdSize];
   static uint32_t configSum = 0;
@@ -108,6 +110,7 @@ bool checkEEprom(){
   test = (configSum == 0);
   return test;
 }
+
 bool checkName(){
   static uint8_t nameConfig[CustomNameMaxLength];
   static uint32_t configSum = 0;
@@ -119,7 +122,6 @@ bool checkName(){
   test = (configSum != 0);
   return test;
 }
-
 
 void setHIDS(float temp, float humid){
   MeasVal.Temperature = temp;
@@ -143,24 +145,29 @@ void setVOC(uint16_t voc) {
 
 void setAHT2x(float airtemp, float airhum) {
   MeasVal.AHT2x_humidity = airhum;
-  if (airhum > MeasVal.AHT2x_humiditymax) {
-    MeasVal.AHT2x_humiditymax = airhum;
-  }
+//  if (airhum > MeasVal.AHT2x_humiditymax) {
+//    MeasVal.AHT2x_humiditymax = airhum;
+//  }
   MeasVal.AHT2x_temperature = airtemp;
-  if (airtemp > MeasVal.AHT2x_temperaturemax) {
-    MeasVal.AHT2x_temperaturemax = airtemp;
-  }
+//  if (airtemp > MeasVal.AHT2x_temperaturemax) {
+//    MeasVal.AHT2x_temperaturemax = airtemp;
+//  }
 }
 
 void setBMP280(float airtemp, float airhpa) {
   MeasVal.BMP280_temperature = airtemp;
-  if (airtemp > MeasVal.BMP280_temperaturemax) {
-    MeasVal.BMP280_temperaturemax = airtemp;
-  }
+//  if (airtemp > MeasVal.BMP280_temperaturemax) {
+//    MeasVal.BMP280_temperaturemax = airtemp;
+//  }
   MeasVal.BMP280_airpressure = airhpa;
-  if (airhpa > MeasVal.BMP280_airpressuremax) {
-    MeasVal.BMP280_airpressuremax = airhpa;
-  }
+//  if (airhpa > MeasVal.BMP280_airpressuremax) {
+//    MeasVal.BMP280_airpressuremax = airhpa;
+//  }
+#ifdef SSD1306
+//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
+//    displayhPa();
+//  }
+#endif
 }
 
 void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2) {
@@ -174,19 +181,6 @@ void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2) {
     MeasVal.eCO2Indexmax = eco2;
   }
 }
-
-void sethPa(float hPa) {
-  MeasVal.hPaValue = hPa;
-  if (hPa > MeasVal.hPaValuemax) {
-    MeasVal.hPaValuemax = hPa;
-  }
-#ifdef SSD1306
-//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
-//    displayhPa();
-//  }
-#endif
-}
-
 
 void setMic(float dB, float dBmax, float dBAavg){
   MeasVal.dBA = dB;
@@ -265,13 +259,12 @@ void resetMaxMeasurementValues() {
     MeasVal.PM10p0max = 0.0f;
     MeasVal.airNOxmax = 0;
   }
-  MeasVal.AHT2x_humiditymax = 0.0;
-  MeasVal.AHT2x_temperaturemax = 0.0;
-  MeasVal.BMP280_temperaturemax = 0.0;
-  MeasVal.BMP280_airpressuremax = 0.0;
+//  MeasVal.AHT2x_humiditymax = 0.0;
+//  MeasVal.AHT2x_temperaturemax = 0.0;
+//  MeasVal.BMP280_temperaturemax = 0.0;
+//  MeasVal.BMP280_airpressuremax = 0.0;
   MeasVal.eCO2Indexmax = 0;
   MeasVal.AQIndexmax = 0;
-  MeasVal.hPaValuemax = 0.0;
 }
 
 void SetConfigMode(){
@@ -519,12 +512,12 @@ index = strlen(message);
 
   if (IsBMP280SensorPresent()) {
     ReadUint8ArrayEEprom(hPaConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer, "BMP280", "hPa") && (MeasVal.hPaValuemax != 0.0)) {
+    if (isKeyValid(keybuffer, "BMP280", "hPa") && MeasVal.BMP280_airpressure) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.hPaValuemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_airpressure);
 #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.hPaValuemax);
+      sprintf(&message[0], ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_airpressure);
 #endif
       index += strlen(message);
       if (send) {
@@ -537,9 +530,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "BMP280", "Temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperaturemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperature);
   #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperaturemax);
+      sprintf(&message[0], ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperature);
   #endif
       index += strlen(message);
       if (send) {
@@ -685,9 +678,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "AHT2x", "temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperaturemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperature);
 #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperaturemax);
+      sprintf(&message[0], ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperature);
 #endif
       index += strlen(message);
       if (send) {
@@ -700,9 +693,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "AHT2x", "humidity")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humiditymax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humidity);
   #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humiditymax);
+      sprintf(&message[0], ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humidity);
   #endif
       index += strlen(message);
       if (send) {

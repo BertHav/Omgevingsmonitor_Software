@@ -447,6 +447,9 @@ void check_cli_command() {
       usblog = !usblog; // log info to usb too
       break;
 #endif
+    case (uint8_t)'v':
+      BinaryReleaseInfo(); // show me the build
+      break;
     default:
       Error("Error unknown request from Serial UART1 (TTY)\r\n");
       printf("Possible commands:\r\n\r\n");
@@ -457,10 +460,11 @@ void check_cli_command() {
       printf("m - VerboseLevel set to minimal\r\n");
       printf("n - VerboseLevel set to none\r\n");
       printf("s - Start particle measurement\r\n");
-      printf("t - Show actual systemtime\r\n");
+      printf("t - Show actual system time\r\n");
 #ifdef USBLOGGING
       printf("u - USB logging toggle\r\n");
 #endif
+      printf("v - Show system version\r\n");
   break;
   }
   u1_rx_buff[0] = '\0';

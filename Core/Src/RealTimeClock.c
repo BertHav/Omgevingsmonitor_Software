@@ -24,6 +24,7 @@ typedef struct {
 
 
 bool firstTimeUpdate = true;
+bool dstchkd = false;
 uint8_t lasthour;
 uint8_t weekday;
 static Clock myUpTime = {.Day = 0, .Hour = 0, .Minutes = 0, .Seconds = 0};
@@ -57,6 +58,10 @@ void showTime() {
   printf("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds\r\n",
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
+  if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && !dstchkd && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
+    dstchkd = true;
+    setESPTimeStamp(0); // check for summer/wintertime
+  }
 }
 
 
@@ -135,8 +140,33 @@ void ParseTime(char* buffer) {
   Debug("Current RTC date before update is: %02d-%02d-%02d", currentDate.Date , currentDate.Month, currentDate.Year  );
   RTC_SetTime(&currentTime);
   RTC_SetDate(&currentDate);
+/* DST insert === */
+  // DST == DaySavingTime == Zomertijd
+  bool dst = false;
+
+  int mnd = currentDate.Month;
+  dst = !((mnd < 3) || (mnd > 10)); // between october and march
+  if (dst)
+  {
+    if ((mnd == 3) && (currentDate.WeekDay == 7) && (currentDate.Date < 25)) {
+      // starts last sunday of march
+      // weekday -> sunday returns 7
+        dst = false;
+    }
+    else if ((mnd == 10) && (currentDate.WeekDay == 7) && (currentDate.Date < 25))
+    {
+        dst = false;
+    }
+  }
+  if (dst) {
+    Info("Daylight Saving Time active");
+    HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
+  }
+
+//=================
   if (currentDate.WeekDay == 2) {
-    reset_fanCleaningDone();
+    reset_fanCleaningDone(); // reset the cleaning flag done
+    dstchkd = false; // reset the dst flag done
   }
   if (posixBootTime == 0) {
     posixBootTime = makeTime(&currentDate, &currentTime);

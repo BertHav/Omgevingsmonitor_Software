@@ -334,10 +334,15 @@ BMP280State BMP_Upkeep(void) {
     airtemp = BMP280_calc_temperature();
     airhpa = BMP280_calc_pressure();
     if ((airhpa > 850.0) && (airhpa < 1100)) {
-      sethPa(airhpa);
-      Info("BMP280 airtemperature: %2.2fC barometric value: %.2fhPa", airtemp, airhpa);
+//      sethPa(airhpa);
+      Info("BMP280 barometric value: %.2fhPa  airtemperature: %2.2fC", airhpa, airtemp);
       setBMP280(airtemp, airhpa);
-      BMP280TimeStamp = HAL_GetTick() + 60000;
+      if (Check_USB_PowerOn()) {
+        BMP280TimeStamp = HAL_GetTick() + 60000;
+      }
+      else {
+        BMP280TimeStamp = HAL_GetTick() + 1000;
+      }
     }
     else {
       Error("BMP280 value out of valid range, not stored/used");

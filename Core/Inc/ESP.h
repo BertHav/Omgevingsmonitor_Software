@@ -73,13 +73,13 @@ typedef struct
   float ambient_humidity;
   float ambient_temperature;
   float AHT2x_humidity;
-  float AHT2x_humiditymax;
+//  float AHT2x_humiditymax;
   float AHT2x_temperature;
-  float AHT2x_temperaturemax;
+//  float AHT2x_temperaturemax;
   float BMP280_temperature;
-  float BMP280_temperaturemax;
+//  float BMP280_temperaturemax;
   float BMP280_airpressure;
-  float BMP280_airpressuremax;
+//  float BMP280_airpressuremax;
   uint16_t VOCIndex;
   uint16_t TVOCIndex;
   uint16_t airNOx;
@@ -91,8 +91,8 @@ typedef struct
   float dBA;
   float dBApeak;
   float dBAaverage;
-  float hPaValue;
-  float hPaValuemax;
+//  float hPaValue;
+//  float hPaValuemax;
 } MeasurementValues;
 
 extern MeasurementValues MeasVal;
@@ -213,7 +213,6 @@ void setVOC(uint16_t voc);
 void setAHT2x(float airhum, float airtemp);
 void setBMP280(float airtemp, float airhpa);
 void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2);
-void sethPa(float hPa);
 void setHIDS(float temp, float humid);
 void setMic(float dB, float dBmax, float dBAavg);
 void setPM1p0(uint16_t PM1);
