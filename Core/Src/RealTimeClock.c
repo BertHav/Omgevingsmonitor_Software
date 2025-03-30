@@ -161,6 +161,9 @@ void ParseTime(char* buffer) {
   if (dst) {
     Info("Daylight Saving Time active");
     HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
+    HAL_Delay(500);
+    RTC_GetTime(&currentTime, &currentDate);
+    Debug("Current RTC time after update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
   }
 
 //=================
