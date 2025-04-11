@@ -325,7 +325,12 @@ int main(void)
     if (!usbPluggedIn) {
       if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
         EnabledConnectedDevices();
-        Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        if (ReadSolarVoltage() > 4500) {  // if battery is fully charged and sun is shining wake-up about every 5 minutes
+          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM_SUN:WAIT_WITHOUT_PM_SUN);
+        }
+        else {
+          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        }
       }
     }
 #ifdef USBLOGGING

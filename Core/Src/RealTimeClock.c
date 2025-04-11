@@ -338,6 +338,7 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   showTime();
   EnabledConnectedDevices();
   ResetDBACalculator();  // reset the DBA average calculation
+  ResetBMP280samplecounter();
   ResetSGP40samplecounter();
   ResetENS160samplecounter();
   setsen5xSamplecounter(0);

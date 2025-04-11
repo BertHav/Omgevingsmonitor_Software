@@ -266,6 +266,18 @@ void powerDisplay(Battery_Status status){
   if(status == BATTERY_CRITICAL){
     Debug("Battery is critical, stop processes");
   }
+  switch (Read_Charge_Status()) {
+  case CHARGING_OFF:
+    Debug("Battery charging off");
+    break;
+  case CHARGING_ON:
+    Debug("Battery is charging");
+    break;
+  case CHARGING_FULL:
+    Debug("Battery full, charging off");
+    break;
+  }
+
 }
 
 void configCheck(){

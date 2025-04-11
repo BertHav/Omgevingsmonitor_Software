@@ -18,6 +18,7 @@ static calibration_param_t dig;
 
 static uint8_t bmp280I2Caddr = BMP280_ADDRESS;
 static uint8_t mode = BMP280_FORCED_MODE;
+static uint8_t bmp280samplecounter = 0;
 static int32_t t_fine;        /*used for pressure compensation, changes with temperature*/
 static int32_t raw_temp, raw_mpa;
 static uint32_t BMP280TimeStamp;
@@ -41,6 +42,11 @@ static bool ReadMemRegister(uint16_t MemAddress, uint16_t MemSize, uint8_t* buff
 void setBMP280TimeStamp(uint32_t ticks) {
   BMP280TimeStamp = HAL_GetTick() + ticks;
 }
+
+void ResetBMP280samplecounter() {
+  bmp280samplecounter = 0;
+}
+
 
 static void BMP280_reset() {
   uint8_t data = BMP280_RESET_VALUE;
@@ -334,11 +340,21 @@ BMP280State BMP_Upkeep(void) {
     airtemp = BMP280_calc_temperature();
     airhpa = BMP280_calc_pressure();
     if ((airhpa > 850.0) && (airhpa < 1100)) {
-//      sethPa(airhpa);
-      Info("BMP280 barometric value: %.2fhPa  airtemperature: %2.2fC", airhpa, airtemp);
+      bmp280samplecounter++;
+      if (bmp280samplecounter == 2) {
+        Info("BMP280 barometric value: %.2fhPa  airtemperature: %2.2fC", airhpa, airtemp);
+      }
+      else {
+        if (bmp280samplecounter == 11) {
+          bmp280samplecounter = 0;
+        }
+      }
+
+
       setBMP280(airtemp, airhpa);
       if (Check_USB_PowerOn()) {
         BMP280TimeStamp = HAL_GetTick() + 60000;
+        bmp280samplecounter = 1;
       }
       else {
         BMP280TimeStamp = HAL_GetTick() + 1000;

@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.63](#version463)\
 [version 4.62](#version462)\
 [version 4.61](#version461)\
 [version 4.60](#version460)\
@@ -115,6 +116,9 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.63 <a name="version463"></a>
+When battery is full and sun is shining upload every 5 minutes
 
 ## version 4.62 <a name="version462"></a>
 DST implemented
