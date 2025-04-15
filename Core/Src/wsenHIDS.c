@@ -278,6 +278,7 @@ wsenHIDSState HIDS_Upkeep(void) {
       setSensorLock(HIDS);
       SetMeasurementIndicator();
       HIDS_StartMeasurement();
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       HIDSState = HIDS_STATE_WAIT_FOR_COMPLETION;
       break;
@@ -290,6 +291,7 @@ wsenHIDSState HIDS_Upkeep(void) {
       if(HIDS_GetMeasurementValues(&humid, &temp)) {
         HIDSState = HIDS_STATE_PROCESS_RESULTS;
       }
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       break;
 
@@ -303,6 +305,7 @@ wsenHIDSState HIDS_Upkeep(void) {
           break;
         }
         HIDS_EnableHeater();
+        HAL_Delay(10); // wait for deferred DMA transfers
         setSensorLock(FREE);
         HIDSTimeStamp = HAL_GetTick() + 12000;
       }

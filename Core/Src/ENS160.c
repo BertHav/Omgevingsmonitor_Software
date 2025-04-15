@@ -385,6 +385,7 @@ ENS160State ENS_Upkeep(void) {
     setSensorLock(ENS160);
     bool result = ENS160_setMode(ENS160_OPMODE_STD);
     Debug("ENS160 switched to standard mode %s", result?"done.":"failed.");
+    HAL_Delay(10); // wait for deferred DMA transfers
     setSensorLock(FREE);
     ENSState = ENS_STATUS_CHECK;
     ENS160TimeStamp = HAL_GetTick() + 1000;
@@ -396,6 +397,7 @@ ENS160State ENS_Upkeep(void) {
     }
     setSensorLock(ENS160);
     status = ENS160_readStatus();
+    HAL_Delay(10); // wait for deferred DMA transfers
     setSensorLock(FREE);
     if ((status & 0x0C) != 0) {
       switch (status >> 2) {
@@ -432,6 +434,7 @@ ENS160State ENS_Upkeep(void) {
     if ((status & 0x02) == 0) {
       ENS160TimeStamp = HAL_GetTick() + 500;
 //      Debug("ENS160 status register is: %d", status);
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       break;
     }
@@ -465,6 +468,7 @@ ENS160State ENS_Upkeep(void) {
       setSensorLock(ENS160);
       bool result = ENS160_setMode(ENS160_OPMODE_DEP_SLEEP);
       Debug("ENS160 switched to deep sleep %s, sample counter is: %d", result?"done.":"failed.", enscnt);
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       ENS160TimeStamp = HAL_GetTick() + 45000;
     }
@@ -482,6 +486,7 @@ ENS160State ENS_Upkeep(void) {
         bool result = ENS160_setMode(ENS160_OPMODE_STD);
         Debug("ENS160 switched to standard operating mode %s", result?"done.":"failed.");
       }
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       ENSState = ENS_STATUS_CHECK;
     break;

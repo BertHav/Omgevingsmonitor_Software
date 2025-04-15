@@ -2,6 +2,13 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.63](#version463)\
+[version 4.62](#version462)\
+[version 4.61](#version461)\
+[version 4.60](#version460)\
+[version 4.59](#version459)\
+[version 4.58](#version458)\
+[version 4.57](#version457)\
 [version 4.56](#version456)\
 [version 4.55](#version455)\
 [version 4.54](#version454)\
@@ -51,6 +58,13 @@ The dB LED has the following meaning, more or less in the order of the rainbow:
 - dBA >= 40 - dBA < 50 blue
 - dBA >= 35 - dBA < 40 purple
 - dBA < 35 LED off, equals to noise level of the microphone
+
+Other LED indications different from the original meaning:
+3 flashing red LEDs, communication error with ESP32 => Reboot device by pressing reboot button for at least 3 seconds.
+3 flashing blu LEDs, error reading barometric sensor if installed. Without rebooting this can persist over a longer period.
+When operating on batterypower, the system wakes about every 15 minutes. When flashing green the charge status is ok, when flashing red the battery status is below 20%. Recharge by USB if possible.
+When operating on batterypower, and the system has been waken up by the boot button (i.e. the LEDs are active) pressing the user button the VOC LED lights up white for 1,5 sec to acknowledge the system switches to sleep mode.
+When een SEN54 or SEN55 is installed, pressing the userbuttton for at least 2 seconds PM measurement is disabled. Only VOC and in case of a connected SEN55 NOx is measured. The VOC LED flashes one time red for 400ms.
 
 ## Compiling and building <a name="Compiling"></a>
 The project was developed with STM32CubeIDE 1.16.1, but also builds in STM32CubeIDE Version: 1.17.0
@@ -102,6 +116,28 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.63 <a name="version463"></a>
+When battery is full and sun is shining upload every 5 minutes
+
+## version 4.62 <a name="version462"></a>
+DST implemented
+
+## version 4.61 <a name="version461"></a>
+Under rare circumstances, an error can occur on the I2C bus to which a SEN5x is connected. The sensors of the SEN5x can then no longer be read. This seems to occur if the power of the USB-C is interrupted during a measurement. The handling of read errors of the SEN5x has been made more robust.
+The release build variant is now testing, because the maximum programm size is nearly reached for the debug build.
+
+## version 4.60 <a name="version460"></a>
+A possibility has been created to see the uptime of the OM in opensensemap. Because this is a primitive representation, this is not included in the standard build. It is necessary that the PUBLIC directive is commented out in main.h. By hiding the PUBLIC directive, a file cred.h is expected during the build that must contain the ssid and password of the local WLAN. For the content and format check cred_pub.h. This also ensures that the ESP loses the credentials after a configuration change, upload of new firmware or reset. It is necessary that a sensor is created in opensensemap. The key of this sensor must also be programmed in the OM. This programming can be done by connecting putty or teraterm to the USB-C connector of the OM. Type in helpme or a number of other random letters. The key is displayed at position 25.
+
+## version 4.59 <a name="version459"></a>
+Bugfix for blue LEDs during read error BMP280
+
+## version 4.58 <a name="version458"></a>
+Bugfixing for BMP280 which prevented proper waking from sleep mode and returning to sleep mode.
+
+## version 4.57 <a name="version457"></a>
+Fixes for manually input keys from opensensemap.org. The USB input keeps buggy. But this is only for emergency key input without reprogramming the whole box or people who want to add sensors which are not supported in de default configuration. If the input hangs, just reset the box. Sensors of SEN54/55 added to upload to opensensemap.org.
 
 ## version 4.56 <a name="version456"></a>
 Many small adjustments to improve reliability when switching operating modes. All output of sensors that can be additionally connected to the 3V3 I2C bus are uploaded in the case of a valid opensensemap key, which can be entered via USB.
@@ -189,6 +225,7 @@ NOx and VOC from sen55 is included in measurement. For this it is necessary that
 - The system must be reset twice to reach optimal energy saving mode.
 - If the user button is pressed to change the LED mode, it may take up to 30 seconds for the system to enter standby mode when a sen5x is attached. This is not really an issue because the system is waiting for a particle measurement.
 - USBLOGGING works only with the Debug build.
+- If 3 blue flashing LEDs the barometric sensor has an error on de I2C bus. Reason unknown.
 
 ## License <a name="License"></a>
 Parts are licensed under GNU GENERAL PUBLIC LICENSE Version 3 and GNU AFFERO GENERAL PUBLIC LICENSE Version 3AGPL-3.0

@@ -103,15 +103,17 @@ extern uint8_t ESPstate;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "4.56 BH"
-#define CURRENT_WEEK "2025w9-4"  // -x is daynumber of week i.e. monday = 1
+#define SRC_VERSION "4.63 BH"
+#define CURRENT_WEEK "2025w15-2"  // -x is day number of week i.e. Monday = 1
 #define PUBLIC
 //#define STLINK_V3PWR true
 
 #define WAIT_WITH_PM 860
 #define WAIT_WITHOUT_PM 880
+#define WAIT_WITH_PM_SUN 260 // with sun shining and battery full loaded with sen5x
+#define WAIT_WITHOUT_PM_SUN 280  // with sun shining and battery full loaded
 #define BATTERY_READ_CYCLE 50000  // About once a minute
-#define DEVICE_INIT_TIMEOUT 25000 // during battery power the device become about 3,5 second to take 3 samples after they are disabled
+#define DEVICE_INIT_TIMEOUT 25000 // This is the initial time out for sensors during startup
 #define DEVICE_TIMEOUT 4500 // during battery power the device become about 4,5 second to take 3 samples after they are disabled
 
 

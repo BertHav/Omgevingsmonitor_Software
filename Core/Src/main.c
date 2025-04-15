@@ -293,7 +293,7 @@ int main(void)
         if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
           SetVOCSensorDIS_ENA(false);
         }
-        if (!usbPluggedIn) {
+        if (!usbPluggedIn && (HAL_GetTick() > DEVICE_INIT_TIMEOUT)) {
           Debug("Device time out set in main due to powerstatus shift");
           deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
         }
@@ -325,7 +325,12 @@ int main(void)
     if (!usbPluggedIn) {
       if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
         EnabledConnectedDevices();
-        Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        if (ReadSolarVoltage() > 4500) {  // if battery is fully charged and sun is shining wake-up about every 5 minutes
+          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM_SUN:WAIT_WITHOUT_PM_SUN);
+        }
+        else {
+          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
+        }
       }
     }
 #ifdef USBLOGGING
@@ -447,6 +452,9 @@ void check_cli_command() {
       usblog = !usblog; // log info to usb too
       break;
 #endif
+    case (uint8_t)'v':
+      BinaryReleaseInfo(); // show me the build
+      break;
     default:
       Error("Error unknown request from Serial UART1 (TTY)\r\n");
       printf("Possible commands:\r\n\r\n");
@@ -457,10 +465,11 @@ void check_cli_command() {
       printf("m - VerboseLevel set to minimal\r\n");
       printf("n - VerboseLevel set to none\r\n");
       printf("s - Start particle measurement\r\n");
-      printf("t - Show actual systemtime\r\n");
+      printf("t - Show actual system time\r\n");
 #ifdef USBLOGGING
       printf("u - USB logging toggle\r\n");
 #endif
+      printf("v - Show system version\r\n");
   break;
   }
   u1_rx_buff[0] = '\0';

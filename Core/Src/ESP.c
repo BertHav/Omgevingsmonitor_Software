@@ -93,10 +93,12 @@ void forceNTPupdate() {
 void setESPTimeStamp(uint32_t delayms) {
   ESPTimeStamp = HAL_GetTick() + delayms;
 }
+
 void setCharges(){
   batteryCharge = ReadBatteryVoltage();
   solarCharge = ReadSolarVoltage() / 1000.0;
 }
+
 bool checkEEprom(){
   static uint8_t tempConfig[IdSize];
   static uint32_t configSum = 0;
@@ -108,6 +110,7 @@ bool checkEEprom(){
   test = (configSum == 0);
   return test;
 }
+
 bool checkName(){
   static uint8_t nameConfig[CustomNameMaxLength];
   static uint32_t configSum = 0;
@@ -119,7 +122,6 @@ bool checkName(){
   test = (configSum != 0);
   return test;
 }
-
 
 void setHIDS(float temp, float humid){
   MeasVal.Temperature = temp;
@@ -141,26 +143,31 @@ void setVOC(uint16_t voc) {
 #endif
 }
 
-void setAHT2x(float airhum, float airtemp) {
+void setAHT2x(float airtemp, float airhum) {
   MeasVal.AHT2x_humidity = airhum;
-  if (airhum > MeasVal.AHT2x_humiditymax) {
-    MeasVal.AHT2x_humiditymax = airhum;
-  }
+//  if (airhum > MeasVal.AHT2x_humiditymax) {
+//    MeasVal.AHT2x_humiditymax = airhum;
+//  }
   MeasVal.AHT2x_temperature = airtemp;
-  if (airtemp > MeasVal.AHT2x_temperaturemax) {
-    MeasVal.AHT2x_temperaturemax = airtemp;
-  }
+//  if (airtemp > MeasVal.AHT2x_temperaturemax) {
+//    MeasVal.AHT2x_temperaturemax = airtemp;
+//  }
 }
 
 void setBMP280(float airtemp, float airhpa) {
   MeasVal.BMP280_temperature = airtemp;
-  if (airtemp > MeasVal.BMP280_temperaturemax) {
-    MeasVal.BMP280_temperaturemax = airtemp;
-  }
+//  if (airtemp > MeasVal.BMP280_temperaturemax) {
+//    MeasVal.BMP280_temperaturemax = airtemp;
+//  }
   MeasVal.BMP280_airpressure = airhpa;
-  if (airhpa > MeasVal.BMP280_airpressuremax) {
-    MeasVal.BMP280_airpressuremax = airhpa;
-  }
+//  if (airhpa > MeasVal.BMP280_airpressuremax) {
+//    MeasVal.BMP280_airpressuremax = airhpa;
+//  }
+#ifdef SSD1306
+//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
+//    displayhPa();
+//  }
+#endif
 }
 
 void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2) {
@@ -174,19 +181,6 @@ void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2) {
     MeasVal.eCO2Indexmax = eco2;
   }
 }
-
-void sethPa(float hPa) {
-  MeasVal.hPaValue = hPa;
-  if (hPa > MeasVal.hPaValuemax) {
-    MeasVal.hPaValuemax = hPa;
-  }
-#ifdef SSD1306
-//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
-//    displayhPa();
-//  }
-#endif
-}
-
 
 void setMic(float dB, float dBmax, float dBAavg){
   MeasVal.dBA = dB;
@@ -252,6 +246,11 @@ void setNOx(uint16_t nox) {
 #endif
 }
 
+void SetSEN545temphum(float airtemp, float airhum) {
+  MeasVal.sen55_temperature = airtemp / 200.0f;
+  MeasVal.sen55_humidity = airhum / 100.0f;
+}
+
 void resetMaxMeasurementValues() {
   if (sen5x_Get_sen5x_enable_state()) {
     MeasVal.PM1p0max = 0.0f;
@@ -260,13 +259,12 @@ void resetMaxMeasurementValues() {
     MeasVal.PM10p0max = 0.0f;
     MeasVal.airNOxmax = 0;
   }
-  MeasVal.AHT2x_humiditymax = 0.0;
-  MeasVal.AHT2x_temperaturemax = 0.0;
-  MeasVal.BMP280_temperaturemax = 0.0;
-  MeasVal.BMP280_airpressuremax = 0.0;
+//  MeasVal.AHT2x_humiditymax = 0.0;
+//  MeasVal.AHT2x_temperaturemax = 0.0;
+//  MeasVal.BMP280_temperaturemax = 0.0;
+//  MeasVal.BMP280_airpressuremax = 0.0;
   MeasVal.eCO2Indexmax = 0;
   MeasVal.AQIndexmax = 0;
-  MeasVal.hPaValuemax = 0.0;
 }
 
 void SetConfigMode(){
@@ -411,11 +409,11 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   }
 }
 
-bool isKeyValid(uint8_t data[]) {
+bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
   if ((data[0] > 66) && (data[0] != 0xFF))
     return true;
   else {
-    printf("Error sensor seems to have no stored key: ");
+    printf("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
     for (int i = 0; i < 12; i++) {
       printf("%02x", data[i]);
     }
@@ -435,7 +433,9 @@ uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
   static bool retstat = true;
   static uint8_t nameConfig[CustomNameMaxLength];
   static uint8_t keybuffer[IdSize];
-
+#ifndef PUBLIC
+  static char uptimeBuf[14];
+#endif
 #ifdef LONGDATAGRAM
   static char Buffer[(IdSize*2)+1];
 #endif
@@ -491,14 +491,33 @@ index = strlen(message);
     retstat &= status;
   }
 
+#ifndef PUBLIC
+  ReadUint8ArrayEEprom(UptimeConfigAddr, keybuffer, IdSize);
+  if (isKeyValid(keybuffer, "Uptime", "dhhmm")) {
+    uint8ArrayToString(Buffer, keybuffer);
+    getUptime(uptimeBuf);
+
+#ifdef OPENSENSEMAP
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%s}", Buffer, uptimeBuf);
+#else
+    sprintf(&message[0], ",{\"name\":\"uptime\", \"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
+#endif
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
+  }
+#endif
+
   if (IsBMP280SensorPresent()) {
     ReadUint8ArrayEEprom(hPaConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer) && (MeasVal.hPaValuemax != 0.0)) {
+    if (isKeyValid(keybuffer, "BMP280", "hPa") && MeasVal.BMP280_airpressure) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.hPaValuemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_airpressure);
 #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.hPaValuemax);
+      sprintf(&message[0], ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_airpressure);
 #endif
       index += strlen(message);
       if (send) {
@@ -508,12 +527,12 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(BMPTempConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "BMP280", "Temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperaturemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperature);
   #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperaturemax);
+      sprintf(&message[0], ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperature);
   #endif
       index += strlen(message);
       if (send) {
@@ -564,9 +583,41 @@ index = strlen(message);
         retstat &= status;
       }
     }
+
+    ReadUint8ArrayEEprom(SEN55TempConfigAddr, keybuffer, IdSize);
+    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "temperature")) {
+      uint8ArrayToString(Buffer, keybuffer);
+#ifdef OPENSENSEMAP
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_temperature);
+#else
+      sprintf(&message[0], ",{\"name\":\"SEN54/5 temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_temperature);
+#endif
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
+    }
+
+    ReadUint8ArrayEEprom(SEN55HumidConfigAddr, keybuffer, IdSize);
+    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "humidity")) {
+      uint8ArrayToString(Buffer, keybuffer);
+#ifdef OPENSENSEMAP
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_humidity);
+#else
+      sprintf(&message[0], ",{\"name\":\"SEN54/5 humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_humidity);
+#endif
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
+      }
+    }
+
+
     if (sen5x_Get_sen5x_enable_state()) {
       ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer)) {
+      if (isKeyValid(keybuffer, "PM1", "particle")) {
         uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
         sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
@@ -593,7 +644,7 @@ index = strlen(message);
       }
 
       ReadUint8ArrayEEprom(PM4ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer)) {
+      if (isKeyValid(keybuffer, "PM4", "particle")) {
         uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
         sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
@@ -624,12 +675,12 @@ index = strlen(message);
 
   if (IsAHT20SensorPresent()) {
     ReadUint8ArrayEEprom(AHTTempConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "AHT2x", "temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperaturemax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperature);
 #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperaturemax);
+      sprintf(&message[0], ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperature);
 #endif
       index += strlen(message);
       if (send) {
@@ -639,12 +690,12 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(AHTHumidConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "AHT2x", "humidity")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humiditymax);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humidity);
   #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humiditymax);
+      sprintf(&message[0], ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humidity);
   #endif
       index += strlen(message);
       if (send) {
@@ -656,7 +707,7 @@ index = strlen(message);
 
   if (IsENS160SensorPresent()) {
     ReadUint8ArrayEEprom(ENSAQIConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "air quality index")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.AQIndexmax);
@@ -671,7 +722,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(ENSTVOCConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "TVOC")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.TVOCIndex);
@@ -686,7 +737,7 @@ index = strlen(message);
     }
 
     ReadUint8ArrayEEprom(ENSeCO2ConfigAddr, keybuffer, IdSize);
-    if (isKeyValid(keybuffer)) {
+    if (isKeyValid(keybuffer, "ENS160", "eCO2")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.eCO2Indexmax);
@@ -1615,6 +1666,10 @@ ESP_States ESP_Upkeep(void) {
             clearDMABuffer();
             stop = HAL_GetTick();
             Info("Message time update in %lu ms", (stop-start));
+            if (HAL_GetTick() < DEVICE_INIT_TIMEOUT) { // during startup the sensors are active after getting time
+              deviceTimeOut = DEVICE_INIT_TIMEOUT;
+              EnabledConnectedDevices();
+            }
             EspState = ESP_STATE_DEINIT;
             Mode = AT_MODE_SEND;
           }

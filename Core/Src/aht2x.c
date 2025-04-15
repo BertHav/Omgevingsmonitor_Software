@@ -238,11 +238,13 @@ AHT20State AHT_Upkeep(void) {
     else {
       AHTState = AHT_STATE_WAIT_FOR_COMPLETION;
     }
+    HAL_Delay(10); // wait for deferred DMA transfers
     break;
 
   case AHT_STATE_WAIT_FOR_COMPLETION:
     if(AHT20_GetMeasurementValues()) {
 //      Debug("AHT20_GetMeasurementValues success");
+      HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       AHTState = AHT_STATE_PROCESS_RESULTS;
     }

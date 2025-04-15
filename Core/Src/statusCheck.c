@@ -209,7 +209,9 @@ void SetAllBlueLED() {
     HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
     HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, false);  // blue on
     HAL_Delay(1000);
-    SetLEDsOff();
+    TIM2 -> CCR4 = LED_OFF;
+    TIM3 -> CCR3 = LED_OFF;
+    HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);  // blue off
     HAL_Delay(500);
   }
 }
@@ -250,8 +252,7 @@ Battery_Status powerCheck(){
 
 void powerDisplay(Battery_Status status){
   if(status == USB_PLUGGED_IN){
-    Debug("USB power detected, LED's are okay");
-
+    Debug("USB power detected, LED's are okay, battery: %fV, solar %dmV", ReadBatteryVoltage(), ReadSolarVoltage());
   }
   if(status == BATTERY_FULL){
     Debug("Battery fully charged");
@@ -265,6 +266,18 @@ void powerDisplay(Battery_Status status){
   if(status == BATTERY_CRITICAL){
     Debug("Battery is critical, stop processes");
   }
+  switch (Read_Charge_Status()) {
+  case CHARGING_OFF:
+    Debug("Battery charging off");
+    break;
+  case CHARGING_ON:
+    Debug("Battery is charging");
+    break;
+  case CHARGING_FULL:
+    Debug("Battery full, charging off");
+    break;
+  }
+
 }
 
 void configCheck(){

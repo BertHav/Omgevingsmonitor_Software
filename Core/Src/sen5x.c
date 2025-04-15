@@ -318,6 +318,7 @@ void sen5xStore() {
     setPM10(sen5x_data.mass_concentration_pm10p0);
   }
   if (((product_name[4] == '4') || (product_name[4] == '5'))) {
+    SetSEN545temphum(sen5x_data.ambient_temperature, sen5x_data.ambient_humidity);
     if (!VOCNOx || usbPluggedIn) {
       if (sen5x_data.voc_index != 0x7fff) {
         SetVOCindicator(sen5x_data.voc_index / 10);
@@ -384,9 +385,9 @@ void sensirion_i2c_hal_sleep_usec(uint32_t useconds) {
 }
 
 bool sen5x_check_for_errors(void){
-  uint32_t device_status = 0;
-  if (sen5x_read_device_status(&device_status)) {
-    Error("Error reading sen5x device status register");
+  uint32_t device_status = sen5x_read_device_status(&device_status);
+  if (device_status == 0xD206) {
+    Error("Error reading sen5x device status register causes by I2C error");
     return true;
   }
   if (device_status == 0) {
@@ -410,7 +411,8 @@ bool sen5x_check_for_errors(void){
   if (device_status & SEN5X_FAN_BLOCKED_ERROR) {
     Debug("sen5x Fan failure, fan is mechanically blocked or broken.");
   }
-  return 1;
+  Debug("Content of SEN5x Device Status Register: 0x%08X", device_status);
+  return true;
 }
 
 void set_light_on_state(void) {
@@ -453,7 +455,9 @@ void sen5x_statemachine() {
           if (sen5x_device_reset()) {
             Error("Error resetting sen5x");
             sen5xErrors++;
-            PMsamplesState = CHECK_SEN5X;
+            sen5x_Power_Off();  // switch off sen5x for a full reset
+            sen5xReadTimer = HAL_GetTick() + SEN5X_STARTUP_DELAY; // wait about 30s when started up
+            PMsamplesState = SAMPLES_TAKEN;
           }
           else {
             Info("sen5x reset executed");
@@ -475,6 +479,9 @@ void sen5x_statemachine() {
         if (sen5x_read_measurement(&sen5x_data)) {
           Error("Error executing sen5x_read_measured_values()");
           sen5xErrors++;
+          sen5x_Power_Off();  // switch off sen5x for a full reset
+          sen5xReadTimer = HAL_GetTick() + SEN5X_STARTUP_DELAY; // wait about 30s when started up
+          PMsamplesState = SAMPLES_TAKEN;
         }
         sen5xSamples++;
         if (sen5xSamples == 31) { // about two times a minute
@@ -500,7 +507,7 @@ void sen5x_statemachine() {
       break;
     case CLEAN_FAN:
       // start the cleaning procedure once a week
-      if ((RTC_GetWeekday() == MONDAY ) && !fanCleaningDone) {
+      if ((weekday == MONDAY ) && (lasthour == 1) && !fanCleaningDone) {
         sen5x_start_fan_cleaning();
         Info("executing fan cleaning");
         sen5xReadTimer = HAL_GetTick() + SEN5X_FAN_CLEANING_PERIOD;  // fan cleaning takes 10 seconds

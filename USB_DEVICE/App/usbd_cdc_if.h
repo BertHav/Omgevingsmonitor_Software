@@ -17,7 +17,7 @@
   ******************************************************************************
   */
 
-//#define USBLOGGING enabled
+// #define USBLOGGING enabled
 
 /* USER CODE END Header */
 
