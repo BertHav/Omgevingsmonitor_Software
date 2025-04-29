@@ -10,6 +10,7 @@
 #include "measurement.h"
 #include "ESP.h"
 #include "statusCheck.h"
+#include "RealTimeClock.h"
 
 
 static I2CWriteMEM WriteMemFunction = NULL;
@@ -22,6 +23,7 @@ static uint8_t bmp280samplecounter = 0;
 static int32_t t_fine;        /*used for pressure compensation, changes with temperature*/
 static int32_t raw_temp, raw_mpa;
 static uint32_t BMP280TimeStamp;
+static uint8_t offday;
 
 BMP280State BMPState = BMP_SET_CONFIG;
 
@@ -262,7 +264,10 @@ BMP280State BMP_Upkeep(void) {
   switch(BMPState) {
   case BMP_STATE_OFF:
     Debug("Measurements are turned off for barometric device BMP280.");
-    BMP280TimeStamp = HAL_GetTick() + 3120000;  // once an hour
+    BMP280TimeStamp = HAL_GetTick() + 780000;  // about 4 times an hour if powered
+    if (weekday != offday) {  // try to enable device again
+      BMPState = BMP_STATE_WAIT;
+    }
     break;
 
   case BMP_STATE_INIT:

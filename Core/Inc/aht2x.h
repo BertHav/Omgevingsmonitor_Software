@@ -41,4 +41,6 @@ void AHT_Init(I2CReadCb readFunction, I2CWriteCB writeFunction, I2CReadDir readD
 AHT20State AHT_Upkeep(void);
 bool AHT20_DeviceConnected();
 
+extern AHT20State AHTState;
+
 #endif /* INC_AHT2X_H_ */

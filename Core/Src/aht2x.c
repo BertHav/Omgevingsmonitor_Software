@@ -9,6 +9,8 @@
 #include "ENS160.h"
 #include "measurement.h"
 #include "ESP.h"
+#include "RealTimeClock.h"
+
 
 static uint8_t AHT20_start[3]      = {AHT20_INIT,0x08,0x00};
 static uint8_t AHT20_soft_reset[1] = {AHT20_RESET};
@@ -23,6 +25,8 @@ static I2CWriteCB WriteFunction = NULL;
 static I2CReadDir ReadDirFunction = NULL;
 static uint8_t airtemphumraw[7];
 static uint8_t AHTerrors = 0;
+static uint8_t offday;
+
 AHT20State AHTState = AHT_STATE_START_MEASUREMENTS; // init is done by probing
 
 static uint8_t CalculateCRC(uint8_t* data, uint8_t length);
@@ -225,6 +229,9 @@ AHT20State AHT_Upkeep(void) {
   case AHT_STATE_OFF:
     Debug("Measurements are turned off for AHT20.");
     AHT20TimeStamp = HAL_GetTick() + 900000;  // about every 15 minute
+    if (weekday != offday) {  // try to enable device again
+      AHTState = AHT_STATE_WAIT;
+    }
     break;
 
   case AHT_STATE_START_MEASUREMENTS:
@@ -233,6 +240,8 @@ AHT20State AHT_Upkeep(void) {
     }
     setSensorLock(AHT20);
     if (!AHT20_StartMeasurement()) {
+      AHT20_reset();
+      AHT20TimeStamp = HAL_GetTick() + 200;
       AHTState = AHT20_ERROR;
     }
     else {
@@ -280,6 +289,7 @@ AHT20State AHT_Upkeep(void) {
     if (AHTerrors > 25) {
       Error("AHT2x more than 25 consecutive errors detected. Device disabled.");
       AHTState = AHT_STATE_OFF;
+      offday = weekday;
     }
     break;
   }

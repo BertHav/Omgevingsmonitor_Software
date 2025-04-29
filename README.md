@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.64](#version464)\
 [version 4.63](#version463)\
 [version 4.62](#version462)\
 [version 4.61](#version461)\
@@ -117,11 +118,14 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 4.64 <a name="version464"></a>
+solution for disabled AHT2x sensor, which resulted in a hanging system.
+
 ## version 4.63 <a name="version463"></a>
-When battery is full and sun is shining upload every 5 minutes
+When battery is full and sun is shining upload every 5 minutes.
 
 ## version 4.62 <a name="version462"></a>
-DST implemented
+DST implemented.
 
 ## version 4.61 <a name="version461"></a>
 Under rare circumstances, an error can occur on the I2C bus to which a SEN5x is connected. The sensors of the SEN5x can then no longer be read. This seems to occur if the power of the USB-C is interrupted during a measurement. The handling of read errors of the SEN5x has been made more robust.

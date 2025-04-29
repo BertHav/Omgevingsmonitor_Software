@@ -309,10 +309,10 @@ void EnabledConnectedDevices() {
   if (SensorProbe.HT_Present) {
     Sensor.HT_measurementEnabled = true;
   }
-  if (SensorProbe.AHT20_Present) {
+  if ((SensorProbe.AHT20_Present) && (AHTState = AHT_STATE_OFF)) {
     Sensor.AHT_measurementEnabled = true;
   }
-  if (SensorProbe.BMP280_Present) {
+  if ((SensorProbe.BMP280_Present) && (BMPState != BMP_STATE_OFF)) {
     Sensor.BMP_measurementEnabled = true;
   }
   if (SensorProbe.ENS160_Present) {

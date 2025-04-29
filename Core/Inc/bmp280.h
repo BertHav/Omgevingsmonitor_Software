@@ -11,6 +11,7 @@
 #include "math.h"
 #include "stm32l0xx_hal.h"
 
+
 #define BMP280_ADDRESS                            0x76 // the 7 bit address
 #define BMP280_I2C_ADDR_SEC                       0x77 // if SDO is connected to Vddio
 //#define BMP280_OK               0
@@ -85,6 +86,8 @@ typedef enum {
     BMP_STATE_WAIT,
     BMP_MODE_SELECT
 } BMP280State;
+
+extern BMP280State BMPState;
 
 typedef bool (*I2CReadMEM)(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes);
 typedef bool (*I2CWriteMEM)(uint8_t address, uint16_t MemAddress, uint16_t MemSize, uint8_t* buffer, uint16_t nrBytes);

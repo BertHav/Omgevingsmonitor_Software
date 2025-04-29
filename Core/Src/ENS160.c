@@ -10,10 +10,12 @@
 #include "utils.h"
 #include "measurement.h"
 #include "statusCheck.h"
+#include "RealTimeClock.h"
 
 bool debugENS160 = false;
 uint32_t ENS160TimeStamp;
 static uint8_t enscnt = 0;
+static uint8_t offday;
 static I2CReadMEM ReadMemFunction = NULL;
 static I2CWriteMEM WriteMemFunction = NULL;
 
@@ -374,9 +376,11 @@ ENS160State ENS_Upkeep(void) {
   switch(ENSState) {
   case ENS_STATE_OFF:
     Debug("Measurements are turned off for gas device ENS160.");
-    ENS160TimeStamp = HAL_GetTick() + 3120000;  // once an hour
+    ENS160TimeStamp = HAL_GetTick() + 780000;  // 4 times an hour
+    if (weekday != offday) {  // try to enable device again
+      ENSState = ENS_STATE_WAIT;
+    }
     break;
-
 
   case ENS_STATE_INIT:
     if (getSensorLock() != FREE) {
