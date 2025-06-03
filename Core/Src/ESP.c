@@ -343,7 +343,6 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
       for (uint8_t resl = 0; resl < 6; resl++) { //Wait some time to reset
         SetAllREDLED();
-        SetLEDsOff();
         HAL_Delay(500);
       }
       HAL_NVIC_SystemReset();

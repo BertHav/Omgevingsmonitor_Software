@@ -194,6 +194,7 @@ void SetAllREDLED() {
   HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
   HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
   HAL_Delay(1000);
+  SetLEDsOff();
 }
 
 void SetAllBlueLED() {

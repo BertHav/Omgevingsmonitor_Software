@@ -2,6 +2,8 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.66](#version466)\
+[version 4.65](#version465)\
 [version 4.64](#version464)\
 [version 4.63](#version463)\
 [version 4.62](#version462)\
@@ -117,6 +119,12 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.66 <a name="version466"></a>
+Some minor changes, no stability issues
+
+## version 4.65 <a name="version465"></a>
+fix for red LED off in case of error with 3 LED on
 
 ## version 4.64 <a name="version464"></a>
 solution for disabled AHT2x sensor, which resulted in a hanging system.
