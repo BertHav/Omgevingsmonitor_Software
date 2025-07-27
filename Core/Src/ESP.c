@@ -3,7 +3,7 @@
  *
  *  Created on: Jun 28, 2024
  *      Author: Joris Blankestijn
- *              Bert Havinga nov-dec
+ *              Bert Havinga nov 2024 - july 2025
  */
 
 #include <eeprom.h>
@@ -41,8 +41,8 @@ static bool InitIsDone = false;
 static bool WifiReset = false;
 bool ReconfigSet = false;
 static bool ConnectionMade = false;
-static bool beursTest = false;
-static bool beurs = false;
+static bool APtested = false;
+//static bool beurs = false;
 static bool setTime = true;
 static bool msgdone = false;
 bool ESPTransmitDone = false;
@@ -53,22 +53,26 @@ static uint16_t txLength = 0;
 static uint8_t oldEspState = 255;
 float batteryCharge = 0.0;
 float solarCharge = 0.0;
-static char message[144];
-static const char APIBeurs[] = "\"https://deomgevingsmonitor.nl//api/set_device_data.php\"";
+static char message[192];
 static const char API[] = "\"https://api.opensensemap.org/boxes/";
+static const char header1[] = "\"content-type: application/json\"";
 static AT_Commands ATCommandArray[10];
 static AT_Commands AT_INIT[] = {AT_WAKEUP, AT_SET_RFPOWER, AT_CHECK_RFPOWER, AT_CWINIT, AT_CWAUTOCONN, AT_CWMODE1, AT_CIPMUX};
 static AT_Commands AT_SEND[] = {AT_WAKEUP,  AT_HTTPCPOST, AT_SENDDATA};
-static AT_Commands AT_BEURSTEST[] = {AT_WAKEUP, AT_CWSTATE};
+static AT_Commands AT_TEST[] = {AT_WAKEUP, AT_CWSTATE};
 static AT_Commands AT_WIFI_CONFIG[] = {AT_WAKEUP, AT_CWINIT, AT_CWMODE3, AT_CWAUTOCONN, AT_CWJAP, AT_CIPMUX};
 static AT_Commands AT_WIFI_RECONFIG[] = {AT_WAKEUP, AT_CWMODE3, AT_CWSAP, AT_CIPMUX, AT_WEBSERVER};
 static AT_Commands AT_SNTP[] = {AT_WAKEUP, AT_CIPSNTPCFG, AT_CIPSNTPTIME, AT_CIPSNTPINTV};
+#ifdef USE_MAIL
+static AT_Commands AT_MAIL[] = {AT_WAKEUP, AT_HTTPCPOST_MAILAPI, AT_SENDMAIL};
+static const char APIMail[] = "\"https://api.smtp2go.com/v3/email/send\"";
+#endif
 uint8_t ATState;
 uint8_t ATCounter = 0;
 static uint8_t errorcntr = 0;
 static uint8_t timeoutcntr = 0;
 static uint32_t ESPTimeStamp = 0;
-static uint32_t ESPNTPTimeStamp = ESP_NTP_INIT_DELAY;  // ticks before the NTP request starts
+uint32_t ESPNTPTimeStamp = ESP_NTP_INIT_DELAY;  // ticks before the NTP request starts
 static uint32_t savedESPTimeStamp = ESP_1ST_DATAGRAM_AFTER_NTP_INIT ; // ticks afer NTP init request before the first measurement datagram is send
 static uint8_t retry = 0;
 
@@ -122,6 +126,22 @@ bool checkName(){
   test = (configSum != 0);
   return test;
 }
+
+#ifdef USE_MAIL
+void setModePowerMail() {
+  uint8_t MailAPIKeyConfig[MailAPIKeyMaxLength];
+  ReadUint8ArrayEEprom(MailAPIKeyConfigAddr, MailAPIKeyConfig, MailAPIKeyMaxLength);
+  if ( strlen((char*)MailAPIKeyConfig) == 0) {
+    Error("No mail API key defined");
+    return;
+  }
+  sendpwremail = DO_PWR_MAIL;
+  Mode = AT_MODE_MAIL;
+  EspState = ESP_STATE_INIT;
+  savedESPTimeStamp = ESPTimeStamp;
+  ESPTimeStamp = 0;
+}
+#endif
 
 void setHIDS(float temp, float humid){
   MeasVal.Temperature = temp;
@@ -288,7 +308,7 @@ void ESP_Init(UART_HandleTypeDef* espUart) {
   EspUart = espUart;
   EspState = ESP_STATE_INIT;
   ESP_GetUID();
-  beurs = checkEEprom();
+//  beurs = checkEEprom();
 }
 
 static bool ESP_Send(uint8_t* command, uint16_t length) {
@@ -337,13 +357,13 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
     if (reset) {
       //switch off the ESP and reset the system
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
-      HAL_Delay(1);
+      HAL_Delay(10);
       HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
-      HAL_Delay(1);
+      HAL_Delay(10);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
-      for (uint8_t resl = 0; resl < 6; resl++) { //Wait some time to reset
+      for (uint8_t resl = 0; resl < 10; resl++) { //Wait some time to reset
         SetAllREDLED();
-        HAL_Delay(500);
+        HAL_Delay(1000);
       }
       HAL_NVIC_SystemReset();
     }
@@ -427,7 +447,35 @@ void uint8ArrayToString(char *destination, uint8_t data[]) {
   }
 }
 
-uint16_t CreateMessage(bool onBeurs, bool *txstat, bool send) {
+#ifdef USE_MAIL
+uint16_t CreateMailMessage(bool *txstat, bool send) {
+  static bool status = false;
+  static bool retstat = true;
+  static uint8_t nameConfig[CustomNameMaxLength];
+  static uint8_t SendFromnameConfig[SendFromNameMaxLength];
+  static uint8_t SendTonameConfig[SendToNameMaxLength];
+  uint16_t lngth = 0;
+  ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
+  ReadUint8ArrayEEprom(SendFromNameConfigAddr, SendFromnameConfig, SendFromNameMaxLength);
+  ReadUint8ArrayEEprom(SendToNameConfigAddr, SendTonameConfig, SendToNameMaxLength);
+  sprintf(message, "{\"sender\": \"%s\",\"to\": [\"%s\"],\"subject\": \"Battery status\",", (char*)SendFromnameConfig, (char*)SendTonameConfig);
+  lngth = strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
+  sprintf(message, "\"text_body\": \"Battery of device %s is nearly empty. Actual voltage is %.2fV, about 20%%\"}", (char*)nameConfig, ReadBatteryVoltage());
+  lngth += strlen(message);
+  if (send) {
+    status = ESP_Send((uint8_t*)message, strlen(message));
+    retstat &= status;
+  }
+  *txstat = retstat;
+  return lngth;
+}
+#endif
+
+uint16_t CreateMessage(bool *txstat, bool send) {
   static bool status = false;
   static bool retstat = true;
   static uint8_t nameConfig[CustomNameMaxLength];
@@ -497,7 +545,7 @@ index = strlen(message);
     getUptime(uptimeBuf);
 
 #ifdef OPENSENSEMAP
-    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%s}", Buffer, uptimeBuf);
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
 #else
     sprintf(&message[0], ",{\"name\":\"uptime\", \"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
 #endif
@@ -554,7 +602,7 @@ index = strlen(message);
     retstat &= status;
   }
 
-  if(!onBeurs){
+//  if(!onBeurs){
     ReadUint8ArrayEEprom(SolVoltConfigAddr, keybuffer, IdSize);
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
@@ -587,7 +635,7 @@ index = strlen(message);
     if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_temperature);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_temperature);
 #else
       sprintf(&message[0], ",{\"name\":\"SEN54/5 temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_temperature);
 #endif
@@ -602,7 +650,7 @@ index = strlen(message);
     if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "humidity")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.sen55_humidity);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_humidity);
 #else
       sprintf(&message[0], ",{\"name\":\"SEN54/5 humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_humidity);
 #endif
@@ -670,7 +718,7 @@ index = strlen(message);
         retstat &= status;
       }
     }
-  }
+//  }
 
   if (IsAHT20SensorPresent()) {
     ReadUint8ArrayEEprom(AHTTempConfigAddr, keybuffer, IdSize);
@@ -845,6 +893,7 @@ void StartProg(){
   const char start[] = AT_RESPONSE_START;
   const char WIFI[] = AT_RESPONSE_WIFI;
   const char TIME[] = AT_RESPONSE_TIME_UPDATED;
+  const char MAIL_API[] = AT_RESPONSE_MAIL_API;
   if(expectation == RECEIVE_EXPECTATION_OK){
     ParsePoint = strstr(tempBuf, OK);
   }
@@ -857,11 +906,14 @@ void StartProg(){
   if(expectation == RECEIVE_EXPECTATION_TIME){
     ParsePoint = strstr(tempBuf, TIME);
   }
-
+  if(expectation == RECEIVE_EXPECTATION_MAIL_API){
+    ParsePoint = strstr(tempBuf, MAIL_API);
+  }
   char *ParsePoint2 = strstr(tempBuf, ERROR);
   char *ParsePoint3 = strstr(tempBuf, WIFI);
-  char *ParsePoint4 = strstr(tempBuf, SSIDBeurs);
+  char *ParsePoint4 = strstr(tempBuf, SSID);
   char *ParsePoint5 = strstr(tempBuf, FAIL);
+  char *ParsePoint6 = strstr(tempBuf, MAIL_API);
   if(len > 1 ){
     if(ParsePoint != 0 && *ParsePoint == 'O'){
 // call function to update time in realtimeclock.c
@@ -892,8 +944,12 @@ void StartProg(){
       ConnectionMade = true;
     }
     if(ParsePoint4 != 0 && *ParsePoint4 == '2'){
-      beurs = true;
     }
+#ifdef USE_MAIL
+    if(ParsePoint6 != 0 && *ParsePoint6 == '{'){
+      status = RECEIVE_STATUS_MAIL_API;
+    }
+#endif
   }
   return(status);
 
@@ -982,10 +1038,10 @@ bool CWAUTOCONN(){
 }
 
 bool CWJAP(){
-  beursTest = true;
+  APtested = true;
   char atCommandBuff[100];
   memset(atCommandBuff, '\0', 100);
-  sprintf(atCommandBuff, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSIDBeurs, PasswordBeurs);
+  sprintf(atCommandBuff, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, WLANPassword);
   uint8_t len = strlen(atCommandBuff);
   char atCommand[len+1];
   memset(atCommand, '\0', len+1);
@@ -1051,27 +1107,16 @@ bool WEBSERVER(){
 
 //These are the commands necesarry for sending data.
 bool HTTPCPOST(){
-//  char atCommandBuff[256];
   bool txresult = false;
 
-//  memset(atCommandBuff, '\0', 256);
-  uint16_t length = CreateMessage(beurs, &txresult, false);
-  if(beurs){
-//    sprintf(atCommandBuff, "AT+HTTPCPOST=%s,%d,1,\"content-type: application/json\"\r\n", APIBeurs, length);
-    sprintf(message, "AT+HTTPCPOST=%s,%d,1,\"content-type: application/json\"\r\n", APIBeurs, length);
-  }
-  else{
-    static uint8_t boxConfig[IdSize];
-    static char Buffer[25];
-    ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
-    uint8ArrayToString(Buffer, boxConfig);
-//    sprintf(atCommandBuff, "AT+HTTPCPOST=%s%s/data\",%d,1,\"content-type: application/json\"\r\n", API, Buffer, length);
-    sprintf(message, "AT+HTTPCPOST=%s%s/data\",%d,1,\"content-type: application/json\"\r\n", API, Buffer, length);
-  }
-//  uint16_t len = strlen(atCommandBuff);
+  uint16_t length = CreateMessage(&txresult, false);
+  static uint8_t boxConfig[IdSize];
+  static char Buffer[25];
+  ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
+  uint8ArrayToString(Buffer, boxConfig);
+  sprintf(message, "AT+HTTPCPOST=%s%s/data\",%d,1,%s\r\n", API, Buffer, length, header1);
   uint16_t len = strlen(message);
-  Debug("length of message (former atCommandBuff) during header tx: %d bool value of tx result %d", len, txresult);
-//  if(ESP_Send((uint8_t*)atCommandBuff, len)){
+  Debug("length of message (former atCommandBuff) during header tx: %d, bool value of tx result %d", len, txresult);
   if(ESP_Send((uint8_t*)message, len)){
     return true;
   }
@@ -1080,18 +1125,31 @@ bool HTTPCPOST(){
   }
 }
 
-bool SENDDATA(){
+#ifdef USE_MAIL
+bool SENDMAIL() {
   bool result = false;
-/*
+  txLength = CreateMailMessage(&result, true);
+  Debug("SENDMAIL ESP_Send result = %d, transmitted data %d chars", result, txLength);
+  return result;
+}
+
+bool HTTPCPOST_MAILAPI() {
+  bool txresult = false;
+  uint16_t maillength = CreateMailMessage(&txresult, false);
+  uint8_t MailAPIKeyConfig[MailAPIKeyMaxLength];
+  ReadUint8ArrayEEprom(MailAPIKeyConfigAddr, MailAPIKeyConfig, MailAPIKeyMaxLength);
+  sprintf(message, "AT+HTTPCPOST=%s,%d,3,%s,\"accept: application/json\",\"X-Smtp2go-Api-Key: %s\"\r\n", APIMail, maillength, header1, (char*)MailAPIKeyConfig);
   uint16_t len = strlen(message);
-  if(ESP_Send((uint8_t*)message, len)) {
+  if(ESP_Send((uint8_t*)message, len)){
     return true;
   }
-  else{
-    return false;
-  }
-*/
-  txLength = CreateMessage(beurs, &result, true);
+  return false;
+}
+#endif
+
+bool SENDDATA(){
+  bool result = false;
+  txLength = CreateMessage(&result, true);
   Debug("SENDDATA ESP_Send result = %d, transmitted data %d chars", result, txLength);
   return result;
 }
@@ -1213,6 +1271,11 @@ bool ATCompare(uint8_t AT_Command_Received, uint8_t AT_Command_Expected){
   if(AT_Command_Expected == RECEIVE_EXPECTATION_TIME){
     value = (AT_Command_Received == RECEIVE_STATUS_TIME);
   }
+#ifdef USE_MAIL
+  if(AT_Command_Expected == RECEIVE_EXPECTATION_MAIL_API){
+    value = (AT_Command_Received == RECEIVE_STATUS_MAIL_API);
+  }
+#endif
   return(value);
 }
 
@@ -1340,6 +1403,19 @@ bool AT_Send(AT_Commands state){
     ATCommandSend = CIPSNTPINTV();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
+#ifdef USE_MAIL
+  case AT_HTTPCPOST_MAILAPI:
+    Debug("Start EMAIL Post via HTTP");
+    ATCommandSend = HTTPCPOST_MAILAPI();
+    ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_LONG;
+    break;
+
+  case AT_SENDMAIL:
+    Debug("Send Email content");
+    ATCommandSend = SENDMAIL();
+    ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME; // + 7000;
+    break;
+#endif
 
   case AT_END:
     break;
@@ -1366,6 +1442,7 @@ void ESP_WakeTest(void) {
         HAL_Delay(10);
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
         ESPTimeStamp = HAL_GetTick() + ESP_START_UP_TIME;
+        HAL_Delay(10);
         EspTurnedOn = true;
       }
       if(ESP_Receive(RxBuffer, ESP_MAX_BUFFER_SIZE)) {
@@ -1444,7 +1521,11 @@ ESP_States ESP_Upkeep(void) {
 
   if ((EspState != oldEspState) && (GetVerboseLevel() == VERBOSE_ALL)) {
     oldEspState = EspState;
-    if (!((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
+#ifdef USE_MAIL
+    if ( !((oldEspState == 3) && ((ATCommand == AT_HTTPCPOST) || (ATCommand == AT_HTTPCPOST_MAILAPI))) ) {
+#else
+      if ( !((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
+#endif
       Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
     }
   }
@@ -1465,6 +1546,7 @@ ESP_States ESP_Upkeep(void) {
 //      Debug("entry in ESP_STATE_INIT");
       deviceTimeOut = 0;
       if (!AllDevicesReady()) {
+//        Debug("Waiting for all devices ready");
         break;
       }
       SetESPIndicator();
@@ -1481,6 +1563,7 @@ ESP_States ESP_Upkeep(void) {
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
         ESPTimeStamp = HAL_GetTick() + ESP_START_UP_TIME;
         EspTurnedOn = true;
+        Debug("ESP powered on.");
       }
       // Wait for ESP to be ready
       // Start reading DMA buffer for AT commands
@@ -1518,15 +1601,27 @@ ESP_States ESP_Upkeep(void) {
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-      if(InitIsDone && ConnectionMade && !beursTest){
-        memcpy(ATCommandArray, AT_BEURSTEST, 2);
+//      if(InitIsDone && ConnectionMade && !beursTest){
+      if(InitIsDone && ConnectionMade && !APtested){
+        memcpy(ATCommandArray, AT_TEST, 2);
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
         Mode = AT_MODE_TEST;
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-      if(InitIsDone && ConnectionMade && beursTest && !setTime){
+#ifdef USE_MAIL
+      if(InitIsDone && ConnectionMade && APtested && (sendpwremail == DO_PWR_MAIL)){
+        memcpy(ATCommandArray, AT_MAIL, 3);
+        EspState = ESP_STATE_SEND;
+        ATCounter = 0;
+        Mode = AT_MODE_MAIL;
+        ATCommand = ATCommandArray[ATCounter];
+        ATExpectation = RECEIVE_EXPECTATION_OK;
+      }
+#endif
+//      if(InitIsDone && ConnectionMade && beursTest && !setTime){
+      if(InitIsDone && ConnectionMade && APtested && !setTime && (sendpwremail != DO_PWR_MAIL)){
         memcpy(ATCommandArray, AT_SEND, 3);
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
@@ -1535,7 +1630,8 @@ ESP_States ESP_Upkeep(void) {
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-      if(InitIsDone && ConnectionMade && beursTest && setTime){
+//      if(InitIsDone && ConnectionMade && beursTest && setTime){
+      if(InitIsDone && ConnectionMade && APtested && setTime && (sendpwremail != DO_PWR_MAIL)){
         memcpy(ATCommandArray, AT_SNTP, 4);
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
@@ -1643,6 +1739,11 @@ ESP_States ESP_Upkeep(void) {
       if(ATCommand == AT_CIPSNTPCFG){
          ATExpectation = RECEIVE_EXPECTATION_TIME;
       }
+#ifdef USE_MAIL
+      if(ATCommand == AT_SENDMAIL){
+         ATExpectation = RECEIVE_EXPECTATION_MAIL_API;
+      }
+#endif
       EspState = ESP_STATE_SEND;
       if(ATCommand == AT_END){
         if(Mode == AT_MODE_SEND){
@@ -1672,6 +1773,17 @@ ESP_States ESP_Upkeep(void) {
             EspState = ESP_STATE_DEINIT;
             Mode = AT_MODE_SEND;
           }
+#ifdef USE_MAIL
+        else if (Mode == AT_MODE_MAIL) {
+            clearDMABuffer();
+            Info("Email message send");
+            ESPTimeStamp = savedESPTimeStamp;
+            sendpwremail = DONE;
+            EspState = ESP_STATE_DEINIT;
+            Mode = AT_MODE_SEND;
+            EnabledConnectedDevices();
+          }
+#endif
         else{
           EspState = ESP_STATE_RESET;
         }
@@ -1689,6 +1801,7 @@ ESP_States ESP_Upkeep(void) {
       EspState = ESP_STATE_RESET;
       HAL_Delay(1);
       ResetESPIndicator();
+      Debug("ESP powered off.");
       if (Check_USB_PowerOn() || userToggle) {
         EnabledConnectedDevices();
       }
@@ -1705,19 +1818,23 @@ ESP_States ESP_Upkeep(void) {
         }
         if(Mode == AT_MODE_CONFIG){
           ConnectionMade = true;
-          beurs = true;
           EspState = ESP_STATE_MODE_SELECT;
         }
         if(Mode == AT_MODE_SEND){
           EspState = ESP_STATE_INIT;
         }
+#ifdef USE_MAIL
+        if(Mode == AT_MODE_MAIL){
+          EspState = ESP_STATE_CONFIG;
+        }
+#endif
         if(Mode == AT_MODE_RECONFIG){
           EspState = ESP_STATE_CONFIG;
           Info("Do nothing until reset");
         }
         if(Mode == AT_MODE_TEST){
           EspState = ESP_STATE_MODE_SELECT;
-          beursTest = true;
+          APtested = true;  // deze lijkt mij dubieus wordt in CWJAP gezet.
         }
         if ((ReconfigSet) && (Mode != AT_MODE_RECONFIG)) {
           EspState = ESP_STATE_INIT;

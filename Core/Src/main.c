@@ -73,6 +73,8 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
+  bool usbinitiated = false;
+  uint8_t sendpwremail = CLEAR;
   static bool priorUSBpluggedIn = false;
   static bool stlinkpwr = true;
   uint8_t MICstate;
@@ -108,17 +110,6 @@ void SetTestDone(){
   HAL_Delay(500);
   SetLEDsOff();
   InitDone();
-}
-
-void FlashLEDs(){
-  for (uint8_t i=0; i<5 ; i++){
-    SetDBLED(true, true, true);
-    SetStatusLED(LED_OFF, LED_OFF, LED_ON);
-    SetVocLED(LED_OFF, LED_OFF, LED_ON);
-    HAL_Delay(250);
-    SetLEDsOff();
-    HAL_Delay(250);
-  }
 }
 
 void ESP_Programming_Read_Remaining_DMA()
@@ -215,7 +206,7 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 #ifdef USBLOGGING
-  vcp_init();
+  usbinitiated = vcp_init(Check_USB_PowerOn());
 #endif
   // General TODO 's
 	/*
@@ -269,16 +260,41 @@ int main(void)
 
     }
     configCheck();
+    if (charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
+      WalkAllRedLED();
+      Sensor.PM_measurementEnabled = false;
+#ifdef USE_MAIL
+      if ((charge == BATTERY_LOW) && (sendpwremail == CLEAR) && !EspTurnedOn && (!Check_USB_PowerOn())) {
+        setModePowerMail();
+        ESP_Upkeep();
+      }
+#endif
+    }
+
+#ifdef USE_MAIL
+/*
+    // ==== used for email testing at startup in case of a different mail provider
+    float vltg = ReadBatteryVoltage();
+    if ((spanning <= 4.170000) && (sendpwremail == CLEAR) && !EspTurnedOn && (ESPNTPTimeStamp != ESP_NTP_INIT_DELAY) && (!Check_USB_PowerOn())) {
+      Debug("Battery voltage is: %fV", vltg);
+      Sensor.PM_measurementEnabled = false;
+      AllDevicesReady();
+      setModePowerMail();
+      ESP_Upkeep();
+    }
+    // ==== end of test mail
+*/
+#endif
 #ifndef STLINK_V3PWR
 //==== disable for power measurements in test condition
     stlinkpwr = false;
-    if (charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
-      FlashLEDs();
-      Sensor.PM_measurementEnabled = false;
-    }
     if (charge == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
        batteryEmpty = true;
-       Enter_Standby_Mode(); // we are going in deep sleep, nearly off and no wakeup from RTC
+       // we are going in deep sleep, nearly off and no wakeup from RTC Do not use standby mode,
+       // because without a modification on the PCB the ESP32 is activated
+       // instead use the stop mode with or without RTC
+       //Enter_Standby_Mode();
+       Enter_Stop_Mode_for_empty_battery(120); // light up the leds every 2 minutes
     }
     else{
       batteryEmpty = false;
@@ -334,7 +350,6 @@ int main(void)
       }
     }
 #ifdef USBLOGGING
-
     int len = vcp_recv (u1_rx_buff, 3);
     if (len > 0) {
       check_cli_command();

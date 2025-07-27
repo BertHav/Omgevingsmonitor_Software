@@ -33,6 +33,7 @@ extern bool userToggle;
 void setuserToggle(void);
 void configCheck();
 void SetAllREDLED();
+void WalkAllRedLED();
 void SetAllBlueLED();
 Battery_Status Battery_Upkeep();
 Battery_Status powerCheck();

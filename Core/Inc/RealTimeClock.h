@@ -53,6 +53,7 @@ uint32_t getPosixTime(void);
 // Functie om een wakeup timer in te stellen
 void RTC_SetWakeUpTimer(uint32_t secondsOfSleep);
 void Enter_Standby_Mode(void);
+void Enter_Stop_Mode_for_empty_battery(uint16_t sleepTime);
 void Enter_Stop_Mode(uint16_t sleepTime);
 
 void InitClock(RTC_HandleTypeDef *hrtc);

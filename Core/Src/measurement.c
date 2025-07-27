@@ -261,6 +261,7 @@ void Device_Test(){
 
 bool AllDevicesReady() {
   static bool prevstatus = true;
+  static bool allinwait = false;
   if (TimestampIsReached(deviceTimeOut)) {
     if (!sensorsdisablereq) {
       Debug("Requesting all devices ready");
@@ -294,10 +295,12 @@ bool AllDevicesReady() {
         Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d, Lock is from sensor column : %d (0 is FREE)",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
           Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled, getSensorLock());
         prevstatus = status;
+        allinwait = false;
       }
-      if (status) {
+      if (status && !allinwait) {
         Debug("All sensors in wait");
         prevstatus = status;
+        allinwait = true;
       }
       return status;
     }
@@ -309,11 +312,17 @@ void EnabledConnectedDevices() {
   if (SensorProbe.HT_Present) {
     Sensor.HT_measurementEnabled = true;
   }
-  if ((SensorProbe.AHT20_Present) && (AHTState = AHT_STATE_OFF)) {
+  if ((SensorProbe.AHT20_Present) && (AHTState != AHT_STATE_OFF)) {
     Sensor.AHT_measurementEnabled = true;
+  }
+  if ((SensorProbe.AHT20_Present) && (AHTState == AHT_STATE_OFF)) {
+    Info("AHT2x sensor is disabled");
   }
   if ((SensorProbe.BMP280_Present) && (BMPState != BMP_STATE_OFF)) {
     Sensor.BMP_measurementEnabled = true;
+  }
+  if ((SensorProbe.BMP280_Present) && (BMPState == BMP_STATE_OFF)) {
+    Info("BMP20 sensor is disabled");
   }
   if (SensorProbe.ENS160_Present) {
     Sensor.ENS_measurementEnabled = true;

@@ -42,6 +42,11 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+typedef enum {
+CLEAR,
+DO_PWR_MAIL,
+DONE
+}PWR_MAIL_Mode;
 
 /* USER CODE END EC */
 
@@ -56,6 +61,7 @@ void Error_Handler(void);
 extern uint32_t deviceTimeOut;
 extern uint8_t MICstate;
 extern uint8_t ESPstate;
+extern uint8_t sendpwremail;
 
 /* USER CODE END EFP */
 
@@ -103,8 +109,13 @@ extern uint8_t ESPstate;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "4.66 BH"
-#define CURRENT_WEEK "2025w23-2"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "4.67 BH"
+#define CURRENT_WEEK "2025w30-7"  // -x is day number of week i.e. Monday = 1
+
+// Mail variables. Uncomment the next line and a mail will be sent at
+// a nearly dead battery event to the mailapi of smtp2go
+#define USE_MAIL
+
 #define PUBLIC
 //#define STLINK_V3PWR true
 

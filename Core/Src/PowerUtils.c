@@ -64,7 +64,13 @@ uint16_t ReadSolarVoltage(void){
 
 // True if 5V on USB Connector
 bool Check_USB_PowerOn(void){
-  return (HAL_GPIO_ReadPin(VusbDetect_GPIO_Port, VusbDetect_Pin));
+   if (HAL_GPIO_ReadPin(VusbDetect_GPIO_Port, VusbDetect_Pin)) {
+     if (sendpwremail == DONE) {
+       sendpwremail = CLEAR;
+     }
+     return true;
+   }
+   return false;
 }
 
 // Returns Battery status in TypeDef

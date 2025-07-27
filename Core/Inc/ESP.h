@@ -20,7 +20,7 @@
 
 #define LONGMESSAGES true  // show long messages f.i. the datagram on debug UART
 #define LONGDATAGRAM  // use beurs or opensensemap, if not defined use nodeRed
-//#define OPENSENSEMAP // use optimum diagram for opensensemap
+#define OPENSENSEMAP // use optimum diagram for opensensemap
 
 #define ESP_MAX_UART_RETRIES 2
 #define ESP_MAX_BUFFER_SIZE 256
@@ -36,7 +36,7 @@
 #define ESP_1ST_DATAGRAM_AFTER_NTP_INIT 32000; // ticks afer NTP init request before the first measurement datagram is send
 #define ESP_UNTIL_NEXT_SEND 240000  // about every 5 minutes
 #define ESP_UNTIL_NEXT_RETRANSMIT_SEND 50000  //when failed try it next minute
-#define ESP_NTP_INIT_DELAY 0;  // getting time is part of the ESP startup procedure, executed direct after ESP init
+#define ESP_NTP_INIT_DELAY 0  // getting time is part of the ESP startup procedure, executed direct after ESP init
 #define ESP_UNTIL_NEXT_NTP 75398  //about every 24 hours
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""
@@ -53,8 +53,9 @@
 #define AT_RESPONSE_START ">"
 #define AT_RESPONSE_WIFI "WIFI CONNECTED"
 #define AT_RESPONSE_TIME_UPDATED "+TIME_UPDATED"
+#define AT_RESPONSE_MAIL_API "{\"succeeded\":1"
 
-#define AT_COMMANDS_SIZE 21
+#define AT_COMMANDS_SIZE 22
 
 typedef struct
 {
@@ -112,7 +113,8 @@ typedef enum {
   AT_MODE_SEND,
   AT_MODE_RECONFIG,
   AT_MODE_TEST,
-  AT_MODE_GETTIME
+  AT_MODE_GETTIME,
+  AT_MODE_MAIL
 }AT_Mode;
 
 typedef enum {
@@ -127,7 +129,8 @@ typedef enum {
   RECEIVE_STATUS_HOME,
   RECEIVE_STATUS_SSID,
   RECEIVE_STATUS_LOOP,
-  RECEIVE_STATUS_TIME
+  RECEIVE_STATUS_TIME,
+  RECEIVE_STATUS_MAIL_API
 }Receive_Status;
 
 typedef enum {
@@ -136,7 +139,8 @@ typedef enum {
   RECEIVE_EXPECTATION_START,
   RECEIVE_EXPECTATION_WIFI,
   RECEIVE_EXPECTATION_SSID,
-  RECEIVE_EXPECTATION_TIME
+  RECEIVE_EXPECTATION_TIME,
+  RECEIVE_EXPECTATION_MAIL_API
 } AT_Expectation;
 
 typedef enum {
@@ -159,30 +163,34 @@ typedef enum {
 } ESP_States;
 
 typedef enum {
-  AT_WAKEUP,
+  AT_WAKEUP,    // 0
   AT_SET_RFPOWER,
   AT_CHECK_RFPOWER,
   AT_RESTORE,
   AT_CWINIT,
-  AT_CWMODE1,
+  AT_CWMODE1,  // 5
   AT_CWMODE2,
   AT_CWAUTOCONN,
   AT_CWJAP,
   AT_CWSTATE,
-  AT_CWMODE3,
+  AT_CWMODE3, // 10
   AT_CWSAP,
   AT_CIPMUX,
   AT_WEBSERVER,
   AT_HTTPCPOST,
-  AT_SENDDATA,
+  AT_SENDDATA,  //15
   AT_SLEEP,
   AT_CIPSNTPCFG,
   AT_CIPSNTPTIME,
   AT_CIPSNTPINTV,
+#ifdef USE_MAIL
+  AT_HTTPCPOST_MAILAPI, // 20
+  AT_SENDMAIL,
+#endif
   AT_END
 } AT_Commands;
 
-typedef struct BeursConfig {
+typedef struct WLANConfig {
   char SSID[50];
   char Password[50];
 }WifiConfig;
@@ -201,6 +209,7 @@ typedef struct {
 extern bool ESPTransmitDone;
 extern bool EspTurnedOn;
 extern bool ReconfigSet;
+extern uint32_t ESPNTPTimeStamp;
 void uint8ArrayToString(char *destination, uint8_t data[]);
 bool GetReconfigMode();
 void ESP_Init(UART_HandleTypeDef* espUart);
@@ -209,6 +218,7 @@ void ESP_Reset(void);
 void ESP_Sleep(void);
 void ESP_DeInit(void);
 void ESP_WakeTest();
+void setModePowerMail();
 void setVOC(uint16_t voc);
 void setAHT2x(float airhum, float airtemp);
 void setBMP280(float airtemp, float airhpa);

@@ -17,7 +17,7 @@
   ******************************************************************************
   */
 
-#define USBLOGGING enabled
+// #define USBLOGGING enabled
 
 /* USER CODE END Header */
 
@@ -131,7 +131,7 @@ void GetUsbRxNextChunk(uint32_t writePointer);
 uint8_t * GetUsbRxPointer();
 uint32_t GetUsbRxDataSize();
 #ifdef USBLOGGING
-void vcp_init();
+bool vcp_init(bool USBconnected);
 int vcp_send(uint8_t* buf, uint16_t len);
 int vcp_recv(uint8_t* buf, uint16_t len);
 void vcp_service();

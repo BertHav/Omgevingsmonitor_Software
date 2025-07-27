@@ -373,8 +373,12 @@ void GetUsbRxNextChunk(uint32_t writePointer)
 }
 
 #ifdef USBLOGGING
-void vcp_init() {
-  while (vcp_tx_fifo.data == 0);    // Wait until the CDC library calls CDC_Init_FS, by checking for a non-null buffer pointer
+bool vcp_init(bool USBconnected) {
+  if (USBconnected) {
+    while (vcp_tx_fifo.data == 0);    // Wait until the CDC library calls CDC_Init_FS, by checking for a non-null buffer pointer
+    return true;
+  }
+  return false;
 }
 
 int vcp_send(uint8_t* buf, uint16_t len) {

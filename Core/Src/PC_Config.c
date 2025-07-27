@@ -59,7 +59,8 @@ void Process_PC_Config(uint8_t* data) //, uint16_t length)
 
 void ProcessCmd(Receive_MSG msg)
 {
-    switch (msg.Command)
+  printf_USB("(msg.Command: %d",msg.Command);
+  switch (msg.Command)
     {
         case BoxConfigCmd:  // 0
             WriteUint8ArrayEepromSafe(BoxConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
@@ -133,8 +134,18 @@ void ProcessCmd(Receive_MSG msg)
         case SEN55HumidConfigCmd: // 24
           WriteUint8ArrayEepromSafe(SEN55HumidConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
+        case SendFromNameConfigCmd:  // 25
+            WriteUint8ArrayEepromSafe(SendFromNameConfigAddr, msg.Payload, msg.PayloadLength, SendFromNameMaxLength);
+        break;
+        case SendToNameConfigCmd:  // 26
+          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+          WriteUint8ArrayEepromSafe(SendToNameConfigAddr, msg.Payload, msg.PayloadLength, SendToNameMaxLength);
+        break;
+        case MailAPIKeyConfigCmd:  // 27
+            WriteUint8ArrayEepromSafe(MailAPIKeyConfigAddr, msg.Payload, msg.PayloadLength, MailAPIKeyMaxLength);
+        break;
 #ifndef PUBLIC
-        case UptimeConfigCmd: // 25
+        case UptimeConfigCmd: // 28
           WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
 #endif
@@ -243,8 +254,13 @@ void PC_show_Keys() {
   static uint8_t pwdConfig[pwdMaxLength];         // 22
   static uint8_t SEN55TempConfig[IdSize];         // 23
   static uint8_t SEN55HumidConfig[IdSize];        // 24
+#ifdef USE_MAIL
+  static uint8_t SendFromnameConfig[SendFromNameMaxLength]; //25
+  static uint8_t SendTonameConfig[SendToNameMaxLength]; //26
+  static uint8_t MailAPIKeyConfig[MailAPIKeyMaxLength]; //27
+#endif
 #ifndef PUBLIC
-  static uint8_t UptimeConfig[IdSize];            // 25
+  static uint8_t UptimeConfig[IdSize];            // 28
 #endif
 
   static char Buffer[25];
@@ -378,11 +394,29 @@ void PC_show_Keys() {
   uint8ArrayToString(Buffer, SEN55HumidConfig);
   sprintf(msg, "24 - SEN54/55 Humidity sensor id ---: %s\r\n", Buffer);
   PC_selectout(&msg[0], usb_out);
+#ifdef USE_MAIL
+  ReadUint8ArrayEEprom(SendFromNameConfigAddr, SendFromnameConfig, SendFromNameMaxLength);
+  sprintf(msg, "25 - Stored Send from name ---------: ");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)SendFromnameConfig);  // probably too long to held in same buffer
+  PC_selectout(&msg[0], usb_out);
 
+  ReadUint8ArrayEEprom(SendToNameConfigAddr, SendTonameConfig, SendToNameMaxLength);
+  sprintf(msg, "26 - Stored Send to name -----------: ");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)SendTonameConfig);  // probably too long to held in same buffer
+  PC_selectout(&msg[0], usb_out);
+
+  ReadUint8ArrayEEprom(MailAPIKeyConfigAddr, MailAPIKeyConfig, MailAPIKeyMaxLength);
+  sprintf(msg, "27 - Stored SMTP2go API key --------: ");
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)MailAPIKeyConfig);  // probably too long to held in same buffer
+  PC_selectout(&msg[0], usb_out);
+#endif
 #ifndef PUBLIC
   ReadUint8ArrayEEprom(UptimeConfigAddr, UptimeConfig, IdSize);
   uint8ArrayToString(Buffer, UptimeConfig);
-  sprintf(msg, "25 - Uptime sensor id --------------: %s\r\n", Buffer);
+  sprintf(msg, "28 - Uptime sensor id --------------: %s\r\n", Buffer);
   PC_selectout(&msg[0], usb_out);
 #endif
 
@@ -400,6 +434,16 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB(" $05,67af09374cdef30007b35055\r\n");
   HAL_Delay(10);
+  printf_USB("For changing string entries use prefix S, example: ");
+  HAL_Delay(10);
+  printf_USB("S12,Testsysteem (max 48 chars)\r\n");
+  HAL_Delay(10);
+/*
+#ifdef USBLOGGING
+  printf_USB("U - toggle logging on/off\r\n");
+  HAL_Delay(10);
+#endif
+*/
   if (!usb_out) {
     printf("A key can only be changed by USB input or the by configuration programm.\r\n");
   }
@@ -412,9 +456,9 @@ uint8_t ascii_to_uint8(uint8_t *inchar) {
   }
   uint8_t value = (inchar[0] - '0') * 10 + (inchar[1] - '0');
 #ifndef PUBLIC
-  if (value > 25 || value == 21 || value == 22) {
+  if (value > 28 || value == 21 || value == 22) {
 #else
-  if (value > 24 || value == 21 || value == 22) {
+  if (value > 27 || value == 21 || value == 22) {
 #endif
     printf_USB("Error: value out of range\r\n");
     return 100;
@@ -427,66 +471,92 @@ bool Process_USB_input(uint8_t* data) {
   static uint32_t len = 6;
   uint32_t length = GetUsbRxDataSize();
   uint8_t r = 0;
-  char Buffer[25];
+  uint8_t i = 0;
+  char Buffer[48];
   uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
   if ((length == 1) && (message != NULL) && (len != 28)){
       Debug("Switching to input length of 28 for full opensensemap keylength");
       len = 28;
   }
-  if (length >= len) {
-//    HAL_Delay(20);
-    printf_USB("minimum required USB input reached: %s\r\n", (const char*)data);
-    printf_USB("USB input: %s\r\n", (const char*)data);
-//    message = (unsigned char*)data;
-//    message = data;
-    if (data[0] == '$') {
-      len = 28;
-    }
-    if((data[0] == '#') || (data[0] == '$')) {
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_S);  // zoek op S
+  if ((length == 1) && (message != NULL) && (len != 48)){
+      Debug("Switching to input length of 48 for full name strings");
+      len = 48;
+  }
+/*
+#ifdef USBLOGGING
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_U);  // zoek op S
+  if ((length == 1) && (message != NULL)){
+    printf_USB("\r\nSwitching USB logging\r\n");
+    usblog = !usblog; // log info to usb too
+    length = 0;
+    data[0] = '\0';
+  }
+#endif
+*/
+  if ((length >= len) || (data[length-1] == 13)) {
+    // 'S' is for entering a ASCII string
+    if((data[0] == '#') || (data[0] == '$') || (data[0] == 'S')) {
       received.Command = ascii_to_uint8(&data[1]);  // calculate the command number
       if (received.Command == 100) {
         return false; // value out of range
       }
       if (data[3] == ',') {
-        for (uint8_t i=4; i < len; i++) {
-//          printf_USB("handling character %c as nr: %d for pos: %d\r\n", data[i], i, r);
-          HAL_Delay(10);
-          if (isxdigit(data[i])) {
-            result = (result << 4) | (isdigit(data[i]) ? data[i] - '0' : toupper(data[i]) - 'A' + 10);
-//            printf_USB("Result is 0x%02X\r\n", result);
-            HAL_Delay(10);
-            if (len == 28) {
-              if ((i % 2) == 1) {
-                data[r] = result;
-                Debug("data[%d] = 0x%02X",r, data[r]);
-                r++;
-              }
+        for (i=4; i < len; i++) {
+          if (data[0] == 'S') {
+            if (data[i] == 13) {
+              data[i] = 0;
+              break;
             }
           }
           else {
-            printf_USB("Invalid hexadecimal character: '%c at position %d'\r\n", data[i], i);
-            ResetUsbRxDataSize();
-            PC_show_Keys();
-            for (uint8_t i=0; i < 32; i++) {
-              data[i] = '\0';
+          HAL_Delay(10);
+            if (isxdigit(data[i])) {
+              result = (result << 4) | (isdigit(data[i]) ? data[i] - '0' : toupper(data[i]) - 'A' + 10);
+//              printf_USB("Result is 0x%02X\r\n", result);
+              HAL_Delay(10);
+              if (len == 28) {
+                if ((i % 2) == 1) {
+                  data[r] = result;
+                  Debug("data[%d] = 0x%02X",r, data[r]);
+                  r++;
+                }
+              }
             }
-            return false; // Of een andere foutwaarde
+            else {
+              Debug("Invalid hexadecimal character: '%c at position %d", data[i], i);
+              ResetUsbRxDataSize();
+              PC_show_Keys();
+              for (uint8_t i=0; i < 32; i++) {
+                data[i] = '\0';
+              }
+              return false; // Of een andere foutwaarde
+            }
           }
         }
-        if (len == 6) {
-          ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
-          boxConfig[11] = result; //overwrite the last byte of the key
-          memcpy(received.Payload, boxConfig, IdSize);
+        if (len < 48) {
+          if (len == 6) {
+            ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
+            boxConfig[11] = result; //overwrite the last byte of the key
+            memcpy(received.Payload, boxConfig, IdSize);
+          }
+          else {
+            memcpy(received.Payload, data, IdSize);
+          }
+          received.Payload[12] = '\0';
+          received.PayloadLength = IdSize;
         }
         else {
-          memcpy(received.Payload, data, IdSize);
+          received.PayloadLength = i-3;  // The string terminator counts
         }
-        received.Payload[12] = '\0';
-        received.PayloadLength = IdSize;
-        Debug("first char of payload before conversion: %c", received.Payload[0]);
-        uint8ArrayToString(Buffer, received.Payload);
-        Debug("received Payload to write key %s", Buffer);
-        Debug("first char of payload after conversion: %c", received.Payload[0]);
+        if (len < 48) {
+          uint8ArrayToString(Buffer, received.Payload);
+          Debug("received Payload to write %s", Buffer);
+        }
+        else if (len == 48) {
+          memcpy(received.Payload, data+4, i);
+          Debug("received Payload to write %s", received.Payload);
+        }
         ProcessCmd(received);
         ResetUsbRxDataSize();
         PC_show_Keys();
@@ -496,7 +566,7 @@ bool Process_USB_input(uint8_t* data) {
         return true;
       }
       else {
-        printf_USB("Invalid input; Command comma not found\r\n");
+        printf_USB("\r\nInvalid input; Command comma not found\r\n");
         ResetUsbRxDataSize();
         for (uint8_t i=0; i < 32; i++) {
           data[i] = '\0';
@@ -504,20 +574,19 @@ bool Process_USB_input(uint8_t* data) {
       }
     }
 //    else {
-    len = 6;
     PC_show_Keys();
     ResetUsbRxDataSize();
 //    }
-    for (uint8_t i=0; i < 32; i++) {
+    for (uint8_t i=0; i < length; i++) {
       data[i] = '\0';
     }
+    len = 6;
   }
   if (formerlength != length) {
     printf_USB("USB input: %s\r", (const char*)data);
     formerlength = length;
   }
   GetUsbRxNextChunk(length);
-
   return false;
 }
 

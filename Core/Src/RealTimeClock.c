@@ -160,8 +160,9 @@ void ParseTime(char* buffer) {
   }
   if (dst) {
     Info("Daylight Saving Time active");
+    HAL_Delay(1000);
     HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
-    HAL_Delay(500);
+    HAL_Delay(1000);
     RTC_GetTime(&currentTime, &currentDate);
     Debug("Current RTC time after update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
   }
@@ -290,6 +291,26 @@ void Enter_Standby_Mode(void)
   // Schakel Standby Mode in only if battery is drained
   HAL_SuspendTick();
   HAL_PWR_EnterSTANDBYMode();
+}
+
+
+void Enter_Stop_Mode_for_empty_battery(uint16_t sleepTime)
+{
+  if (sen5x_On) {
+    sen5x_Power_Off();
+  }
+  Info("Battery voltage %.02fV", ReadBatteryVoltage());
+  powerDisplay(powerCheck());
+  Debug("Entering STOP mode for %d seconds", sleepTime);
+  getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
+  Info("The system will wake up at %s.", strbuf);
+  HAL_Delay(100);
+  HAL_SuspendTick();
+  RTC_SetWakeUpTimer(sleepTime);
+  HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+  SystemClock_Config();
+  HAL_ResumeTick(); // Enable SysTick after wake-up
+  showTime();
 }
 
 void Enter_Stop_Mode(uint16_t sleepTime)

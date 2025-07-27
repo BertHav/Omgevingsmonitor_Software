@@ -6,7 +6,9 @@
 //#define IdCount 18
 
 #define IdSize 12
-
+#define SendFromNameMaxLength 48
+#define SendToNameMaxLength 48
+#define MailAPIKeyMaxLength 48
 #define CustomNameMaxLength 32
 #define SSIDMaxLength 32
 #define pwdMaxLength 64
@@ -35,7 +37,10 @@
 #define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
 #define SEN55TempConfigAddr pwdConfigAddr + pwdMaxLength
 #define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
-#define UptimeConfigAddr SEN55HumidConfigAddr + IdSize
+#define SendFromNameConfigAddr SEN55HumidConfigAddr + IdSize
+#define SendToNameConfigAddr SendFromNameConfigAddr + SendFromNameMaxLength
+#define MailAPIKeyConfigAddr SendToNameConfigAddr + SendToNameMaxLength
+#define UptimeConfigAddr MailAPIKeyConfigAddr + MailAPIKeyMaxLength
 
 #define ConfigSize UptimeConfigAddr + IdSize - EEPromStartAddr
 

@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 4.67](#version467)\
 [version 4.66](#version466)\
 [version 4.65](#version465)\
 [version 4.64](#version464)\
@@ -119,6 +120,13 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+## version 4.67 <a name="version467"></a>
+Fix for startup when USBLOGGING is enabled and no USB host is connected. Sending mail added when battery is about 20%. 
+Sending an email is implemented by calling the mail API from SMTP2GO.
+To get is up and running a free account by SMTP2 necessary.
+Sending email requires a free account with smtp2go, as well as the ability to create a DKIM entry in the DNS domain from which the email will be sent. In short: create an API key with SMTP2GO under Account -> Sending -> API Keys. Register the DNS domain from which the email will be sent under Verified Senders. Click on the created domain and copy the three CNAME records. Have the DNS administrator add these records. You can also use a domain managed by them via freeDNS. The administrator will add these records if you request them via email and your reputation is not compromised.
+To program the email functionality in the environment monitor, use the USB port. The omgevingsmonitor has to execute an image without USBLOGGING, either the release or debug build. Connect the environment monitor to a PC and open the COM port with Putty or Teraterm. Type "Help" for instructions. You can now use the commands S25, S26, and S27 to enter the "from" address, the "to" address, and the API key. Commands are case sensistive. It's essential that an image is loaded without USB logging. The definition for this, which needs to be commented out, is in the file usbd_cdc_if.h; comment out the line by starting it with //.
 
 ## version 4.66 <a name="version466"></a>
 Some minor changes, no stability issues

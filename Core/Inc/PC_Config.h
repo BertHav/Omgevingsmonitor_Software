@@ -20,6 +20,8 @@
 
 #define PREAMBLE "#"
 #define PREAMBLE_F "$"
+#define PREAMBLE_S "S"
+#define PREAMBLE_U "U"
 
 #define BoxConfigCmd 0
 #define TempConfigCmd 1
@@ -46,8 +48,11 @@
 #define pwdConfigCmd 22
 #define SEN55TempConfigCmd 23
 #define SEN55HumidConfigCmd 24
+#define SendFromNameConfigCmd 25
+#define SendToNameConfigCmd 26
+#define MailAPIKeyConfigCmd 27
 #ifndef PUBLIC
-#define UptimeConfigCmd 25
+#define UptimeConfigCmd 28
 #endif
 
 #define ClearConfigCmd 253

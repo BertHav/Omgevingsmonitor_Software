@@ -49,13 +49,13 @@ void InitDone(){
 Battery_Status batteryChargeCheck(){
   Battery_Status status;
   batteryCharge = ReadBatteryVoltage();
-  if(batteryCharge < 3.50){
+  if(batteryCharge < 3.68){
     status = BATTERY_CRITICAL;
   }
-  if(batteryCharge >= 3.50 && batteryCharge < 3.70){
+  if(batteryCharge >= 3.68 && batteryCharge < 3.74){
     status = BATTERY_LOW;
   }
-  if(batteryCharge >= 3.70 && batteryCharge < 4.00){
+  if(batteryCharge >= 3.74 && batteryCharge < 4.00){
     status = BATTERY_GOOD;
   }
   if(batteryCharge >= 4.00){
@@ -193,8 +193,31 @@ void SetAllREDLED() {
   HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false); //red on
   HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
   HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
-  HAL_Delay(1000);
+  HAL_Delay(500);
   SetLEDsOff();
+}
+
+void WalkAllRedLED() {
+// Fire all LEDs sequential to red independent of usertoggle or power status and reboot
+  SetLEDsOff();
+  HAL_Delay(250);
+  TIM2 -> CCR1 = LED_ON;
+  TIM2 -> CCR3 = LED_OFF;
+  TIM2 -> CCR4 = LED_OFF;
+  HAL_Delay(250);
+  TIM2 -> CCR1 = LED_OFF;
+
+  TIM3 -> CCR1 = LED_ON;
+  TIM3 -> CCR2 = LED_OFF;
+  TIM3 -> CCR3 = LED_OFF;
+  HAL_Delay(250);
+  TIM3 -> CCR1 = LED_OFF;
+
+  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false); //red on
+  HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
+  HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
+  HAL_Delay(250);
+  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, true); //red off
 }
 
 void SetAllBlueLED() {
