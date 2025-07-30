@@ -17,8 +17,6 @@
   ******************************************************************************
   */
 
-// #define USBLOGGING enabled
-
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -33,7 +31,7 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "PC_Config.h"
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -55,9 +53,6 @@
 #define APP_TX_DATA_SIZE  1024
 /* USER CODE BEGIN EXPORTED_DEFINES */
 
-#ifdef USBLOGGING
- #define RX_BUFFER_MAX_WRITE_INDEX (APP_RX_DATA_SIZE - CDC_DATA_FS_MAX_PACKET_SIZE)
-#endif
 /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -70,15 +65,6 @@
   */
 
 /* USER CODE BEGIN EXPORTED_TYPES */
-#ifdef USBLOGGING
- typedef struct VCP_FIFO_TYPE
- {
-   uint8_t* data;  // Will point to the Cube-generated Tx or Rx buffer
-   int  wr;    // Write index
-   int  rd;    // Read index
-   int  lb;    // Additional index
- } VCP_FIFO;
-#endif
 /* USER CODE END EXPORTED_TYPES */
 
 /**
@@ -130,12 +116,6 @@ void ResetUsbRxDataSize();
 void GetUsbRxNextChunk(uint32_t writePointer);
 uint8_t * GetUsbRxPointer();
 uint32_t GetUsbRxDataSize();
-#ifdef USBLOGGING
-bool vcp_init(bool USBconnected);
-int vcp_send(uint8_t* buf, uint16_t len);
-int vcp_recv(uint8_t* buf, uint16_t len);
-void vcp_service();
-#endif
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**

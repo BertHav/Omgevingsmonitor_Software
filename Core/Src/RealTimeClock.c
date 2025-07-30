@@ -55,7 +55,7 @@ void showTime() {
   lasthour = currentTime.Hours;
   weekday = currentDate.WeekDay;
   UpdateSystemUptime();
-  printf("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds\r\n",
+  Info("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds",
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
   if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && !dstchkd && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {

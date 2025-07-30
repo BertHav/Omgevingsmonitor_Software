@@ -59,7 +59,6 @@ void Process_PC_Config(uint8_t* data) //, uint16_t length)
 
 void ProcessCmd(Receive_MSG msg)
 {
-  printf_USB("(msg.Command: %d",msg.Command);
   switch (msg.Command)
     {
         case BoxConfigCmd:  // 0
@@ -77,11 +76,11 @@ void ProcessCmd(Receive_MSG msg)
         case VocIndexConfigCmd:  // 4
             WriteUint8ArrayEepromSafe(VocIndexConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-        case hPaConfigCmd:  // 5 will be airpressure => hPaconfigCMD hPaConfigAddr ??
-            WriteUint8ArrayEepromSafe(hPaConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-        break;
-        case dBAConfigCmd: // 6 will be dBAConfigCMD
+        case dBAConfigCmd: // 5 was 6 will be dBAConfigCMD
             WriteUint8ArrayEepromSafe(dBAConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        break;
+        case dBcConfigCmd:  // 6
+            WriteUint8ArrayEepromSafe(dBcConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case PM2ConfigCmd:  // 7
             WriteUint8ArrayEepromSafe(PM2ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
@@ -98,10 +97,19 @@ void ProcessCmd(Receive_MSG msg)
         case CustomNameConfigCmd:  // 12
             WriteUint8ArrayEepromSafe(CustomNameConfigAddr, msg.Payload, msg.PayloadLength, CustomNameMaxLength);
         break;
-        case PM1ConfigCmd:  // 13
+        case SSIDConfigCmd: // 13 was 21
+          ClearEEprom(SSIDConfigAddr, SSIDMaxLength);
+          WriteUint8ArrayEepromSafe(SSIDConfigAddr, msg.Payload, msg.PayloadLength, SSIDMaxLength);
+        break;
+        case PasswordConfigCmd: // 14 was 22
+          ClearEEprom(pwdConfigAddr, pwdMaxLength);
+          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+          WriteUint8ArrayEepromSafe(pwdConfigAddr, msg.Payload, msg.PayloadLength, pwdMaxLength);
+        break;
+        case PM1ConfigCmd:  // 21 was 13
             WriteUint8ArrayEepromSafe(PM1ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-        case PM4ConfigCmd:  // 14
+        case PM4ConfigCmd:  // 22 was 14
             WriteUint8ArrayEepromSafe(PM4ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case AHTTempConfigCmd: // 15
@@ -122,12 +130,6 @@ void ProcessCmd(Receive_MSG msg)
         case ENSeCO2ConfigCmd: // 20
           WriteUint8ArrayEepromSafe(ENSeCO2ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-        case SSIDConfigCmd: // 21
-          WriteUint8ArrayEepromSafe(SSIDConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-        break;
-        case pwdConfigCmd: // 22
-          WriteUint8ArrayEepromSafe(pwdConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
-        break;
         case SEN55TempConfigCmd: // 23
           WriteUint8ArrayEepromSafe(SEN55TempConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
@@ -135,22 +137,27 @@ void ProcessCmd(Receive_MSG msg)
           WriteUint8ArrayEepromSafe(SEN55HumidConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case SendFromNameConfigCmd:  // 25
-            WriteUint8ArrayEepromSafe(SendFromNameConfigAddr, msg.Payload, msg.PayloadLength, SendFromNameMaxLength);
+          ClearEEprom(SendFromNameConfigAddr, SendFromNameMaxLength);
+          WriteUint8ArrayEepromSafe(SendFromNameConfigAddr, msg.Payload, msg.PayloadLength, SendFromNameMaxLength);
         break;
         case SendToNameConfigCmd:  // 26
+          ClearEEprom(SendToNameConfigAddr, SendToNameMaxLength);
           printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
           WriteUint8ArrayEepromSafe(SendToNameConfigAddr, msg.Payload, msg.PayloadLength, SendToNameMaxLength);
         break;
         case MailAPIKeyConfigCmd:  // 27
-            WriteUint8ArrayEepromSafe(MailAPIKeyConfigAddr, msg.Payload, msg.PayloadLength, MailAPIKeyMaxLength);
+          ClearEEprom(MailAPIKeyConfigAddr, MailAPIKeyMaxLength);
+          WriteUint8ArrayEepromSafe(MailAPIKeyConfigAddr, msg.Payload, msg.PayloadLength, MailAPIKeyMaxLength);
         break;
-#ifndef PUBLIC
-        case UptimeConfigCmd: // 28
+        case hPaConfigCmd:  // 28 will be airpressure => hPaconfigCMD hPaConfigAddr ??
+          WriteUint8ArrayEepromSafe(hPaConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        break;
+        case UptimeConfigCmd: // 29
           WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
-#endif
         case ClearConfigCmd: // 253
             ClearEEprom(EEPromStartAddr, ConfigSize);
+            ClearEEprom(SSIDStartAddr, IPrelatedConfigSize);
         break;
         case ClearEepromCmd: //254
         {
@@ -219,11 +226,11 @@ void printf_USB(const char* message, ...)
 void PC_selectout(char *msg, bool usb_out) {
   if (usb_out){
     printf_USB(msg);
+    HAL_Delay(10); //wait for the host poll of the USB buffer
   }
 //  else {
     printf(msg);
 //  }
-  HAL_Delay(10); //wait for the host poll of the USB buffer
 }
 
 void PC_show_Keys() {
@@ -233,7 +240,7 @@ void PC_show_Keys() {
   static uint8_t humidConfig[IdSize];        // 2
   static uint8_t noxConfig[IdSize];          // 3
   static uint8_t vocConfig[IdSize];          // 4
-  static uint8_t hPaConfig[IdSize];          // 5
+  static uint8_t dBcConfig[IdSize];          // 5
   static uint8_t soundConfig[IdSize];        // 6
   static uint8_t PM2Config[IdSize];          // 7
   static uint8_t PM10Config[IdSize];         // 8
@@ -259,9 +266,8 @@ void PC_show_Keys() {
   static uint8_t SendTonameConfig[SendToNameMaxLength]; //26
   static uint8_t MailAPIKeyConfig[MailAPIKeyMaxLength]; //27
 #endif
-#ifndef PUBLIC
-  static uint8_t UptimeConfig[IdSize];            // 28
-#endif
+  static uint8_t hPaConfig[IdSize];               // 28 was 5
+  static uint8_t UptimeConfig[IdSize];            // 29
 
   static char Buffer[25];
   static char msg[70];
@@ -273,152 +279,169 @@ void PC_show_Keys() {
   }
   sprintf(msg, "Overview of stored keys:\r\n");
   PC_selectout(&msg[0], usb_out);
+
   ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
   uint8ArrayToString(Buffer, boxConfig);
-  sprintf(msg, "Box id -----------------------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Box id ------------------------: %s\r\n", BoxConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(TempConfigAddr, tempConfig, IdSize);
   uint8ArrayToString(Buffer, tempConfig);
-  sprintf(msg, "01 - Temperature sensor id: --------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Temperature sensor id: --------: %s\r\n", TempConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(HumidConfigAddr, humidConfig, IdSize);
   uint8ArrayToString(Buffer, humidConfig);
-  sprintf(msg, "02 - Humidity sensor id ------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Humidity sensor id ------------: %s\r\n", HumidConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(NOxIndexConfigAddr, noxConfig, IdSize);
   uint8ArrayToString(Buffer, noxConfig);
-  sprintf(msg, "03 - NOx sensor id -----------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - NOx sensor id -----------------: %s\r\n", NOxIndexConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(VocIndexConfigAddr, vocConfig, IdSize);
   uint8ArrayToString(Buffer, vocConfig);
-  sprintf(msg, "04 - VOC sensor id -----------------: %s\r\n", Buffer);
-  PC_selectout(&msg[0], usb_out);
-
-  ReadUint8ArrayEEprom(hPaConfigAddr, hPaConfig, IdSize);
-  uint8ArrayToString(Buffer, hPaConfig);
-  sprintf(msg, "05 is former dBa unused\r\n");
-  PC_selectout(&msg[0], usb_out);
-  sprintf(msg, "05 - Air pressure sensor id --------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - VOC sensor id -----------------: %s\r\n", VocIndexConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(dBAConfigAddr, soundConfig, IdSize);
   uint8ArrayToString(Buffer, soundConfig);
-  sprintf(msg, "06 is former dBc\r\n");
+  sprintf(msg, "%02d - dBA sensor id -----------------: %s\r\n", dBAConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
-  sprintf(msg, "06 - Sound dBA sensor id -----------: %s\r\n", Buffer);
+
+  ReadUint8ArrayEEprom(dBcConfigAddr, dBcConfig, IdSize);
+  uint8ArrayToString(Buffer, dBcConfig);
+  sprintf(msg, "%02d - Sound dBc sensor id -----------: %s\r\n", dBcConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(PM2ConfigAddr, PM2Config, IdSize);
   uint8ArrayToString(Buffer, PM2Config);
-  sprintf(msg, "07 - PM2p5 sensor id ---------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - PM2p5 sensor id ---------------: %s\r\n", PM2ConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(PM10ConfigAddr, PM10Config, IdSize);
   uint8ArrayToString(Buffer, PM10Config);
-  sprintf(msg, "08 - PM10 sensor id ----------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - PM10 sensor id ----------------: %s\r\n", PM10ConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(BatVoltConfigAddr, batteryConfig, IdSize);
   uint8ArrayToString(Buffer, batteryConfig);
-  sprintf(msg, "09 - Battery voltage sensor id -----: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Battery voltage sensor id -----: %s\r\n", BatVoltConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(SolVoltConfigAddr, solarConfig, IdSize);
   uint8ArrayToString(Buffer, solarConfig);
-  sprintf(msg, "10 - Solar voltage sensor id -------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Solar voltage sensor id -------: %s\r\n", SolVoltConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(ChargerStatConfigAddr, ChargerStatConfig, IdSize);
   uint8ArrayToString(Buffer, ChargerStatConfig);
-  sprintf(msg, "11 - Charger status (not used) -----: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Charger status (not used) -----: %s\r\n", ChargerStatConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
-  sprintf(msg, "12 - Stored name -------------------: ");
+  sprintf(msg, "%02d - Stored name -------------------: ", CustomNameConfigCmd);
   PC_selectout(&msg[0], usb_out);
   sprintf(msg, "%s\r\n", (char*)nameConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 
-  ReadUint8ArrayEEprom(PM1ConfigAddr, PM1Config, IdSize);
-  uint8ArrayToString(Buffer, PM1Config);
-  sprintf(msg, "13 - PM1p0 sensor id ---------------: %s\r\n", Buffer);
+  ReadUint8ArrayEEprom(SSIDConfigAddr, SSIDConfig, SSIDMaxLength);
+  uint8ArrayToString(Buffer, SSIDConfig);
+  sprintf(msg, "%02d - SSID name ---------------------: ", SSIDConfigCmd);
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)SSIDConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 
-  ReadUint8ArrayEEprom(PM4ConfigAddr, PM4Config, IdSize);
-  uint8ArrayToString(Buffer, PM4Config);
-  sprintf(msg, "14 - PM4p0 sensor id ---------------: %s\r\n", Buffer);
+  ReadUint8ArrayEEprom(pwdConfigAddr, pwdConfig, pwdMaxLength);
+  uint8ArrayToString(Buffer, pwdConfig);
+  sprintf(msg, "%02d - WiFi password -----------------: ", PasswordConfigCmd);
+  PC_selectout(&msg[0], usb_out);
+  sprintf(msg, "%s\r\n", (char*)pwdConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(AHTTempConfigAddr, AHTTempConfig, IdSize);
   uint8ArrayToString(Buffer, AHTTempConfig);
-  sprintf(msg, "15 - AHT2x Temperature sensor id ---: %s\r\n", Buffer);
+  sprintf(msg, "%02d - AHT2x Temperature sensor id ---: %s\r\n", AHTTempConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(AHTHumidConfigAddr, AHTHumidConfig, IdSize);
   uint8ArrayToString(Buffer, AHTHumidConfig);
-  sprintf(msg, "16 - AHT2x Humidity sensor id ------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - AHT2x Humidity sensor id ------: %s\r\n", AHTHumidConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(BMPTempConfigAddr, BMPTempConfig, IdSize);
   uint8ArrayToString(Buffer, BMPTempConfig);
-  sprintf(msg, "17 - BMP280 Temperature sensor id --: %s\r\n", Buffer);
+  sprintf(msg, "%02d - BMP280 Temperature sensor id --: %s\r\n", BMPTempConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(ENSAQIConfigAddr, ENSAQIConfig, IdSize);
   uint8ArrayToString(Buffer, ENSAQIConfig);
-  sprintf(msg, "18 - ENS160 AQI sensor id ----------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - ENS160 AQI sensor id ----------: %s\r\n", ENSAQIConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(ENSTVOCConfigAddr, ENSTVOCConfig, IdSize);
   uint8ArrayToString(Buffer, ENSTVOCConfig);
-  sprintf(msg, "19 - ENS160 TVOC sensor id ---------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - ENS160 TVOC sensor id ---------: %s\r\n", ENSTVOCConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(ENSeCO2ConfigAddr, ENSeCO2Config, IdSize);
   uint8ArrayToString(Buffer, ENSeCO2Config);
-  sprintf(msg, "20 - ENS160 eCO2 sensor id ---------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - ENS160 eCO2 sensor id ---------: %s\r\n", ENSeCO2ConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
-  sprintf(msg, "21 & 22 - Are interactive not supported\r\n");
+  ReadUint8ArrayEEprom(PM1ConfigAddr, PM1Config, IdSize);
+  uint8ArrayToString(Buffer, PM1Config);
+  sprintf(msg, "%02d - PM1p0 sensor id ---------------: %s\r\n", PM1ConfigCmd, Buffer);
+  PC_selectout(&msg[0], usb_out);
+
+  ReadUint8ArrayEEprom(PM4ConfigAddr, PM4Config, IdSize);
+  uint8ArrayToString(Buffer, PM4Config);
+  sprintf(msg, "%02d - PM4p0 sensor id ---------------: %s\r\n", PM4ConfigCmd, Buffer);
+  PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(SEN55TempConfigAddr, SEN55TempConfig, IdSize);
   uint8ArrayToString(Buffer, SEN55TempConfig);
-  sprintf(msg, "23 - SEN54/55 Temperature sensor id : %s\r\n", Buffer);
+  sprintf(msg, "%02d - SEN54/55 Temperature sensor id : %s\r\n", SEN55TempConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(SEN55HumidConfigAddr, SEN55HumidConfig, IdSize);
   uint8ArrayToString(Buffer, SEN55HumidConfig);
-  sprintf(msg, "24 - SEN54/55 Humidity sensor id ---: %s\r\n", Buffer);
+  sprintf(msg, "%02d - SEN54/55 Humidity sensor id ---: %s\r\n", SEN55HumidConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
+
 #ifdef USE_MAIL
   ReadUint8ArrayEEprom(SendFromNameConfigAddr, SendFromnameConfig, SendFromNameMaxLength);
-  sprintf(msg, "25 - Stored Send from name ---------: ");
+  sprintf(msg, "%02d - Stored Send from name ---------: ", SendFromNameConfigCmd);
   PC_selectout(&msg[0], usb_out);
   sprintf(msg, "%s\r\n", (char*)SendFromnameConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(SendToNameConfigAddr, SendTonameConfig, SendToNameMaxLength);
-  sprintf(msg, "26 - Stored Send to name -----------: ");
+  sprintf(msg, "%02d - Stored Send to name -----------: ", SendToNameConfigCmd);
   PC_selectout(&msg[0], usb_out);
   sprintf(msg, "%s\r\n", (char*)SendTonameConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(MailAPIKeyConfigAddr, MailAPIKeyConfig, MailAPIKeyMaxLength);
-  sprintf(msg, "27 - Stored SMTP2go API key --------: ");
+  sprintf(msg, "%02d - Stored SMTP2go API key --------: ", MailAPIKeyConfigCmd);
   PC_selectout(&msg[0], usb_out);
   sprintf(msg, "%s\r\n", (char*)MailAPIKeyConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
 #endif
-#ifndef PUBLIC
+
+  ReadUint8ArrayEEprom(hPaConfigAddr, hPaConfig, IdSize);
+  uint8ArrayToString(Buffer, hPaConfig);
+  sprintf(msg, "%02d - Air pressure sensor id --------: %s\r\n", hPaConfigCmd, Buffer);
+  PC_selectout(&msg[0], usb_out);
+
   ReadUint8ArrayEEprom(UptimeConfigAddr, UptimeConfig, IdSize);
   uint8ArrayToString(Buffer, UptimeConfig);
-  sprintf(msg, "28 - Uptime sensor id --------------: %s\r\n", Buffer);
+  sprintf(msg, "%02d - Uptime sensor id --------------: %s\r\n", UptimeConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
-#endif
+
+  sprintf(msg, "%02d - Clear all definitions in EEPROM\r\n", clearDefsCmd);
+  PC_selectout(&msg[0], usb_out);
 
   printf_USB("\r\n!!NO LINE EDITING!!\r\n");
   HAL_Delay(10);
@@ -438,14 +461,12 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB("S12,Testsysteem (max 48 chars)\r\n");
   HAL_Delay(10);
-/*
-#ifdef USBLOGGING
-  printf_USB("U - toggle logging on/off\r\n");
+  printf_USB("L - toggle logging on/off, current: %s\r\n", usblog?"on":"off");
   HAL_Delay(10);
-#endif
-*/
+  printf_USB("B - show build information\r\n");
+  HAL_Delay(10);
   if (!usb_out) {
-    printf("A key can only be changed by USB input or the by configuration programm.\r\n");
+    printf("A sensor key can only be changed by USB input or the by configuration programm.\r\n");
   }
 }
 
@@ -455,13 +476,13 @@ uint8_t ascii_to_uint8(uint8_t *inchar) {
     return 100;
   }
   uint8_t value = (inchar[0] - '0') * 10 + (inchar[1] - '0');
-#ifndef PUBLIC
-  if (value > 28 || value == 21 || value == 22) {
-#else
-  if (value > 27 || value == 21 || value == 22) {
-#endif
+
+  if (value >= maxCmd) {
     printf_USB("Error: value out of range\r\n");
     return 100;
+  }
+  if (value == clearDefsCmd) {
+    value = ClearConfigCmd;
   }
   return (uint8_t)value;
 }
@@ -483,22 +504,36 @@ bool Process_USB_input(uint8_t* data) {
       Debug("Switching to input length of 48 for full name strings");
       len = 48;
   }
-/*
-#ifdef USBLOGGING
-  message = (unsigned char*)strstr((const char*)data, PREAMBLE_U);  // zoek op S
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_L);  // Search for 'U'to toggle USB logging
   if ((length == 1) && (message != NULL)){
-    printf_USB("\r\nSwitching USB logging\r\n");
+    ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize);
     usblog = !usblog; // log info to usb too
+    WriteUint8ArrayEepromSafe(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize, uint8_tSize);
+    printf_USB("\r\nSwitching USB logging to %s\r\n", usblog?"on":"off");
     length = 0;
     data[0] = '\0';
+    ResetUsbRxDataSize();
+    return true;
   }
-#endif
-*/
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_B);  // Search for 'B'to show the build
+  if ((length == 1) && (message != NULL)){
+    BinaryReleaseInfo();
+    length = 0;
+    data[0] = '\0';
+    ResetUsbRxDataSize();
+    return true;
+  }
   if ((length >= len) || (data[length-1] == 13)) {
     // 'S' is for entering a ASCII string
     if((data[0] == '#') || (data[0] == '$') || (data[0] == 'S')) {
       received.Command = ascii_to_uint8(&data[1]);  // calculate the command number
-      if (received.Command == 100) {
+      if (received.Command == 100)
+      {
+        ResetUsbRxDataSize();
+        PC_show_Keys();
+        for (uint8_t i=0; i < 32; i++) {
+          data[i] = '\0';
+        }
         return false; // value out of range
       }
       if (data[3] == ',') {
@@ -513,7 +548,7 @@ bool Process_USB_input(uint8_t* data) {
           HAL_Delay(10);
             if (isxdigit(data[i])) {
               result = (result << 4) | (isdigit(data[i]) ? data[i] - '0' : toupper(data[i]) - 'A' + 10);
-//              printf_USB("Result is 0x%02X\r\n", result);
+              printf_USB("Result is 0x%02X\r\n", result);
               HAL_Delay(10);
               if (len == 28) {
                 if ((i % 2) == 1) {

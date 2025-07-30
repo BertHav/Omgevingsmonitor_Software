@@ -13,7 +13,7 @@
 
 // Default verbose level
 VerboseLevel CurrentVerboseLevel = VERBOSE_ALL;
-#define TEXTBUFFER_LEN 128
+#define TEXTBUFFER_LEN 192
 
 extern UART_HandleTypeDef huart1;
 
@@ -44,6 +44,7 @@ static void AddTimestamp(char *stamp) {
   sprintf(stamp, "[%08lu] ", (uint32_t)HAL_GetTick());
 }
 
+
 void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
 
   if (verboseLevel > CurrentVerboseLevel) {
@@ -66,31 +67,15 @@ void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
   vsnprintf(&textBuffer[lineOffset], TEXTBUFFER_LEN - lineOffset, format, args);
   va_end(args);
 
+  if (usblog && Check_USB_PowerOn()){
+    printf_USB("%s\r\n", textBuffer);
+  }
   // Print the final formatted message
   printf("%s\r\n", textBuffer);
 }
 
 int _write(int fd, void *buf, size_t count) {
-//  int _write(int fd, const void *buf, size_t count) {  // conflict with usb logging during test
   HAL_UART_Transmit(&huart1, buf, count, 100);
-#ifdef USBLOGGING
-  if (Check_USB_PowerOn()) {
-    if (usblog && (count < 100)) {
-      uint8_t usboutmsg[100];
-      strncpy((char*)usboutmsg, buf, count);
-      usboutmsg[count] = '\0';
-      count = vcp_send(usboutmsg, count);
-    }
-    else if (count > 99) {
-      uint8_t usboutmsg[100];
-      strncpy((char*)usboutmsg, buf, 97);
-      usboutmsg[97] = '\r';
-      usboutmsg[98] = '\n';
-      usboutmsg[99] = '\0';
-      count = vcp_send(usboutmsg, 100);
-    }
-  }
-#endif
   return count;
 }
 
@@ -103,15 +88,23 @@ uint8_t GetVerboseLevel() {
 
 
 void BinaryReleaseInfo() {
-  Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");
-  Info("Build on: %s at %s", __DATE__, __TIME__);
+  char msgout[41];
+  sprintf(msgout,"Build on: %s at %s", __DATE__, __TIME__);
+  if (!usblog) {
+    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
+  }
+  Info(msgout);
   // Format: YY'w'WWv
   Info("Git: %s", CURRENT_WEEK);
 #ifdef DEBUG
-  Info("Software version: %s, Debug build", SRC_VERSION);
+  sprintf(msgout,"Software version: %s, Debug build", SRC_VERSION);
 #else
-  Info("Software version: %s, Release build", SRC_VERSION);
+  sprintf(msgout,"Software version: %s, Release build", SRC_VERSION);
 #endif
+  if (!usblog) {
+    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
+  }
+  Info(msgout);
 }
 
 //
@@ -119,7 +112,7 @@ void BinaryReleaseInfo() {
 //
 void errorHandler(const char * func, const uint32_t line, const char * file)
 {
-    printf("Error in %s at line %lu in file: %s\r\n", func, line, file);
+    Error("Error in %s at line %lu in file: %s\r\n", func, line, file);
 //    while (true)
 //    {
 //    }

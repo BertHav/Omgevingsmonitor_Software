@@ -210,7 +210,7 @@ bool AHT20_Calculate(float *airtemp, float *airhum) {
   *airtemp = (((float)temperature / 1048576) * 200) - 50;
   humidity = (airtemphumraw[1] << 12) + (airtemphumraw[2] << 4) + (airtemphumraw[3]>>4);
   *airhum = ((float)humidity / 1048576) * 100;
-  Debug("AHT20 air humidity = %2.2f%%, temperature = %2.2fC", *airhum, *airtemp);
+  Info("AHT20 air humidity = %2.2f%%, temperature = %2.2fC", *airhum, *airtemp);
   return true;
 }
 

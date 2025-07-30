@@ -109,14 +109,13 @@ extern uint8_t sendpwremail;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "4.67 BH"
-#define CURRENT_WEEK "2025w30-7"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.00 BH"
+#define CURRENT_WEEK "2025w31-2"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go
 #define USE_MAIL
 
-#define PUBLIC
 //#define STLINK_V3PWR true
 
 #define WAIT_WITH_PM 860

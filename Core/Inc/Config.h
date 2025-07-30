@@ -5,6 +5,7 @@
 
 //#define IdCount 18
 
+#define uint8_tSize 1
 #define IdSize 12
 #define SendFromNameMaxLength 48
 #define SendToNameMaxLength 48
@@ -17,7 +18,7 @@
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
 #define NOxIndexConfigAddr EEPromStartAddr + (IdSize * 3)
 #define VocIndexConfigAddr EEPromStartAddr + (IdSize * 4)
-#define hPaConfigAddr EEPromStartAddr + (IdSize * 5)
+#define dBcConfigAddr EEPromStartAddr + (IdSize * 5)
 #define dBAConfigAddr EEPromStartAddr + (IdSize * 6)
 #define PM2ConfigAddr EEPromStartAddr + (IdSize * 7)
 #define PM10ConfigAddr EEPromStartAddr + (IdSize * 8)
@@ -33,15 +34,27 @@
 #define ENSAQIConfigAddr BMPTempConfigAddr + IdSize
 #define ENSTVOCConfigAddr ENSAQIConfigAddr + IdSize
 #define ENSeCO2ConfigAddr ENSTVOCConfigAddr + IdSize
-#define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
-#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
-#define SEN55TempConfigAddr pwdConfigAddr + pwdMaxLength
+
+
+//#define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
+//#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
+
+#define SEN55TempConfigAddr ENSeCO2ConfigAddr  + IdSize + pwdMaxLength  + SSIDMaxLength
 #define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
-#define SendFromNameConfigAddr SEN55HumidConfigAddr + IdSize
+#define hPaConfigAddr SEN55HumidConfigAddr + IdSize
+#define USBlogstatusConfigAddr hPaConfigAddr + IdSize  // uint8_tSize has size of uint8_tSize
+#define UptimeConfigAddr USBlogstatusConfigAddr + IdSize
+
+#define ConfigSize USBlogstatusConfigAddr + uint8_tSize - EEPromStartAddr
+
+#define SSIDStartAddr 0x08080200
+
+#define SSIDConfigAddr SSIDStartAddr
+#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
+#define SendFromNameConfigAddr pwdConfigAddr + pwdMaxLength
 #define SendToNameConfigAddr SendFromNameConfigAddr + SendFromNameMaxLength
 #define MailAPIKeyConfigAddr SendToNameConfigAddr + SendToNameMaxLength
-#define UptimeConfigAddr MailAPIKeyConfigAddr + MailAPIKeyMaxLength
 
-#define ConfigSize UptimeConfigAddr + IdSize - EEPromStartAddr
+#define IPrelatedConfigSize MailAPIKeyConfigAddr + MailAPIKeyMaxLength - SSIDStartAddr
 
 #endif

@@ -31,6 +31,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "config.h"
+#include "eeprom.h"
 #include "microphone.h"
 #include "I2CSensors.h"
 #include "utils.h"
@@ -73,13 +75,14 @@
   bool testDone = false;
   bool ESP_Programming = false;
   bool batteryEmpty = false;
-  bool usbinitiated = false;
+  bool usbinitiated = USBD_FAIL;
   uint8_t sendpwremail = CLEAR;
   static bool priorUSBpluggedIn = false;
   static bool stlinkpwr = true;
   uint8_t MICstate;
   uint8_t ESPstate;
   bool waitforSamples = false;
+  uint8_t count = 0;
   uint8_t hidscount = 0;
   uint8_t u1_rx_buff[16];  // rxbuffer for serial logger
   uint8_t RxData[UART_CDC_DMABUFFERSIZE] = {0};  //rx buffer for USB
@@ -205,21 +208,20 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-#ifdef USBLOGGING
-  usbinitiated = vcp_init(Check_USB_PowerOn());
-#endif
+  if (Check_USB_PowerOn())
+    while (HAL_GetTick() < 650);  // Wait for the USB to become ready
+
   // General TODO 's
 	/*
 	 * : Put SSID in EEPROM
 	 * : Turn on heater if humidity is too high
 	 * : LEDs indicator for air quality
-	 * : Default network: Sensor community
-	 * : Different modes for outside and inside (check solar or check LED on/off mode?)
-	 * : Add CLI via usb-c
 	 * : Network not found? Sleep
 	 */
   GPIO_InitPWMLEDs(&htim2, &htim3);
+  Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");
   BinaryReleaseInfo();
+  ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize);
   charge = Battery_Upkeep();
   if(charge == BATTERY_CRITICAL) {
     SetAllREDLED();
@@ -349,12 +351,6 @@ int main(void)
         }
       }
     }
-#ifdef USBLOGGING
-    int len = vcp_recv (u1_rx_buff, 3);
-    if (len > 0) {
-      check_cli_command();
-    }
-#endif
     if (u1_rx_buff[0] != '\0') {
       check_cli_command();
     }
@@ -462,17 +458,15 @@ void check_cli_command() {
     case (uint8_t)'t':
       showTime(); // show me the current time
       break;
-#ifdef USBLOGGING
     case (uint8_t)'u':
       usblog = !usblog; // log info to usb too
       break;
-#endif
     case (uint8_t)'v':
       BinaryReleaseInfo(); // show me the build
       break;
     default:
-      Error("Error unknown request from Serial UART1 (TTY)\r\n");
-      printf("Possible commands:\r\n\r\n");
+      printf("Error unknown request from Serial UART1 (TTY)\r\n");
+      printf("\r\n\r\nPossible commands:\r\n\r\n");
       printf("a - VerboseLevel set to all\r\n");
       printf("e - show EEPROM\r\n");
       printf("f - Force NTP time synchronization\r\n");
@@ -481,9 +475,7 @@ void check_cli_command() {
       printf("n - VerboseLevel set to none\r\n");
       printf("s - Start particle measurement\r\n");
       printf("t - Show actual system time\r\n");
-#ifdef USBLOGGING
       printf("u - USB logging toggle\r\n");
-#endif
       printf("v - Show system version\r\n");
   break;
   }

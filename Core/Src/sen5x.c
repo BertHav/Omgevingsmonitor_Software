@@ -132,17 +132,17 @@ int16_t probe_sen5x(void) {
   }
   error = sen5x_get_serial_number(serial_number, serial_number_size);
   if (error) {
-      printf("Error executing sen5x_get_serial_number(): %i\r\n", error);
+      Error("Error executing sen5x_get_serial_number(): %i", error);
       return error;
   } else {
-      printf("Serial number: %s\r\n", serial_number);
+      Info("Serial number: %s", serial_number);
   }
   error = sen5x_get_product_name(product_name, product_name_size);
   if (error) {
-      printf("Error executing sen5x_get_product_name(): %i\r\n", error);
+      Error("Error executing sen5x_get_product_name(): %i", error);
       return error;
   } else {
-      printf("Product name: %s\r\n", product_name);
+      Info("Product name: %s", product_name);
   }
 
   uint8_t firmware_major;
@@ -157,10 +157,10 @@ int16_t probe_sen5x(void) {
                             &protocol_minor);
 
   if (error) {
-      printf("Error executing sen5x_get_version(): %i\r\n", error);
+      Error("Error executing sen5x_get_version(): %i", error);
       return error;
   } else {
-      printf("Firmware: %u.%u, Hardware: %u.%u\r\n", firmware_major,
+      Info("Firmware: %u.%u, Hardware: %u.%u", firmware_major,
              firmware_minor, hardware_major, hardware_minor);
   }
 
@@ -279,28 +279,28 @@ int16_t sen5x_read_measurement(SEN5X_DateTypeDef* sen5x_data) {
 
 void sen5x_printvalues(void) {
   if (sen5x_data.mass_concentration_pm1p0 != 0xFFFF) {
-      printf("Mass concentration pm1p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm1p0 / 10.0f);
+      Info("Mass concentration pm1p0: %.1f µg/m³", sen5x_data.mass_concentration_pm1p0 / 10.0f);
   }
   if (sen5x_data.mass_concentration_pm2p5 != 0xFFFF) {
-        printf("Mass concentration pm2p5: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm2p5 / 10.0f);
+        Info("Mass concentration pm2p5: %.1f µg/m³", sen5x_data.mass_concentration_pm2p5 / 10.0f);
   }
   if (sen5x_data.mass_concentration_pm4p0 != 0xFFFF) {
-        printf("Mass concentration pm4p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm4p0 / 10.0f);
+        Info("Mass concentration pm4p0: %.1f µg/m³", sen5x_data.mass_concentration_pm4p0 / 10.0f);
   }
   if (sen5x_data.mass_concentration_pm10p0 != 0xFFFF) {
-        printf("Mass concentration pm10p0: %.1f µg/m³\r\n", sen5x_data.mass_concentration_pm10p0 / 10.0f);
+        Info("Mass concentration pm10p0: %.1f µg/m³", sen5x_data.mass_concentration_pm10p0 / 10.0f);
   }
   if (sen5x_data.ambient_humidity != 0x7fff) {
-        printf("sen5x Ambient humidity: %.1f %%RH\r\n", sen5x_data.ambient_humidity / 100.0f);
+        Info("sen5x Ambient humidity: %.1f %%RH", sen5x_data.ambient_humidity / 100.0f);
   }
   if (sen5x_data.ambient_temperature != 0x7fff) {
-        printf("sen5x Ambient temperature: %.1f °C\r\n", sen5x_data.ambient_temperature / 200.0f);
+        Info("sen5x Ambient temperature: %.1f °C", sen5x_data.ambient_temperature / 200.0f);
   }
   if (sen5x_data.voc_index != 0x7fff) {
-        printf("sen55 VOC index: %d\r\n", sen5x_data.voc_index / 10);
+        Info("sen55 VOC index: %d", sen5x_data.voc_index / 10);
   }
   if (sen5x_data.nox_index != 0x7fff) {
-        printf("sen55 NOx index: %d\r\n", sen5x_data.nox_index / 10);
+        Info("sen55 NOx index: %d", sen5x_data.nox_index / 10);
   }
 }
 

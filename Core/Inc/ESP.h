@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "stm32l0xx_hal.h"
+#include "Config.h"
 #include "utils.h"
 #include "gpio.h"
 #include "measurement.h"
@@ -190,9 +191,9 @@ typedef enum {
   AT_END
 } AT_Commands;
 
-typedef struct WLANConfig {
-  char SSID[50];
-  char Password[50];
+typedef struct {
+  char SSID[SSIDMaxLength];
+  char Password[pwdMaxLength];
 }WifiConfig;
 
 typedef struct {

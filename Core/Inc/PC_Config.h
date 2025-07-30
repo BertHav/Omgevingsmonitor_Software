@@ -21,40 +21,41 @@
 #define PREAMBLE "#"
 #define PREAMBLE_F "$"
 #define PREAMBLE_S "S"
-#define PREAMBLE_U "U"
+#define PREAMBLE_L "L"
+#define PREAMBLE_B "B"
 
 #define BoxConfigCmd 0
 #define TempConfigCmd 1
 #define HumidConfigCmd 2
 #define NOxIndexConfigCmd 3
 #define VocIndexConfigCmd 4
-#define hPaConfigCmd 5
-#define dBAConfigCmd 6
+#define dBAConfigCmd 5  // was 6
+#define dBcConfigCmd 6
 #define PM2ConfigCmd 7
 #define PM10ConfigCmd 8
 #define BatVoltConfigCmd 9
 #define SolVoltConfigCmd 10
 #define ChargerStatConfigCmd 11 // not used
 #define CustomNameConfigCmd 12
-#define PM1ConfigCmd 13
-#define PM4ConfigCmd 14
+#define SSIDConfigCmd 13
+#define PasswordConfigCmd 14
 #define AHTTempConfigCmd 15
 #define AHTHumidConfigCmd 16
 #define BMPTempConfigCmd 17
 #define ENSAQIConfigCmd 18
 #define ENSTVOCConfigCmd 19
 #define ENSeCO2ConfigCmd 20
-#define SSIDConfigCmd 21
-#define pwdConfigCmd 22
+#define PM1ConfigCmd 21  // was 13
+#define PM4ConfigCmd 22  // was 14
 #define SEN55TempConfigCmd 23
 #define SEN55HumidConfigCmd 24
 #define SendFromNameConfigCmd 25
 #define SendToNameConfigCmd 26
 #define MailAPIKeyConfigCmd 27
-#ifndef PUBLIC
-#define UptimeConfigCmd 28
-#endif
-
+#define hPaConfigCmd 28 // was 5
+#define UptimeConfigCmd 29  // was 28
+#define clearDefsCmd 30
+#define maxCmd 31
 #define ClearConfigCmd 253
 #define ClearEepromCmd 254
 #define ErrorCmd 255

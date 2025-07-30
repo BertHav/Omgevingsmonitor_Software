@@ -2,6 +2,7 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[version 5.00](#version500)\
 [version 4.67](#version467)\
 [version 4.66](#version466)\
 [version 4.65](#version465)\
@@ -121,12 +122,26 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
+## version 5.00 <a name="version500"></a>
+EEPROM memory aligned with v2.0 relase from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
+Switch logging by pressing L (case sensitive!) for logging to USB. 
+
 ## version 4.67 <a name="version467"></a>
 Fix for startup when USBLOGGING is enabled and no USB host is connected. Sending mail added when battery is about 20%. 
 Sending an email is implemented by calling the mail API from SMTP2GO.
 To get is up and running a free account by SMTP2 necessary.
-Sending email requires a free account with smtp2go, as well as the ability to create a DKIM entry in the DNS domain from which the email will be sent. In short: create an API key with SMTP2GO under Account -> Sending -> API Keys. Register the DNS domain from which the email will be sent under Verified Senders. Click on the created domain and copy the three CNAME records. Have the DNS administrator add these records. You can also use a domain managed by them via freeDNS. The administrator will add these records if you request them via email and your reputation is not compromised.
-To program the email functionality in the environment monitor, use the USB port. The omgevingsmonitor has to execute an image without USBLOGGING, either the release or debug build. Connect the environment monitor to a PC and open the COM port with Putty or Teraterm. Type "Help" for instructions. You can now use the commands S25, S26, and S27 to enter the "from" address, the "to" address, and the API key. Commands are case sensistive. It's essential that an image is loaded without USB logging. The definition for this, which needs to be commented out, is in the file usbd_cdc_if.h; comment out the line by starting it with //.
+Sending email requires a free account with SMTP2GO.com, as well as the ability to create a DKIM entry in the DNS domain from which the email will be sent. 
+In short: create an API key with SMTP2GO under Account -> Sending -> API Keys. Register the DNS domain from which the email will be sent under Verified Senders. 
+Click on the created domain and copy the three CNAME records. Have the DNS administrator add these records. 
+You can also use a domain managed at freeDNS. The administrator will add these records if you request them via email and your reputation is not compromised.
+To program the email functionality in the omgevingsmonitor, use the USB port. 
+The omgevingsmonitor has to execute an image without USBLOGGING, either the release or debug build. 
+Connect the omgevingsmonitor to a PC and open the COM port with Putty or Teraterm. 
+Type "Helpme" for instructions. You can now use the commands S25, S26, and S27 as from the shown examples to enter the "from" address, the "to" address, and the API key. 
+Commands are case sensistive. 
+Of non importance from start of version 4.68:
+It's essential that an image is loaded without USB logging. 
+The definition for this, which needs to be commented out, is in the file usbd_cdc_if.h; comment out the line by starting it with //.
 
 ## version 4.66 <a name="version466"></a>
 Some minor changes, no stability issues
@@ -166,7 +181,7 @@ Many small adjustments to improve reliability when switching operating modes. Al
 Some bugfixes, auto detect alternate address ENS160.
 
 ## version 4.54 <a name="version454"></a>
-ENS160 sensor added. Basic frame work is included. The usefulness of this sensor can be disputed as long as it is in the housing. Converting the values ​​of the GPR registers to the respective gases is of little use without a good reference environment. The values ​​of the AHT21 on the same PCB are used for the temperature compensation of the ENS160.
+ENS160 sensor added. Basic frame work is included. The usefulness of this sensor can be disputed as long as it is in the housing. Converting the values ​​of the GPR registers to the respective gases is of little use without a good reference  ronment. The values ​​of the AHT21 on the same PCB are used for the temperature compensation of the ENS160.
 
 ## version 4.53 <a name="version453"></a>
 aht20.% renamed to aht2x.%. Version should support AHT20 and AHT21.

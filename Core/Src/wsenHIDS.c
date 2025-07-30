@@ -296,7 +296,7 @@ wsenHIDSState HIDS_Upkeep(void) {
       break;
 
     case HIDS_STATE_PROCESS_RESULTS:
-      Debug("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
+      Info("Humidity value: %3.2f%%, Temperature value: %3.2fC", humid, temp);
       setHIDS(temp, humid);
       ResetMeasurementIndicator();
       if (((temp - HIDS_DewPointCalculation(&humid, &temp)) < 1.0) && ((getPosixTime() - HIDS_LastHeaterInRTC) > 900)) {

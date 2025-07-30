@@ -18,11 +18,6 @@
 #include "statusCheck.h"
 #include "main.h"
 #include <stdint.h>
-#ifdef PUBLIC
-#include "cred_pub.h"
-#else
-#include "cred.h"
-#endif
 #include "ssd1306_128x64_i2c.h"
 #ifdef SSD1306
 #include "display.h"
@@ -76,6 +71,7 @@ uint32_t ESPNTPTimeStamp = ESP_NTP_INIT_DELAY;  // ticks before the NTP request 
 static uint32_t savedESPTimeStamp = ESP_1ST_DATAGRAM_AFTER_NTP_INIT ; // ticks afer NTP init request before the first measurement datagram is send
 static uint8_t retry = 0;
 
+WifiConfig Credentials;
 
 typedef struct {
     char* ATCommand;
@@ -101,6 +97,16 @@ void setESPTimeStamp(uint32_t delayms) {
 void setCharges(){
   batteryCharge = ReadBatteryVoltage();
   solarCharge = ReadSolarVoltage() / 1000.0;
+}
+
+void getWifiCred(void){
+  ReadUint8ArrayEEprom(SSIDConfigAddr, (uint8_t*)Credentials.SSID, SSIDMaxLength);
+  ReadUint8ArrayEEprom(pwdConfigAddr, (uint8_t*)Credentials.Password, pwdMaxLength);
+  if ((Credentials.SSID[0] == 0) || (Credentials.Password[0] == 0)) {
+    Error("Wifi credentials not found, reprogram or connect to PC and type Helpme");
+  }
+  Info("The SSID is: %s", Credentials.SSID);
+  Info("The Password is: %s", Credentials.Password);
 }
 
 bool checkEEprom(){
@@ -317,11 +323,7 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     Error("Error in HAL_UART_Transmit_DMA");
     return false;
   }
-#ifdef LONGMESSAGES
-  printf("ESP_Send: %s\r\n", command);
-#else
   Debug("ESP_Send: %s", command);
-#endif
   return true;
 }
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
@@ -432,9 +434,15 @@ bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
   if ((data[0] > 66) && (data[0] != 0xFF))
     return true;
   else {
-    printf("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
+    Error("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
     for (int i = 0; i < 12; i++) {
+      if (usblog && Check_USB_PowerOn()) {
+        printf_USB("02x", data[i]);
+      }
       printf("%02x", data[i]);
+    }
+    if (usblog && Check_USB_PowerOn()) {
+      printf_USB("\r\n");
     }
     printf("\r\n");
     return false;
@@ -480,9 +488,7 @@ uint16_t CreateMessage(bool *txstat, bool send) {
   static bool retstat = true;
   static uint8_t nameConfig[CustomNameMaxLength];
   static uint8_t keybuffer[IdSize];
-#ifndef PUBLIC
   static char uptimeBuf[14];
-#endif
 #ifdef LONGDATAGRAM
   static char Buffer[(IdSize*2)+1];
 #endif
@@ -538,7 +544,6 @@ index = strlen(message);
     retstat &= status;
   }
 
-#ifndef PUBLIC
   ReadUint8ArrayEEprom(UptimeConfigAddr, keybuffer, IdSize);
   if (isKeyValid(keybuffer, "Uptime", "dhhmm")) {
     uint8ArrayToString(Buffer, keybuffer);
@@ -555,7 +560,6 @@ index = strlen(message);
       retstat &= status;
     }
   }
-#endif
 
   if (IsBMP280SensorPresent()) {
     ReadUint8ArrayEEprom(hPaConfigAddr, keybuffer, IdSize);
@@ -880,6 +884,9 @@ void StartProg(){
   tempBuf[len] = '\0';
   if (GetVerboseLevel() == VERBOSE_ALL) {
 #ifdef LONGMESSAGES
+  if (usblog && Check_USB_PowerOn()) {
+    printf_USB("%s\r\n", tempBuf);
+  }
   printf("Receive ParseBuffer: %s", tempBuf );
 #else
   Debug("Receive ParseBuffer: %s", tempBuf );
@@ -911,7 +918,7 @@ void StartProg(){
   }
   char *ParsePoint2 = strstr(tempBuf, ERROR);
   char *ParsePoint3 = strstr(tempBuf, WIFI);
-  char *ParsePoint4 = strstr(tempBuf, SSID);
+  char *ParsePoint4 = strstr(tempBuf, Credentials.SSID);
   char *ParsePoint5 = strstr(tempBuf, FAIL);
   char *ParsePoint6 = strstr(tempBuf, MAIL_API);
   if(len > 1 ){
@@ -1037,6 +1044,7 @@ bool CWAUTOCONN(){
   }
 }
 
+/*
 bool CWJAP(){
   APtested = true;
   char atCommandBuff[100];
@@ -1053,6 +1061,22 @@ bool CWJAP(){
     return false;
   }
 }
+*/
+
+bool CWJAP()
+{
+  APtested = true;
+  getWifiCred();
+  static char atCommandBuff[112];
+  memset(atCommandBuff, '\0', 112);
+  sprintf(atCommandBuff, "AT+CWJAP=\"%s\",\"%s\"\r\n", Credentials.SSID, Credentials.Password);
+  uint8_t len = strlen(atCommandBuff);
+  char atCommand[len + 1];
+  memset(atCommand, '\0', len + 1);
+  strncpy(atCommand, atCommandBuff, len);
+  return ESP_Send((uint8_t*)atCommand, len);
+}
+
 
 bool CWMODE3(){
   char* atCommand = "AT+CWMODE=3\r\n";
