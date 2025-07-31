@@ -124,7 +124,7 @@ Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
 
-##Programming the omgevingsmonitor with STM32CubeProgrammer <a name="Programming"></a>
+## Programming the omgevingsmonitor with STM32CubeProgrammer <a name="Programming"></a>
 
 Prerequisites:
 - The path to the *.elf file, f.i. MJSGadget - dB meter.elf. The .elf file contains the firmware for the STM32.
