@@ -2,6 +2,8 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
+[Programming the omgevingsmonitor with STM32CubeProgrammer](#Programming)\
+[Current consumption of the Omgevingsmonitor](#Consumption)\
 [version 5.00](#version500)\
 [version 4.67](#version467)\
 [version 4.66](#version466)\
@@ -121,6 +123,31 @@ Therefore, perform the following steps:
 Execute Project -> Clean.
 
 Check 'Start a build immediately' and choose 'Clean'.
+
+##Programming the omgevingsmonitor with STM32CubeProgrammer <a name="Programming"></a>
+Prerequisites:
+- The path to the *.elf file, f.i. MJSGadget - dB meter.elf. The .elf file contains the firmware for the STM32.
+- Installed STM32CubeProgrammer. You can download it from https://www.st.com/en/development-tools/stm32cubeprog.html#overview.
+- A USB-C cable to a USB port on your PC/laptop.
+
+Connect the omgevingsmonitor to the USB port.
+Press the RESET button, while pressing the RESET button press the BOOT button too. Release the RESET button while holding the BOOT button. Release the BOOT button.
+
+Start the STM32CubeProgrammer.
+![The STM32CubeProgrammer](Images/stm32cubeprogrammer_configure.jpg)
+Press the blue UART button and select USB. USB1 will now appear below the blue button. If "No DFU" is displayed, repeat the button procedure and refresh with the button next to "No DFU."
+Press the "Open file" tab, navigate to the location of the elf file and open the file. The *.elf files are typically located in the Debug and Release folders. It is also possible to just download the "MJSGadget - dB meter.elf" file from the folder in the GitHub repository. Please ensure the file is at least 200kB.
+![The STM32CubeProgrammer ready to programm the Omgevingsmonitor](Images/program_the_stm32.jpg)
+Select "Download".
+Wait for the ready dialog
+![The STM32CubeProgrammer has programmed the Omgevingsmonitor](Images/STMprogrammed.jpg)
+Press the RESET button of the Omgevingsmonitor for at least 2 seconds and release the. The omgevingsmonitor should now start with LED patterns.
+It is possible to interact with the omgevingsmonitor using Putty or TeraTerm. The omgevingsmonitor must be awake for generating a comport on the host PC.
+While the virtual USB comport is active, type Helpme for more information.
+
+## Current consumption of the Omgevingsmonitor <a name="Consumption"></a>
+![The STM32CubeProgrammer current consumption during startup in &muA](Images/versie 4.55 naar standby.png)
+![The STM32CubeProgrammer current consumption during standby in &muA with optional added AHT20 en BMP280](Images/versie 4.55 in standby detail AHT20 en BMP280 in uA.png)
 
 ## version 5.00 <a name="version500"></a>
 EEPROM memory aligned with v2.0 relase from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
