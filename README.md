@@ -137,25 +137,27 @@ Start the STM32CubeProgrammer.
 ![The STM32CubeProgrammer](Images/stm32cubeprogrammer_configure.jpg)
 
 Press the blue UART button and select USB. USB1 will now appear below the blue button. If "No DFU" is displayed, repeat the button procedure and refresh with the button next to "No DFU."
+
 Press the "Open file" tab, navigate to the location of the elf file and open the file. The *.elf files are typically located in the Debug and Release folders. It is also possible to just download the "MJSGadget - dB meter.elf" file from the folder in the GitHub repository. Please ensure the file is at least 200kB.
 
 ![The STM32CubeProgrammer ready to programm the Omgevingsmonitor](Images/program_the_stm32.jpg)
 
 Select "Download".
-Wait for the ready dialog
+Wait for the "File download complete" dialog.
 
 ![The STM32CubeProgrammer has programmed the Omgevingsmonitor](Images/STMprogrammed.jpg)
 
-Press the RESET button of the Omgevingsmonitor for at least 2 seconds and release the. The omgevingsmonitor should now start with LED patterns.
+Press the RESET button of the Omgevingsmonitor for at least 2 seconds and release. The omgevingsmonitor should now start with LED patterns.
+
 It is possible to interact with the omgevingsmonitor using Putty or TeraTerm. The omgevingsmonitor must be awake for generating a comport on the host PC.
 
 While the virtual USB comport is active, type Helpme for more information.
 
 ## Current consumption of the Omgevingsmonitor <a name="Consumption"></a>
 
-![The STM32CubeProgrammer current consumption during startup in μA](Images/versie 4.55 naar standby.png)
+![The STM32CubeProgrammer current consumption during startup in μA]("Images/versie 4.55 naar standby.png")
 
-![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie 4.55 in standby detail AHT20 en BMP280 in uA.png)
+![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280]("Images/versie 4.55 in standby detail AHT20 en BMP280 in uA.png")
 
 ## version 5.00 <a name="version500"></a>
 EEPROM memory aligned with v2.0 relase from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
