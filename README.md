@@ -155,9 +155,9 @@ While the virtual USB comport is active, type Helpme for more information.
 
 ## Current consumption of the Omgevingsmonitor <a name="Consumption"></a>
 
-![The STM32CubeProgrammer current consumption during startup in μA]("Images/versie 4.55 naar standby.png")
+![The STM32CubeProgrammer current consumption during startup in μA](Images/versie_4.55_naar_standby.png)
 
-![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280]("Images/versie 4.55 in standby detail AHT20 en BMP280 in uA.png")
+![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 ## version 5.00 <a name="version500"></a>
 EEPROM memory aligned with v2.0 relase from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
