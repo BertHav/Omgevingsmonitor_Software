@@ -163,25 +163,35 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 ## version 5.00 <a name="version500"></a>
-EEPROM memory aligned with v2.0 relase from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
-Switch logging by pressing L (case sensitive!) for logging to USB. 
+EEPROM memory aligned with v2.0 release from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
+Toggle logging by pressing L (case sensitive!) for logging to USB on/off. 
 
 ## version 4.67 <a name="version467"></a>
 Fix for startup when USBLOGGING is enabled and no USB host is connected. Sending mail added when battery is about 20%. 
 Sending an email is implemented by calling the mail API from SMTP2GO.
-To get is up and running a free account by SMTP2 necessary.
+To get it up and running a free account by SMTP2 necessary.
 Sending email requires a free account with SMTP2GO.com, as well as the ability to create a DKIM entry in the DNS domain from which the email will be sent. 
-In short: create an API key with SMTP2GO under Account -> Sending -> API Keys. Register the DNS domain from which the email will be sent under Verified Senders. 
-Click on the created domain and copy the three CNAME records. Have the DNS administrator add these records. 
+
+In short: 
+
+- Create an API key with SMTP2GO under Account -> Sending -> API Keys. 
+- Register the DNS domain from which the email will be sent under Verified Senders. 
+- Click on the created domain and copy the three CNAME records. 
+- Have the DNS administrator add these records. 
+
+
 You can also use a domain managed at freeDNS. The administrator will add these records if you request them via email and your reputation is not compromised.
+
 To program the email functionality in the omgevingsmonitor, use the USB port. 
-The omgevingsmonitor has to execute an image without USBLOGGING, either the release or debug build. 
+
+The logging to USB from the omgevingsmonitor must be off, toggle by L (CASE sensitive) either the release or debug build. 
 Connect the omgevingsmonitor to a PC and open the COM port with Putty or Teraterm. 
-Type "Helpme" for instructions. You can now use the commands S25, S26, and S27 as from the shown examples to enter the "from" address, the "to" address, and the API key. 
-Commands are case sensistive. 
-Of non importance from start of version 4.68:
-It's essential that an image is loaded without USB logging. 
-The definition for this, which needs to be commented out, is in the file usbd_cdc_if.h; comment out the line by starting it with //.
+Type "Helpme" for instructions. You can now use the commands S25, S26, and S27 as from the shown examples, from the overview screen in the terminal program, to enter the "from" address, the "to" address, and the API key. 
+
+Commands are case sensitive! 
+
+Change from start of version 5.00:
+It's no longer essential that an image is loaded without USB logging. USB logging is redesigned, USB logging should configured off by typing the L character (case sensitive) in the terminal program to the USB port.
 
 ## version 4.66 <a name="version466"></a>
 Some minor changes, no stability issues
