@@ -125,6 +125,7 @@ Execute Project -> Clean.
 Check 'Start a build immediately' and choose 'Clean'.
 
 ##Programming the omgevingsmonitor with STM32CubeProgrammer <a name="Programming"></a>
+
 Prerequisites:
 - The path to the *.elf file, f.i. MJSGadget - dB meter.elf. The .elf file contains the firmware for the STM32.
 - Installed STM32CubeProgrammer. You can download it from https://www.st.com/en/development-tools/stm32cubeprog.html#overview.
@@ -158,7 +159,7 @@ While the virtual USB comport is active, type Helpme for more information.
 The STM32CubeProgrammer current consumption during startup in μA.
 ![The STM32CubeProgrammer current consumption during startup in μA](Images/versie_4.55_naar_standby.png)
 
-The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA.
+The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these snsors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 ## version 5.00 <a name="version500"></a>
