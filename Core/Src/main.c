@@ -76,6 +76,8 @@
   bool ESP_Programming = false;
   bool batteryEmpty = false;
   bool usbinitiated = USBD_FAIL;
+  bool usblog = false;
+
   uint8_t sendpwremail = CLEAR;
   static bool priorUSBpluggedIn = false;
   static bool stlinkpwr = true;
@@ -221,7 +223,7 @@ int main(void)
   GPIO_InitPWMLEDs(&htim2, &htim3);
   Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");
   BinaryReleaseInfo();
-  ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize);
+  ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)&usblog, uint8_tSize);
   charge = Battery_Upkeep();
   if(charge == BATTERY_CRITICAL) {
     SetAllREDLED();

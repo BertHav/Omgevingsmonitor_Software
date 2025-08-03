@@ -32,7 +32,6 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-bool usblog;
 bool ESPProg = false;
 UART_HandleTypeDef UsedUart;
 uint8_t TxData[64] = {0};

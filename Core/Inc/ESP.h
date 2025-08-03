@@ -55,6 +55,8 @@
 #define AT_RESPONSE_WIFI "WIFI CONNECTED"
 #define AT_RESPONSE_TIME_UPDATED "+TIME_UPDATED"
 #define AT_RESPONSE_MAIL_API "{\"succeeded\":1"
+//static const char API[] = "https://api.opensensemap.org/boxes";
+#define API "https://api.opensensemap.org/boxes"
 
 #define AT_COMMANDS_SIZE 22
 

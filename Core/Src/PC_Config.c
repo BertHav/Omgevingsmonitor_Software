@@ -155,6 +155,11 @@ void ProcessCmd(Receive_MSG msg)
         case UptimeConfigCmd: // 29
           WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
+        case URLToUploadConfigCmd: // 30
+          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+          WriteUint8ArrayEepromSafe(URLToUploadConfigAddr, msg.Payload, msg.PayloadLength, URLToUploadMaxLength);
+        break;
+
         case ClearConfigCmd: // 253
             ClearEEprom(EEPromStartAddr, ConfigSize);
             ClearEEprom(SSIDStartAddr, IPrelatedConfigSize);
@@ -218,7 +223,7 @@ void printf_USB(const char* message, ...)
   char string[150];
   va_list args;
   va_start(args, message);
-  vsprintf(string, message, args);
+  vsnprintf(string, 150, message, args);
   va_end(args);
   CDC_Transmit_FS((uint8_t*)string, strlen(string));
 }
@@ -268,7 +273,7 @@ void PC_show_Keys() {
 #endif
   static uint8_t hPaConfig[IdSize];               // 28 was 5
   static uint8_t UptimeConfig[IdSize];            // 29
-
+  static uint8_t URLToUploadConfig[URLToUploadMaxLength]; // 30
   static char Buffer[25];
   static char msg[70];
   if(Check_USB_PowerOn()){
@@ -277,7 +282,7 @@ void PC_show_Keys() {
   else {
     usb_out = false;
   }
-  sprintf(msg, "Overview of stored keys:\r\n");
+  sprintf(msg, "\r\nOverview of stored keys:\r\n");
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
@@ -341,7 +346,7 @@ void PC_show_Keys() {
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
-  sprintf(msg, "%02d - Stored name -------------------: ", CustomNameConfigCmd);
+  sprintf(msg, "%02d - Box name ----------------------: ", CustomNameConfigCmd);
   PC_selectout(&msg[0], usb_out);
   sprintf(msg, "%s\r\n", (char*)nameConfig);  // probably too long to held in same buffer
   PC_selectout(&msg[0], usb_out);
@@ -440,6 +445,20 @@ void PC_show_Keys() {
   sprintf(msg, "%02d - Uptime sensor id --------------: %s\r\n", UptimeConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
+  ReadUint8ArrayEEprom(URLToUploadConfigAddr, URLToUploadConfig, URLToUploadMaxLength);
+  sprintf(msg, "%02d - URL to upload -----------------: ", URLToUploadConfigCmd);
+  PC_selectout(&msg[0], usb_out);
+  if (strlen((char*)URLToUploadConfig) == 0) {
+    sprintf(msg, "Undefined, defaulted to ");
+    PC_selectout(&msg[0], usb_out);
+    PC_selectout((char*)API, usb_out);
+    PC_selectout("\r\n\0", usb_out);
+  }
+  else {
+    sprintf(msg, "%s\r\n", (char*)URLToUploadConfig);  // probably too long to held in same buffer
+    PC_selectout(&msg[0], usb_out);
+  }
+
   sprintf(msg, "%02d - Clear all definitions in EEPROM\r\n", clearDefsCmd);
   PC_selectout(&msg[0], usb_out);
 
@@ -453,17 +472,19 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB("from opensensemap.org in your account to this input.\r\n");
   HAL_Delay(10);
-  printf_USB("Command example for a full key for air pressure =>");
+  printf_USB("Command example for a full key for PM10 sensor =>");
   HAL_Delay(10);
-  printf_USB(" $05,67af09374cdef30007b35055\r\n");
+  printf_USB(" $08,67af09374cdef30007b35055\r\n");
   HAL_Delay(10);
   printf_USB("For changing string entries use prefix S, example: ");
   HAL_Delay(10);
-  printf_USB("S12,Testsysteem (max 48 chars)\r\n");
+  printf_USB("S12,Testsysteem (max 12 chars)\r\n");
   HAL_Delay(10);
   printf_USB("L - toggle logging on/off, current: %s\r\n", usblog?"on":"off");
   HAL_Delay(10);
   printf_USB("B - show build information\r\n");
+  HAL_Delay(10);
+  printf_USB("Example to clear a string: $30,000000000000000000000000\r\n");
   HAL_Delay(10);
   if (!usb_out) {
     printf("A sensor key can only be changed by USB input or the by configuration programm.\r\n");
@@ -493,22 +514,24 @@ bool Process_USB_input(uint8_t* data) {
   uint32_t length = GetUsbRxDataSize();
   uint8_t r = 0;
   uint8_t i = 0;
-  char Buffer[48];
+//  char Buffer[48];
+  char Buffer[pwdMaxLength];
   uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
   if ((length == 1) && (message != NULL) && (len != 28)){
       Debug("Switching to input length of 28 for full opensensemap keylength");
       len = 28;
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_S);  // zoek op S
-  if ((length == 1) && (message != NULL) && (len != 48)){
-      Debug("Switching to input length of 48 for full name strings");
-      len = 48;
+  if ((length == 1) && (message != NULL) && (len != pwdMaxLength)){
+      Debug("Switching to input length of %d for full name strings", pwdMaxLength);
+      len = pwdMaxLength;
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_L);  // Search for 'U'to toggle USB logging
   if ((length == 1) && (message != NULL)){
-    ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize);
+    printf_USB("address of usblog eeprom %ul\r\n", (uint8_t*)&usblog);
+    ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)&usblog, 1);
     usblog = !usblog; // log info to usb too
-    WriteUint8ArrayEepromSafe(USBlogstatusConfigAddr, (uint8_t*)usblog, uint8_tSize, uint8_tSize);
+    WriteUint8ArrayEepromSafe(USBlogstatusConfigAddr, (uint8_t*)&usblog, uint8_tSize, uint8_tSize);
     printf_USB("\r\nSwitching USB logging to %s\r\n", usblog?"on":"off");
     length = 0;
     data[0] = '\0';
@@ -525,7 +548,7 @@ bool Process_USB_input(uint8_t* data) {
   }
   if ((length >= len) || (data[length-1] == 13)) {
     // 'S' is for entering a ASCII string
-    if((data[0] == '#') || (data[0] == '$') || (data[0] == 'S')) {
+    if((data[0] == '#') || (data[0] == '$') || (data[0] == 'S') || (data[0] == 'E')) {
       received.Command = ascii_to_uint8(&data[1]);  // calculate the command number
       if (received.Command == 100)
       {
@@ -538,7 +561,11 @@ bool Process_USB_input(uint8_t* data) {
       }
       if (data[3] == ',') {
         for (i=4; i < len; i++) {
-          if (data[0] == 'S') {
+          if (data[0] == ('S' || 'E')) {
+            if ((data[0] == 'E') && (received.Command == clearDefsCmd)) {
+              Debug("\r\nClear EEPROM request\r\n");
+              received.Command = ClearConfigCmd;
+            }
             if (data[i] == 13) {
               data[i] = 0;
               break;
@@ -569,7 +596,7 @@ bool Process_USB_input(uint8_t* data) {
             }
           }
         }
-        if (len < 48) {
+        if (len < pwdMaxLength) {
           if (len == 6) {
             ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
             boxConfig[11] = result; //overwrite the last byte of the key
@@ -584,11 +611,13 @@ bool Process_USB_input(uint8_t* data) {
         else {
           received.PayloadLength = i-3;  // The string terminator counts
         }
-        if (len < 48) {
+        if ((len < pwdMaxLength) && (len != 6))  {
+//        if (len < 48) {
           uint8ArrayToString(Buffer, received.Payload);
           Debug("received Payload to write %s", Buffer);
         }
-        else if (len == 48) {
+//        else if (len == 48) {
+        else if (len == pwdMaxLength) {
           memcpy(received.Payload, data+4, i);
           Debug("received Payload to write %s", received.Payload);
         }
@@ -596,6 +625,7 @@ bool Process_USB_input(uint8_t* data) {
         ResetUsbRxDataSize();
         PC_show_Keys();
         for (uint8_t i=0; i < 32; i++) {
+//        for (uint8_t i=0; i < pwdMaxLength; i++) {
           data[i] = '\0';
         }
         return true;
@@ -603,6 +633,7 @@ bool Process_USB_input(uint8_t* data) {
       else {
         printf_USB("\r\nInvalid input; Command comma not found\r\n");
         ResetUsbRxDataSize();
+//        for (uint8_t i=0; i < pwdMaxLength; i++) {
         for (uint8_t i=0; i < 32; i++) {
           data[i] = '\0';
         }

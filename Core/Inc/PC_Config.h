@@ -54,8 +54,9 @@
 #define MailAPIKeyConfigCmd 27
 #define hPaConfigCmd 28 // was 5
 #define UptimeConfigCmd 29  // was 28
-#define clearDefsCmd 30
-#define maxCmd 31
+#define URLToUploadConfigCmd 30
+#define clearDefsCmd 31
+#define maxCmd 32
 #define ClearConfigCmd 253
 #define ClearEepromCmd 254
 #define ErrorCmd 255

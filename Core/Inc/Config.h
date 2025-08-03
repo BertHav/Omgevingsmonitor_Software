@@ -13,6 +13,7 @@
 #define CustomNameMaxLength 32
 #define SSIDMaxLength 32
 #define pwdMaxLength 64
+#define URLToUploadMaxLength 48
 #define BoxConfigAddr EEPromStartAddr + (IdSize * 0)
 #define TempConfigAddr EEPromStartAddr + (IdSize * 1)
 #define HumidConfigAddr EEPromStartAddr + (IdSize * 2)
@@ -34,27 +35,28 @@
 #define ENSAQIConfigAddr BMPTempConfigAddr + IdSize
 #define ENSTVOCConfigAddr ENSAQIConfigAddr + IdSize
 #define ENSeCO2ConfigAddr ENSTVOCConfigAddr + IdSize
+#define URLToUploadConfigAddr ENSeCO2ConfigAddr + IdSize
 
 
+// Here is space for another 48 bytes
 //#define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
 //#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
 
-#define SEN55TempConfigAddr ENSeCO2ConfigAddr  + IdSize + pwdMaxLength  + SSIDMaxLength
+//#define SEN55TempConfigAddr ENSeCO2ConfigAddr  + IdSize + pwdMaxLength  + SSIDMaxLength
+
+#define SEN55TempConfigAddr URLToUploadConfigAddr + URLToUploadMaxLength + 48
 #define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
 #define hPaConfigAddr SEN55HumidConfigAddr + IdSize
 #define USBlogstatusConfigAddr hPaConfigAddr + IdSize  // uint8_tSize has size of uint8_tSize
 #define UptimeConfigAddr USBlogstatusConfigAddr + IdSize
-
 #define ConfigSize USBlogstatusConfigAddr + uint8_tSize - EEPromStartAddr
 
 #define SSIDStartAddr 0x08080200
-
 #define SSIDConfigAddr SSIDStartAddr
 #define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
 #define SendFromNameConfigAddr pwdConfigAddr + pwdMaxLength
 #define SendToNameConfigAddr SendFromNameConfigAddr + SendFromNameMaxLength
 #define MailAPIKeyConfigAddr SendToNameConfigAddr + SendToNameMaxLength
-
 #define IPrelatedConfigSize MailAPIKeyConfigAddr + MailAPIKeyMaxLength - SSIDStartAddr
 
 #endif

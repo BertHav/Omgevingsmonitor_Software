@@ -49,8 +49,8 @@ static uint8_t oldEspState = 255;
 float batteryCharge = 0.0;
 float solarCharge = 0.0;
 static char message[192];
-static const char API[] = "\"https://api.opensensemap.org/boxes/";
-static const char header1[] = "\"content-type: application/json\"";
+//static const char header1[] = "\"content-type: application/json\"";
+#define HEADER1 "\"content-type: application/json\""
 static AT_Commands ATCommandArray[10];
 static AT_Commands AT_INIT[] = {AT_WAKEUP, AT_SET_RFPOWER, AT_CHECK_RFPOWER, AT_CWINIT, AT_CWAUTOCONN, AT_CWMODE1, AT_CIPMUX};
 static AT_Commands AT_SEND[] = {AT_WAKEUP,  AT_HTTPCPOST, AT_SENDDATA};
@@ -323,7 +323,19 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     Error("Error in HAL_UART_Transmit_DMA");
     return false;
   }
-  Debug("ESP_Send: %s", command);
+  if ((length > 90) && usblog) {
+    char splitchar;
+#define SPLIT_POS 76
+    splitchar = command[SPLIT_POS];
+    command[SPLIT_POS] = '\0';
+//    printf_USB((char*)"ESP_Send: ");
+    printf_USB((char*)command);
+    command[SPLIT_POS] = splitchar;
+    printf_USB((char*)&command[SPLIT_POS]);
+    printf("ESP_Send: %s", command);
+  }
+  else
+    Debug("ESP_Send: %s", command);
   return true;
 }
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
@@ -437,7 +449,7 @@ bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
     Error("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
     for (int i = 0; i < 12; i++) {
       if (usblog && Check_USB_PowerOn()) {
-        printf_USB("02x", data[i]);
+        printf_USB("%02x", data[i]);
       }
       printf("%02x", data[i]);
     }
@@ -1132,13 +1144,18 @@ bool WEBSERVER(){
 //These are the commands necesarry for sending data.
 bool HTTPCPOST(){
   bool txresult = false;
-
   uint16_t length = CreateMessage(&txresult, false);
   static uint8_t boxConfig[IdSize];
-  static char Buffer[25];
+  static char Buffer[1+(2*IdSize)];
+  static uint8_t URLToUpload[URLToUploadMaxLength];
   ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
   uint8ArrayToString(Buffer, boxConfig);
-  sprintf(message, "AT+HTTPCPOST=%s%s/data\",%d,1,%s\r\n", API, Buffer, length, header1);
+//  sprintf(message, "AT+HTTPCPOST=%s/%s/data\",%d,1,%s\r\n", API, Buffer, length, header1);
+  ReadUint8ArrayEEprom(URLToUploadConfigAddr, URLToUpload, URLToUploadMaxLength);
+  if (strlen((char*)URLToUpload) == 0) {
+    strcpy ((char*)URLToUpload,API);
+  }
+  sprintf(message, "AT+HTTPCPOST=\"%s/%s/data\",%d,1,%s\r\n", (char*)URLToUpload, Buffer, length, HEADER1);
   uint16_t len = strlen(message);
   Debug("length of message (former atCommandBuff) during header tx: %d, bool value of tx result %d", len, txresult);
   if(ESP_Send((uint8_t*)message, len)){
@@ -1162,7 +1179,7 @@ bool HTTPCPOST_MAILAPI() {
   uint16_t maillength = CreateMailMessage(&txresult, false);
   uint8_t MailAPIKeyConfig[MailAPIKeyMaxLength];
   ReadUint8ArrayEEprom(MailAPIKeyConfigAddr, MailAPIKeyConfig, MailAPIKeyMaxLength);
-  sprintf(message, "AT+HTTPCPOST=%s,%d,3,%s,\"accept: application/json\",\"X-Smtp2go-Api-Key: %s\"\r\n", APIMail, maillength, header1, (char*)MailAPIKeyConfig);
+  sprintf(message, "AT+HTTPCPOST=%s,%d,3,%s,\"accept: application/json\",\"X-Smtp2go-Api-Key: %s\"\r\n", APIMail, maillength, HEADER1, (char*)MailAPIKeyConfig);
   uint16_t len = strlen(message);
   if(ESP_Send((uint8_t*)message, len)){
     return true;

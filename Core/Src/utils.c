@@ -64,13 +64,25 @@ void CreateLine(VerboseLevel verboseLevel, char *tag, char *format, ...) {
   // Format the rest of the message with the variable arguments
   va_list args;
   va_start(args, format);
-  vsnprintf(&textBuffer[lineOffset], TEXTBUFFER_LEN - lineOffset, format, args);
+  vsnprintf(&textBuffer[lineOffset], TEXTBUFFER_LEN - lineOffset - 2, format, args);
   va_end(args);
 
   if (usblog && Check_USB_PowerOn()){
     printf_USB("%s\r\n", textBuffer);
+/*
+    if (strlen(textBuffer) >= (TEXTBUFFER_LEN / 2)) {
+      char endchar = textBuffer[(TEXTBUFFER_LEN / 2)];
+      textBuffer[(TEXTBUFFER_LEN / 2)] = '\0';
+      printf_USB(textBuffer);
+      textBuffer[(TEXTBUFFER_LEN / 2)] = endchar;
+      printf_USB("%s\r\n", &textBuffer[(TEXTBUFFER_LEN / 2)]);
+    }
+    else {
+      printf_USB("%s\r\n", textBuffer);
+    }
+*/
   }
-  // Print the final formatted message
+  // Print the final formatted message to serial
   printf("%s\r\n", textBuffer);
 }
 

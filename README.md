@@ -2,8 +2,10 @@
 
 [Introduction](#Introduction)\
 [Compiling and building](#Compiling)\
-[Programming the omgevingsmonitor with STM32CubeProgrammer](#Programming)\
+[Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
+[Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.01](#version501)\
 [version 5.00](#version500)\
 [version 4.67](#version467)\
 [version 4.66](#version466)\
@@ -150,17 +152,25 @@ Wait for the "File download complete" dialog.
 
 Press the RESET button of the Omgevingsmonitor for at least 2 seconds and release. The omgevingsmonitor should now start with LED patterns.
 
+## Configuring the Omgevingsmonitor manually by USB <a name="USBconfig"></a>
+
 It is possible to interact with the omgevingsmonitor using Putty or TeraTerm. The omgevingsmonitor must be awake for generating a comport on the host PC.
 
 While the virtual USB comport is active, type Helpme for more information.
+
+All keys kan be changed as well as the name of De omgevingsmonitor and several other settings.
 
 ## Current consumption of the Omgevingsmonitor <a name="Consumption"></a>
 
 The STM32CubeProgrammer current consumption during startup in μA.
 ![The STM32CubeProgrammer current consumption during startup in μA](Images/versie_4.55_naar_standby.png)
 
-The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these snsors it is about 2250μA. 
+The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
+
+## version 5.01 <a name="version501"></a>
+The URL to which the measurement data is uploaded can be overwritten via USB. The default is openSenseMap. Command 30 allows you to enter a string of up to 48 characters to be used as the domain URL, e.g., HTTP://www.mydomain.org. The URL must not end with a forward slash because it is included in the postfix "content-type: application/json\".
+Some changes has been made to USB logging. Longer messages can be misformed. For a reliable trace use the UART log port inside.
 
 ## version 5.00 <a name="version500"></a>
 EEPROM memory aligned with v2.0 release from KITT. USB logging reimplemented. The compiler flag for USBLOGGING is depricated. Standard is logging to USB possible. Make a connection with your PC and use e.g. Putty or Teraterm. 
