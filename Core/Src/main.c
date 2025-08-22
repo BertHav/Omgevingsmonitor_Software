@@ -77,6 +77,7 @@
   bool batteryEmpty = false;
   bool usbinitiated = USBD_FAIL;
   bool usblog = false;
+  bool espfailshown = false;
 
   uint8_t sendpwremail = CLEAR;
   static bool priorUSBpluggedIn = false;
@@ -88,6 +89,7 @@
   uint8_t hidscount = 0;
   uint8_t u1_rx_buff[16];  // rxbuffer for serial logger
   uint8_t RxData[UART_CDC_DMABUFFERSIZE] = {0};  //rx buffer for USB
+  uint8_t sendpwrmaildate = 0;
   uint16_t IndexRxData = 0;
   uint32_t deviceTimeOut = 0;
   uint32_t LastRxTime = 0;
@@ -108,11 +110,11 @@ void SystemClock_Config(void);
 
 void SetTestDone(){
   testDone = true;
-  HAL_Delay(500);
+  HAL_Delay(250);
   SetDBLED(false, false, true);
   SetStatusLED(LED_OFF, LED_OFF, LED_ON);
   SetVocLED(LED_OFF, LED_OFF, LED_ON);
-  HAL_Delay(500);
+  HAL_Delay(250);
   SetLEDsOff();
   InitDone();
 }
@@ -223,18 +225,24 @@ int main(void)
   GPIO_InitPWMLEDs(&htim2, &htim3);
   Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");
   BinaryReleaseInfo();
-  ReadUint8ArrayEEprom(USBlogstatusConfigAddr, (uint8_t*)&usblog, uint8_tSize);
-  charge = Battery_Upkeep();
-  if(charge == BATTERY_CRITICAL) {
-    SetAllREDLED();
-    Info("Battery voltage is critical: %.02fV", ReadBatteryVoltage());
-#ifndef STLINK_V3PWR
-    Enter_Standby_Mode(); // Battery is empty we are going in deep sleep, nearly off and no wakeup from RTC
-#endif
-  }
+  usblog = *(bool*)(USBlogstatusConfigAddr);
   if(UserButton_Pressed()){
     EnableESPProg();
     ESP_Programming = true;
+  }
+  else {
+    charge = batteryChargeCheck();
+//    batteryCharge = ReadBatteryVoltage();
+    Error("Battery voltage is: %.02fV", batteryCharge);
+    if(batteryCharge <= 3.68) {
+      SetAllREDLED();
+      Error("Battery voltage is critical: %.02fV, going in deep sleep. Waking for LED indication %s seconds", batteryCharge, DEEP_SLEEP);
+      WalkAllRedLED();
+#ifndef STLINK_V3PWR
+      Enter_Stop_Mode_for_empty_battery(DEEP_SLEEP);
+#endif
+      }
+
   }
   SetVerboseLevel(VERBOSE_ALL);
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
@@ -261,14 +269,15 @@ int main(void)
       charge = Battery_Upkeep();
       batteryReadTimer  = HAL_GetTick() + BATTERY_READ_CYCLE;
       showTime();
-
     }
     configCheck();
-    if (charge == BATTERY_LOW || charge == BATTERY_CRITICAL){
+    if ((charge == BATTERY_LOW || charge == BATTERY_CRITICAL)  && !EspTurnedOn){
       WalkAllRedLED();
       Sensor.PM_measurementEnabled = false;
 #ifdef USE_MAIL
-      if ((charge == BATTERY_LOW) && (sendpwremail == CLEAR) && !EspTurnedOn && (!Check_USB_PowerOn())) {
+      pwrmailTodaySend();
+      if (((charge == BATTERY_LOW)  || (charge == BATTERY_CRITICAL)) && (sendpwremail == CLEAR) && !Check_USB_PowerOn()) {
+        Debug("charge: %d, sendpwrmail: %d Check_USB_PowerOn(): %d", charge, sendpwremail, Check_USB_PowerOn());
         setModePowerMail();
         ESP_Upkeep();
       }
@@ -278,9 +287,8 @@ int main(void)
 #ifdef USE_MAIL
 /*
     // ==== used for email testing at startup in case of a different mail provider
-    float vltg = ReadBatteryVoltage();
-    if ((spanning <= 4.170000) && (sendpwremail == CLEAR) && !EspTurnedOn && (ESPNTPTimeStamp != ESP_NTP_INIT_DELAY) && (!Check_USB_PowerOn())) {
-      Debug("Battery voltage is: %fV", vltg);
+    if ((batteryCharge <= 4.170000) && (sendpwremail == CLEAR) && !EspTurnedOn && (ESPNTPTimeStamp != ESP_NTP_INIT_DELAY) && (!Check_USB_PowerOn())) {
+      Debug("Battery voltage is: %fV", batteryCharge);
       Sensor.PM_measurementEnabled = false;
       AllDevicesReady();
       setModePowerMail();
@@ -298,7 +306,7 @@ int main(void)
        // because without a modification on the PCB the ESP32 is activated
        // instead use the stop mode with or without RTC
        //Enter_Standby_Mode();
-       Enter_Stop_Mode_for_empty_battery(120); // light up the leds every 2 minutes
+       Enter_Stop_Mode_for_empty_battery(DEEP_SLEEP); // light up the leds every hour
     }
     else{
       batteryEmpty = false;
@@ -314,7 +322,7 @@ int main(void)
           SetVOCSensorDIS_ENA(false);
         }
         if (!usbPluggedIn && (HAL_GetTick() > DEVICE_INIT_TIMEOUT)) {
-          Debug("Device time out set in main due to powerstatus shift");
+//          Debug("Device time out set in main due to powerstatus shift");
           deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
         }
         priorUSBpluggedIn = usbPluggedIn;
@@ -337,7 +345,13 @@ int main(void)
           sen5x_Power_Off();
         }
       }
-      ESPstate = ESP_Upkeep();
+      if (SensorProbe.ESP_Present && !espfailshown) {
+        ESPstate = ESP_Upkeep();
+      }
+      else {
+        Error("ESP failed during init");
+        espfailshown = true;
+      }
     }
     if(!testDone && !ESP_Programming && !batteryEmpty){
       Device_Test();  // for device with startup time

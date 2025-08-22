@@ -100,14 +100,7 @@ uint8_t GetVerboseLevel() {
 
 
 void BinaryReleaseInfo() {
-  char msgout[41];
-  sprintf(msgout,"Build on: %s at %s", __DATE__, __TIME__);
-  if (!usblog) {
-    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
-  }
-  Info(msgout);
-  // Format: YY'w'WWv
-  Info("Git: %s", CURRENT_WEEK);
+  char msgout[42];
 #ifdef DEBUG
   sprintf(msgout,"Software version: %s, Debug build", SRC_VERSION);
 #else
@@ -117,6 +110,13 @@ void BinaryReleaseInfo() {
     printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
   }
   Info(msgout);
+  sprintf(msgout,"Build on: %s at %s", __DATE__, __TIME__);
+  if (!usblog) {
+    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
+  }
+  Info(msgout);
+  // Format: YY'w'WWv
+  Info("Git: %s", CURRENT_WEEK);
 }
 
 //

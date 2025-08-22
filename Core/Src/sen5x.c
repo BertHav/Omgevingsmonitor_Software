@@ -1,3 +1,4 @@
+
 /*
  * sen5x.c
  *
@@ -438,7 +439,7 @@ void sen5x_statemachine() {
       Error("sen5x device is disabled due to too many errors");
       SetPMSensorStatus(false);
       DisablePMSensor();
-      sen5xReadTimer = HAL_GetTick() + SEN5X_DISPLAY_DISABLED_MSG; //some more less then an hour a message when continue operated.
+      sen5xReadTimer = HAL_GetTick() + SEN5X_DISPLAY_DISABLED_MSG; //some more less then ten minutes a message when continue operated.
       break;
     case LIGHT_OUT:
       sen5xReadTimer = HAL_GetTick() + SEN5X_STARTUP_DELAY; // wait about 30s when started up
@@ -498,7 +499,6 @@ void sen5x_statemachine() {
           sen5x_printvalues(); // print the values
           Info("!!==Values are bogus, voltage for sen5x is out of range when powered by the STLINK_V3PWR==!!");
 #endif
-//          HAL_Delay(1000);
         }
       }
       if (usbPluggedIn || (sen5xSamples > 1)) {

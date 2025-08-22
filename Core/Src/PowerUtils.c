@@ -67,6 +67,7 @@ bool Check_USB_PowerOn(void){
    if (HAL_GPIO_ReadPin(VusbDetect_GPIO_Port, VusbDetect_Pin)) {
      if (sendpwremail == DONE) {
        sendpwremail = CLEAR;
+       sendpwrmaildate = 0;
      }
      return true;
    }

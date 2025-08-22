@@ -15,7 +15,7 @@ typedef struct  {
   uint8_t Year;   // offset from 1970;
 }   tmElements_t, TimeElements, *tmElementsPtr_t;
 
-
+extern uint8_t lastminute;
 extern uint8_t lasthour;
 extern uint8_t lastminute;
 extern uint8_t lastsecond;
@@ -33,7 +33,9 @@ extern uint8_t year;
 
 void ParseTime(char* buffer);
 // Functies voor het instellen en uitlezen van de tijd
+uint8_t getDate();
 void getUptime(char* uptbuffer);
+void showUpTime();
 void showTime();
 void setBootTime(void);
 void UpdateSystemUptime();

@@ -21,7 +21,21 @@
 #include "i2c.h"
 
 /* USER CODE BEGIN 0 */
-
+#if I2C-SCAN-ENA // I2C bus scan
+  // Scan I2C bus for all possible 7-bit addresses
+  printf("I2C2 bus scan:\r\n   ");
+  for (i = 0; i < 0x10; i++) printf("  %X", i);
+  printf("\r\n00:         ");
+  for (i = 3; i < 0x78; i++) {
+    if (!(i & 0x0F)) printf("\r\n%02X:", i);
+    if (I2C_IsDeviceReady(I2C2, i << 1, 5) == I2C_SUCCESS) {
+      printf(" %02X", i);
+    } else {
+      printf(" --");
+    }
+  }
+  printf("\r\n");
+#endif // I2C bus scan
 /* USER CODE END 0 */
 
 I2C_HandleTypeDef hi2c1;

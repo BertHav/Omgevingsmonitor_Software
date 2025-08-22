@@ -62,6 +62,7 @@ extern uint32_t deviceTimeOut;
 extern uint8_t MICstate;
 extern uint8_t ESPstate;
 extern uint8_t sendpwremail;
+extern uint8_t sendpwrmaildate;
 extern bool usblog;
 
 
@@ -111,13 +112,14 @@ extern bool usblog;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "5.01 BH"
-#define CURRENT_WEEK "2025w31-7"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.02 BH"
+#define CURRENT_WEEK "2025w34-5"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go
 #define USE_MAIL
 
+//#define SMALLBUILD  // this build type fits the debug build
 //#define STLINK_V3PWR true
 
 #define WAIT_WITH_PM 860
@@ -125,6 +127,7 @@ extern bool usblog;
 #define WAIT_WITH_PM_SUN 260 // with sun shining and battery full loaded with sen5x
 #define WAIT_WITHOUT_PM_SUN 280  // with sun shining and battery full loaded
 #define BATTERY_READ_CYCLE 50000  // About once a minute
+#define DEEP_SLEEP 3600
 #define DEVICE_INIT_TIMEOUT 25000 // This is the initial time out for sensors during startup
 #define DEVICE_TIMEOUT 4500 // during battery power the device become about 4,5 second to take 3 samples after they are disabled
 

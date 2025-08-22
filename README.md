@@ -5,6 +5,7 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.02](#version502)\
 [version 5.01](#version501)\
 [version 5.00](#version500)\
 [version 4.67](#version467)\
@@ -167,6 +168,9 @@ The STM32CubeProgrammer current consumption during startup in μA.
 
 The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
+
+## version 5.02 <a name="version502"></a>
+Mail interval on empty battery is changed to once a day. Some small improvements and optimizations. Corrrections to CLI.
 
 ## version 5.01 <a name="version501"></a>
 The URL to which the measurement data is uploaded can be overwritten via USB. The default is openSenseMap. Command 30 allows you to enter a string of up to 48 characters to be used as the domain URL, e.g., HTTP://www.mydomain.org. The URL must not end with a forward slash because it is included in the postfix "content-type: application/json\".

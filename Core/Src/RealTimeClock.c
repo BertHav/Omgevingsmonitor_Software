@@ -25,13 +25,18 @@ typedef struct {
 
 bool firstTimeUpdate = true;
 bool dstchkd = false;
+uint8_t lastminute = 0;
 uint8_t lasthour;
 uint8_t weekday;
+static uint32_t posixBootTime = 0;
 static Clock myUpTime = {.Day = 0, .Hour = 0, .Minutes = 0, .Seconds = 0};
 static const char *dayNames[7] = {  "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}; // 0..6 -> 1 to 7
 static const char *monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // 0..11 -> 1 to 12
 static RTC_HandleTypeDef * RealTime_Handle;
-static uint32_t posixBootTime = 0;
+
+RTC_TimeTypeDef currentTime;
+RTC_DateTypeDef currentDate;
+
 
 //char systemUptime[16] = {0};
 char strbuf[24] = {0}; //fi length -> 22-jan-24 23h:12m:23s
@@ -45,19 +50,35 @@ void getUptime(char* uptbuffer) {
 }
 #endif
 
+uint8_t getDate() {
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
+  RTC_GetTime(&currentTime, &currentDate);
+  return currentDate.Date;
+}
+
+void showUpTime() {
+    printf_USB("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm\r\n",
+        currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
+        currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes);  // alway forced shown even if usb logging is off
+}
+
 void showTime() {
   if (posixBootTime == 0) {
     return;
   }
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   lasthour = currentTime.Hours;
   weekday = currentDate.WeekDay;
   UpdateSystemUptime();
-  Info("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds",
+  if (lastminute != currentTime.Minutes) {
+    lastminute = currentTime.Minutes;
+    Info("System time: %02d-%s-%02d %02dh:%02dm:%02ds, system uptime is: %dd %02dh:%02dm:%02ds",
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
+  }
   if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && !dstchkd && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
     dstchkd = true;
     setESPTimeStamp(0); // check for summer/wintertime
@@ -66,16 +87,16 @@ void showTime() {
 
 
 uint32_t calculateNextNTPTime(void) {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   return makeTime(&currentDate, &currentTime);
 }
 
 
 void UpdateSystemUptime() {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   uint32_t uxUptime;
   uint32_t time;
   RTC_GetTime(&currentTime, &currentDate);
@@ -126,8 +147,8 @@ uint8_t aBuff2int(char* aBuff, uint8_t start, uint8_t stop) {
 }
 
 void ParseTime(char* buffer) {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   currentTime.Hours = aBuff2int(buffer, 24, 25);
   currentTime.Minutes = aBuff2int(buffer, 27, 28);
@@ -203,14 +224,14 @@ void RTC_SetDate(RTC_DateTypeDef* sDate) {
     }
 }
 
-// Functie om de tijd uit te lezen
 void RTC_GetTime(RTC_TimeTypeDef* gTime, RTC_DateTypeDef* gDate) {
 uint8_t t = 1;
 uint8_t prevValue = 0;
-Battery_Status status;
-  status = powerCheck();
-  if ( status == BATTERY_CRITICAL) {
-//    To be able to read the RTC calendar register when the APB1 clock frequency is less than
+// Battery_Status status;
+//  status = powerCheck();
+//  if ( status == BATTERY_CRITICAL) {
+  if (batteryCharge  < 3.77) {
+    //    To be able to read the RTC calendar register when the APB1 clock frequency is less than
 //    seven times the RTC clock frequency (7*RTCLCK), the software must read the calendar
 //    time and date registers twice.
     t++; //
@@ -222,7 +243,8 @@ Battery_Status status;
     if (HAL_RTC_GetDate(RealTime_Handle, gDate, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting date from RTC");
     }
-    if ( status == BATTERY_CRITICAL) {
+//    if ( status == BATTERY_CRITICAL) {
+    if (batteryCharge  < 3.77) {
       if (prevValue != gTime->Hours) {
         prevValue = gTime->Hours;
         t++;
@@ -234,16 +256,17 @@ Battery_Status status;
   }
 }
 
+// Functie om de tijd uit te lezen
 uint32_t getPosixTime(void) {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   return makeTime(&currentDate, &currentTime);
 }
 
 void getUTCfromPosixTime(uint32_t posixTime, char* strbuf1) {
-  RTC_TimeTypeDef currentTime;
-  RTC_DateTypeDef currentDate;
+//  RTC_TimeTypeDef currentTime;
+//  RTC_DateTypeDef currentDate;
   breakPosixTime(posixTime, &currentDate, &currentTime);
   sprintf(strbuf1, "%02d-%02d-%02d %02dh:%02dm:%02ds\r\n", currentDate.Date, currentDate.Month, currentDate.Year,
       currentTime.Hours, currentTime.Minutes, currentTime.Seconds);
@@ -278,8 +301,10 @@ void RTC_SetWakeUpTimer(uint32_t secondsOfSleep)
     HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, secondsOfSleep-1, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
 }
 
+/*
 void Enter_Standby_Mode(void)
 {
+  // Not such a good idea, the esp is powered when gpio is high impedance
     // Schakel de clock voor de Power Controller in
     //__HAL_RCC_PWR_CLK_ENABLE();
   Debug("Entering STANDBY mode, deepsleep");
@@ -290,17 +315,17 @@ void Enter_Standby_Mode(void)
   GPIO_PrepareForStandbyMode();
   // Schakel Standby Mode in only if battery is drained
   HAL_SuspendTick();
-  HAL_PWR_EnterSTANDBYMode();
+  HAL_PWR_EnterSTANDBYMode(); // Not such a good idea, the esp is powered when gpio is high impedance
 }
-
+*/
 
 void Enter_Stop_Mode_for_empty_battery(uint16_t sleepTime)
 {
   if (sen5x_On) {
     sen5x_Power_Off();
   }
-  Info("Battery voltage %.02fV", ReadBatteryVoltage());
-  powerDisplay(powerCheck());
+  Info("Battery voltage %.02fV", batteryCharge);
+//  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);
@@ -318,8 +343,8 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   if (sen5x_On) {
     sen5x_Power_Off();
   }
-  Info("Battery voltage %.02fV", ReadBatteryVoltage());
-  powerDisplay(powerCheck());
+  Info("Battery voltage %.02fV", batteryCharge);
+//  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);
@@ -359,7 +384,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   showTime();
   EnabledConnectedDevices();
   ResetDBACalculator();  // reset the DBA average calculation
-  ResetBMP280samplecounter();
   ResetSGP40samplecounter();
   ResetENS160samplecounter();
   setsen5xSamplecounter(0);

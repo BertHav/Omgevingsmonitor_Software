@@ -25,13 +25,13 @@ static uint8_t usedMicLEDcolor;
 uint32_t ConfigStamp;
 uint32_t UserbuttonStamp;
 uint32_t PowerStamp = 0;
-static float batteryCharge = 0.0;
+float batteryCharge = 0.0;
 
 void InitDone(){
   init = false;
 }
 
-/*
+/* open voltage
   100%----4.20V
   90%-----4.06V
   80%-----3.98V
@@ -44,18 +44,22 @@ void InitDone(){
   10%-----3.68V
   5%------3.45V
   0%------3.00V
+
+  "De Omgevingsmonitor" will refuse to upload data to openSenseMap.org if the voltage under load drops below 3.77V with SEN5x attached.
+  Without a SEN5x attached the Omgevingsmonitor stops sending to OpenSenseMap at 3.75V
+
  */
 
 Battery_Status batteryChargeCheck(){
   Battery_Status status;
   batteryCharge = ReadBatteryVoltage();
-  if(batteryCharge < 3.68){
+  if(batteryCharge < 3.75){
     status = BATTERY_CRITICAL;
   }
-  if(batteryCharge >= 3.68 && batteryCharge < 3.74){
+  if(batteryCharge >= 3.75 && batteryCharge < 3.85){
     status = BATTERY_LOW;
   }
-  if(batteryCharge >= 3.74 && batteryCharge < 4.00){
+  if(batteryCharge >= 3.85 && batteryCharge < 4.00){
     status = BATTERY_GOOD;
   }
   if(batteryCharge >= 4.00){
@@ -92,6 +96,7 @@ void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue){
     TIM2 -> CCR4 = blue;
   }
 }
+
 // Sets dB LED to (RGB) color
 void SetDBLED(bool red, bool green, bool blue){
   // RED LED
@@ -101,6 +106,7 @@ void SetDBLED(bool red, bool green, bool blue){
     HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, !blue);
   }
 }
+
 // Sets VOC LED to (RGB) color
 void SetVocLED(uint16_t red, uint16_t green, uint16_t blue){
   if(usbPluggedIn || init || userToggle){
@@ -109,6 +115,7 @@ void SetVocLED(uint16_t red, uint16_t green, uint16_t blue){
     TIM3 -> CCR3 = blue;
   }
 }
+
 void SetMeasurementIndicator(){
   if(usbPluggedIn||userToggle){
     TIM2 -> CCR3 = Calculate_LED_ON();
@@ -175,7 +182,7 @@ void ResetPMIndicator() {
 }
 
 // Sets all LEDs Off
-void SetLEDsOff(void){
+void SetLEDsOff() {
   SetStatusLED(LED_OFF,LED_OFF,LED_OFF);
   SetDBLED(false,false,false);
   SetVocLED(LED_OFF,LED_OFF,LED_OFF);
@@ -184,6 +191,7 @@ return;
 
 void SetAllREDLED() {
 // Fire all LEDs to red independent of usertoggle or power status and reboot
+  SetLEDsOff();
   TIM2 -> CCR1 = LED_ON;
   TIM2 -> CCR3 = LED_OFF;
   TIM2 -> CCR4 = LED_OFF;
@@ -194,30 +202,32 @@ void SetAllREDLED() {
   HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
   HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
   HAL_Delay(500);
-  SetLEDsOff();
+  TIM2 -> CCR1 = LED_OFF;
+  TIM3 -> CCR1 = LED_OFF;
+  HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, true); //red off
 }
 
 void WalkAllRedLED() {
 // Fire all LEDs sequential to red independent of usertoggle or power status and reboot
   SetLEDsOff();
-  HAL_Delay(250);
-  TIM2 -> CCR1 = LED_ON;
-  TIM2 -> CCR3 = LED_OFF;
-  TIM2 -> CCR4 = LED_OFF;
-  HAL_Delay(250);
-  TIM2 -> CCR1 = LED_OFF;
+  HAL_Delay(100);
 
   TIM3 -> CCR1 = LED_ON;
   TIM3 -> CCR2 = LED_OFF;
   TIM3 -> CCR3 = LED_OFF;
-  HAL_Delay(250);
+  HAL_Delay(100);
   TIM3 -> CCR1 = LED_OFF;
 
   HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, false); //red on
   HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
   HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);
-  HAL_Delay(250);
+  HAL_Delay(100);
   HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, true); //red off
+  TIM2 -> CCR1 = LED_ON;
+  TIM2 -> CCR3 = LED_OFF;
+  TIM2 -> CCR4 = LED_OFF;
+  HAL_Delay(100);
+  TIM2 -> CCR1 = LED_OFF;
 }
 
 void SetAllBlueLED() {
@@ -232,11 +242,10 @@ void SetAllBlueLED() {
     HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, true);   //red off
     HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, true);
     HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, false);  // blue on
-    HAL_Delay(1000);
+    HAL_Delay(250);
     TIM2 -> CCR4 = LED_OFF;
-    TIM3 -> CCR3 = LED_OFF;
+//    TIM3 -> CCR3 = LED_OFF;  // do not switch off blue VOC led
     HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, true);  // blue off
-    HAL_Delay(500);
   }
 }
 
@@ -282,10 +291,10 @@ void powerDisplay(Battery_Status status){
     Debug("Battery fully charged");
   }
   if(status == BATTERY_GOOD){
-    Debug("Battery charge is doing well");
+    Debug("Battery status good");
   }
   if(status == BATTERY_LOW){
-    Debug("Battery is getting low");
+    Debug("Battery status low");
   }
   if(status == BATTERY_CRITICAL){
     Debug("Battery is critical, stop processes");
@@ -341,7 +350,7 @@ void configCheck(){
       VOCNOx = !VOCNOx;
       if (VOCNOx)  color = Calculate_LED_ON();
         else color = 4000;
-      Info("VOC and NOx only measurement %s", VOCNOx?"enabled":"disabled");
+      Info("VOC and NOx only measurement %sabled", VOCNOx?"en":"dis");
       for (uint8_t i=0; i<2; i++) {
         TIM3 -> CCR1 = Calculate_LED_ON();
         TIM3 -> CCR2 = color;
@@ -354,7 +363,7 @@ void configCheck(){
       }
 //      Debug("userToggle flipped back to prior status");
       userToggle = !userToggle;
-      Info("userToggle status is %s", userToggle?"enabled":"disabled");
+      Info("userToggle status is %sabled", userToggle?"en":"dis");
       if (usbPluggedIn) {
         set_light_on_state();  // in case of battery operation the mode is picked up by the state machine
       }
@@ -390,7 +399,7 @@ Battery_Status Battery_Upkeep(){
 }
 
 void setuserToggle(void) {
-  if (powerCheck() != USB_PLUGGED_IN) { //operate only in battery operation mode
+  if (!Check_USB_PowerOn()) { //operate only in battery operation mode
     userToggle = true;
     EnabledConnectedDevices();
   }

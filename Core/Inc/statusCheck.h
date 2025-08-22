@@ -29,6 +29,7 @@ typedef enum {
 
 extern bool usbPluggedIn;
 extern bool userToggle;
+extern float batteryCharge;
 
 void setuserToggle(void);
 void configCheck();

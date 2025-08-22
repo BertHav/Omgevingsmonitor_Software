@@ -27,7 +27,7 @@
 
 // due to disabled interrupts from sound calculation a HAL tick is about 1,2 ms
 #define SEN5X_STARTUP_DELAY 22800 //about 28 seconds
-#define SEN5X_DISPLAY_DISABLED_MSG 3141592 // about every hour, or about a million pi ;)
+#define SEN5X_DISPLAY_DISABLED_MSG 314159 // about every 10 minutes, or about a 100000 pi ;)
 
 typedef enum {
   S5X_DISABLED,

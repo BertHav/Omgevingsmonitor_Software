@@ -26,7 +26,7 @@
 #define ESP_MAX_UART_RETRIES 2
 #define ESP_MAX_BUFFER_SIZE 256
 #define ESP_TX_BUFFER_SIZE 512
-#define ESP_START_UP_TIME 700
+#define ESP_START_UP_TIME 900
 #define ESP_RESPONSE_TIME 10
 #define ESP_RESPONSE_LONG 50
 #define ESP_WIFI_INIT_TIME 500
@@ -54,9 +54,9 @@
 #define AT_RESPONSE_START ">"
 #define AT_RESPONSE_WIFI "WIFI CONNECTED"
 #define AT_RESPONSE_TIME_UPDATED "+TIME_UPDATED"
-#define AT_RESPONSE_MAIL_API "{\"succeeded\":1"
-//static const char API[] = "https://api.opensensemap.org/boxes";
 #define API "https://api.opensensemap.org/boxes"
+#define SPLIT_POS 76
+
 
 #define AT_COMMANDS_SIZE 22
 
@@ -133,7 +133,6 @@ typedef enum {
   RECEIVE_STATUS_SSID,
   RECEIVE_STATUS_LOOP,
   RECEIVE_STATUS_TIME,
-  RECEIVE_STATUS_MAIL_API
 }Receive_Status;
 
 typedef enum {
@@ -143,7 +142,6 @@ typedef enum {
   RECEIVE_EXPECTATION_WIFI,
   RECEIVE_EXPECTATION_SSID,
   RECEIVE_EXPECTATION_TIME,
-  RECEIVE_EXPECTATION_MAIL_API
 } AT_Expectation;
 
 typedef enum {
@@ -198,17 +196,6 @@ typedef struct {
   char Password[pwdMaxLength];
 }WifiConfig;
 
-typedef struct {
-  char User[30];
-  char ChipId[32];
-  char BoxAddress[30];
-  char TempAddress[30];
-  char HumidAddress[30];
-  char SoundAddress[30];
-  char VOCAddress[30];
-  char BatteryChargeAddress[30];
-}APIConfig;
-
 extern bool ESPTransmitDone;
 extern bool EspTurnedOn;
 extern bool ReconfigSet;
@@ -221,7 +208,10 @@ void ESP_Reset(void);
 void ESP_Sleep(void);
 void ESP_DeInit(void);
 void ESP_WakeTest();
+#ifdef USE_MAIL
 void setModePowerMail();
+void pwrmailTodaySend();
+#endif
 void setVOC(uint16_t voc);
 void setAHT2x(float airhum, float airtemp);
 void setBMP280(float airtemp, float airhpa);

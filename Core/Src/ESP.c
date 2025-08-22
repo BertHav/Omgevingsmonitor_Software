@@ -37,22 +37,23 @@ static bool WifiReset = false;
 bool ReconfigSet = false;
 static bool ConnectionMade = false;
 static bool APtested = false;
-//static bool beurs = false;
 static bool setTime = true;
 static bool msgdone = false;
 bool ESPTransmitDone = false;
+#ifndef OPENSENSEMAP
 static uint32_t uid[3];
+#endif
 static uint32_t start;
 static uint32_t stop;
 static uint16_t txLength = 0;
 static uint8_t oldEspState = 255;
-float batteryCharge = 0.0;
+//float batteryCharge = 0.0;
 float solarCharge = 0.0;
 static char message[192];
 //static const char header1[] = "\"content-type: application/json\"";
 #define HEADER1 "\"content-type: application/json\""
 static AT_Commands ATCommandArray[10];
-static AT_Commands AT_INIT[] = {AT_WAKEUP, AT_SET_RFPOWER, AT_CHECK_RFPOWER, AT_CWINIT, AT_CWAUTOCONN, AT_CWMODE1, AT_CIPMUX};
+static AT_Commands AT_INIT[] = {AT_WAKEUP, AT_SET_RFPOWER, AT_CHECK_RFPOWER, AT_CWINIT, AT_CWAUTOCONN, AT_CWMODE1, AT_CWJAP, AT_CIPMUX};
 static AT_Commands AT_SEND[] = {AT_WAKEUP,  AT_HTTPCPOST, AT_SENDDATA};
 static AT_Commands AT_TEST[] = {AT_WAKEUP, AT_CWSTATE};
 static AT_Commands AT_WIFI_CONFIG[] = {AT_WAKEUP, AT_CWINIT, AT_CWMODE3, AT_CWAUTOCONN, AT_CWJAP, AT_CIPMUX};
@@ -141,11 +142,19 @@ void setModePowerMail() {
     Error("No mail API key defined");
     return;
   }
+//  Debug("Powermail is forced.");
   sendpwremail = DO_PWR_MAIL;
   Mode = AT_MODE_MAIL;
   EspState = ESP_STATE_INIT;
   savedESPTimeStamp = ESPTimeStamp;
   ESPTimeStamp = 0;
+  sendpwrmaildate = getDate();
+}
+
+void pwrmailTodaySend() {
+  if (sendpwrmaildate != getDate()) {
+    sendpwremail = CLEAR;
+  }
 }
 #endif
 
@@ -305,15 +314,20 @@ bool GetReconfigMode() {
   return ReconfigSet;
 }
 
+#ifndef OPENSENSEMAP
 void ESP_GetUID(){
   uid[0] = HAL_GetUIDw0();
   uid[1] = HAL_GetUIDw1();
   uid[2] = HAL_GetUIDw2();
 }
+#endif
+
 void ESP_Init(UART_HandleTypeDef* espUart) {
   EspUart = espUart;
   EspState = ESP_STATE_INIT;
+#ifndef OPENSENSEMAP
   ESP_GetUID();
+#endif
 //  beurs = checkEEprom();
 }
 
@@ -323,9 +337,8 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     Error("Error in HAL_UART_Transmit_DMA");
     return false;
   }
-  if ((length > 90) && usblog) {
+  if ((length > 90) && usblog && Check_USB_PowerOn()) {
     char splitchar;
-#define SPLIT_POS 76
     splitchar = command[SPLIT_POS];
     command[SPLIT_POS] = '\0';
 //    printf_USB((char*)"ESP_Send: ");
@@ -344,45 +357,54 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
   HAL_StatusTypeDef status = HAL_UART_Receive_DMA(EspUart, reply, length);
   if (status != HAL_OK) {
     Error("Error in HAL_UART_Receive_DMA. errorcode: %d", EspUart->ErrorCode);
+#ifndef SMALLBUILD
+    char uartespmod[] =" error in UART to ESP module";
     if (status & HAL_UART_ERROR_PE) {
-      Error("Parity error in UART to ESP module");
+      Error("Parity%s", uartespmod);
       reset = true;
     }
     if (status & HAL_UART_ERROR_NE) {
-      Error("Noise error in UART to ESP module");
+      Error("Noise%s", uartespmod);
+      reset = true;
     }
     if (status & HAL_UART_ERROR_FE) {
-      Error("Frame error in UART to ESP module");
+      Error("Frame%s", uartespmod);
     }
     if (status & HAL_UART_ERROR_ORE) {
-      Error("Overrun error in UART to ESP module");
+      Error("Overrun%s", uartespmod);
     }
     if (status & HAL_UART_ERROR_DMA) {
-      Error("DMA transfer error in UART to ESP module");
+      Error("DMA transfer%s", uartespmod);
     }
     if (status & HAL_UART_ERROR_RTO) {
-      Error("Receiver Timeout error in UART to ESP module");
+      Error("Receiver Timeout%s", uartespmod);
     }
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
     if (status & HAL_UART_ERROR_INVALID_CALLBACK) {
-      Error("Invalid Callback error in UART to ESP module");
+      Error("Invalid Callback%s", uartespmod);
     }
 #endif
     if (reset) {
       //switch off the ESP and reset the system
+//      HAL_UART_Abort_IT(EspUart);
+//      HAL_UART_DMAStop(EspUart);
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(10);
       HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(10);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
+//      HAL_UART_DMAStop(EspUart);
+      // line below from: https://stackoverflow.com/questions/71287996/stm32-uart-in-dma-mode-stops-receiving-after-receiving-from-a-host-with-wrong-ba
+      UART_Start_Receive_DMA(EspUart, EspUart->pRxBuffPtr, EspUart->RxXferSize);
       for (uint8_t resl = 0; resl < 10; resl++) { //Wait some time to reset
         SetAllREDLED();
-        HAL_Delay(1000);
+        HAL_Delay(100);
       }
       HAL_NVIC_SystemReset();
     }
     RxComplete = true;
     return false;
+#endif
   }
   return true;
 }
@@ -397,6 +419,9 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
 
 // Callback for UART error
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+  char espconnuart[] = "ESP connection UART ";
+  char comcalb[] = " Complete";
+  char cid[] = " Callback ID";
   if (huart == EspUart) {
     if (huart->ErrorCode == 4) {
       return;
@@ -404,40 +429,40 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     Debug("A callback error has occurred, errorcode %0X", huart->ErrorCode);
     switch (huart->ErrorCode) {
       case HAL_UART_TX_HALFCOMPLETE_CB_ID:
-        Error("ESP connection UART Tx Half Complete Callback ID");
+        Error("%sTx Half%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_TX_COMPLETE_CB_ID:
-        Error("ESP connection UART Tx Complete Callback ID");
+        Error("%sTx%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_RX_HALFCOMPLETE_CB_ID:
-        Error("ESP connection UART Rx Half Complete Callback ID");
+        Error("%sRx Half%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_RX_COMPLETE_CB_ID:
-        Error("ESP connection UART Rx Complete Callback ID");
+        Error("%sRx%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_ERROR_CB_ID:
-        Error("ESP connection UART Error Callback ID");
+        Error("%sError%s", espconnuart, cid);
         break;
       case HAL_UART_ABORT_COMPLETE_CB_ID:
-        Error("ESP connection UART Abort Complete Callback ID");
+        Error("%sAbort%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_ABORT_TRANSMIT_COMPLETE_CB_ID:
-        Error("ESP connection UART Abort Transmit Complete Callback ID");
+        Error("%sAbort Transmit%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID:
-        Error("ESP connection UART Abort Receive Complete Callback ID");
+        Error("%sAbort Receive%s%s", espconnuart, comcalb, cid);
         break;
       case HAL_UART_WAKEUP_CB_ID:
-        Error("ESP connection UART Wakeup Callback ID");
+        Error("%sWakeup%s", espconnuart, cid);
         break;
       case HAL_UART_MSPINIT_CB_ID:
-        Error("ESP connection UART MspInit callback ID");
+        Error("%sMspInit%s", espconnuart, cid);
         break;
       case HAL_UART_MSPDEINIT_CB_ID:
-        Error("ESP connection UART MspDeInit callback ID");
+        Error("%sMspDeInit%s", espconnuart, cid);
         break;
       default:
-        Error("ESP connection UART Unknown error");
+        Error("%sUnknown error");
     }
   }
 }
@@ -446,7 +471,7 @@ bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
   if ((data[0] > 66) && (data[0] != 0xFF))
     return true;
   else {
-    Error("Error sensor %s seems to have no stored key for %s: ", sensormodel, sensortype);
+    Error("Error sensor %s has no stored key for %s: ", sensormodel, sensortype);
     for (int i = 0; i < 12; i++) {
       if (usblog && Check_USB_PowerOn()) {
         printf_USB("%02x", data[i]);
@@ -478,13 +503,13 @@ uint16_t CreateMailMessage(bool *txstat, bool send) {
   ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
   ReadUint8ArrayEEprom(SendFromNameConfigAddr, SendFromnameConfig, SendFromNameMaxLength);
   ReadUint8ArrayEEprom(SendToNameConfigAddr, SendTonameConfig, SendToNameMaxLength);
-  sprintf(message, "{\"sender\": \"%s\",\"to\": [\"%s\"],\"subject\": \"Battery status\",", (char*)SendFromnameConfig, (char*)SendTonameConfig);
+  sprintf(message, "{\r\n\"sender\": \"%s\",\r\n\"to\": [\r\n\"%s\"\r\n],\r\n\"subject\": \"Battery status\",\r\n", (char*)SendFromnameConfig, (char*)SendTonameConfig);
   lngth = strlen(message);
   if (send) {
     status = ESP_Send((uint8_t*)message, strlen(message));
     retstat &= status;
   }
-  sprintf(message, "\"text_body\": \"Battery of device %s is nearly empty. Actual voltage is %.2fV, about 20%%\"}", (char*)nameConfig, ReadBatteryVoltage());
+  sprintf(message, "\"text_body\": \"Battery of device %s is nearly empty. Actual voltage is %.2fV\"\r\n}\r\n", (char*)nameConfig, ReadBatteryVoltage());
   lngth += strlen(message);
   if (send) {
     status = ESP_Send((uint8_t*)message, strlen(message));
@@ -899,7 +924,7 @@ void StartProg(){
   if (usblog && Check_USB_PowerOn()) {
     printf_USB("%s\r\n", tempBuf);
   }
-  printf("Receive ParseBuffer: %s", tempBuf );
+  printf("Receive ParseBuffer: %s\r\n", tempBuf );
 #else
   Debug("Receive ParseBuffer: %s", tempBuf );
 #endif
@@ -912,7 +937,6 @@ void StartProg(){
   const char start[] = AT_RESPONSE_START;
   const char WIFI[] = AT_RESPONSE_WIFI;
   const char TIME[] = AT_RESPONSE_TIME_UPDATED;
-  const char MAIL_API[] = AT_RESPONSE_MAIL_API;
   if(expectation == RECEIVE_EXPECTATION_OK){
     ParsePoint = strstr(tempBuf, OK);
   }
@@ -925,14 +949,10 @@ void StartProg(){
   if(expectation == RECEIVE_EXPECTATION_TIME){
     ParsePoint = strstr(tempBuf, TIME);
   }
-  if(expectation == RECEIVE_EXPECTATION_MAIL_API){
-    ParsePoint = strstr(tempBuf, MAIL_API);
-  }
   char *ParsePoint2 = strstr(tempBuf, ERROR);
   char *ParsePoint3 = strstr(tempBuf, WIFI);
   char *ParsePoint4 = strstr(tempBuf, Credentials.SSID);
   char *ParsePoint5 = strstr(tempBuf, FAIL);
-  char *ParsePoint6 = strstr(tempBuf, MAIL_API);
   if(len > 1 ){
     if(ParsePoint != 0 && *ParsePoint == 'O'){
 // call function to update time in realtimeclock.c
@@ -964,11 +984,6 @@ void StartProg(){
     }
     if(ParsePoint4 != 0 && *ParsePoint4 == '2'){
     }
-#ifdef USE_MAIL
-    if(ParsePoint6 != 0 && *ParsePoint6 == '{'){
-      status = RECEIVE_STATUS_MAIL_API;
-    }
-#endif
   }
   return(status);
 
@@ -1056,25 +1071,6 @@ bool CWAUTOCONN(){
   }
 }
 
-/*
-bool CWJAP(){
-  APtested = true;
-  char atCommandBuff[100];
-  memset(atCommandBuff, '\0', 100);
-  sprintf(atCommandBuff, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, WLANPassword);
-  uint8_t len = strlen(atCommandBuff);
-  char atCommand[len+1];
-  memset(atCommand, '\0', len+1);
-  strncpy(atCommand, atCommandBuff, len);
-  if(ESP_Send((uint8_t*)atCommand, len)) {
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-*/
-
 bool CWJAP()
 {
   APtested = true;
@@ -1157,7 +1153,7 @@ bool HTTPCPOST(){
   }
   sprintf(message, "AT+HTTPCPOST=\"%s/%s/data\",%d,1,%s\r\n", (char*)URLToUpload, Buffer, length, HEADER1);
   uint16_t len = strlen(message);
-  Debug("length of message (former atCommandBuff) during header tx: %d, bool value of tx result %d", len, txresult);
+//  Debug("ESP_send result of header: %d, transmitted data %d chars", txresult, len);
   if(ESP_Send((uint8_t*)message, len)){
     return true;
   }
@@ -1170,7 +1166,7 @@ bool HTTPCPOST(){
 bool SENDMAIL() {
   bool result = false;
   txLength = CreateMailMessage(&result, true);
-  Debug("SENDMAIL ESP_Send result = %d, transmitted data %d chars", result, txLength);
+//  Debug("SENDMAIL ESP_Send result = %d, transmitted data %d chars", result, txLength);
   return result;
 }
 
@@ -1191,7 +1187,7 @@ bool HTTPCPOST_MAILAPI() {
 bool SENDDATA(){
   bool result = false;
   txLength = CreateMessage(&result, true);
-  Debug("SENDDATA ESP_Send result = %d, transmitted data %d chars", result, txLength);
+//  Debug("SENDDATA ESP_Send result = %d, transmitted data %d chars", result, txLength);
   return result;
 }
 
@@ -1312,11 +1308,6 @@ bool ATCompare(uint8_t AT_Command_Received, uint8_t AT_Command_Expected){
   if(AT_Command_Expected == RECEIVE_EXPECTATION_TIME){
     value = (AT_Command_Received == RECEIVE_STATUS_TIME);
   }
-#ifdef USE_MAIL
-  if(AT_Command_Expected == RECEIVE_EXPECTATION_MAIL_API){
-    value = (AT_Command_Received == RECEIVE_STATUS_MAIL_API);
-  }
-#endif
   return(value);
 }
 
@@ -1333,49 +1324,49 @@ bool AT_Send(AT_Commands state){
   break;
 
   case AT_SET_RFPOWER:
-    Debug("Setting RF Power");
+//    Debug("Setting RF Power");
     ATCommandSend = RFPower();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CHECK_RFPOWER:
-    Debug("Checking RF Power");
+//    Debug("Checking RF Power");
     ATCommandSend = CheckRFPower();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_RESTORE:
-    Debug("Restoring ESP");
+//    Debug("Restoring ESP");
     ATCommandSend = ATRestore();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_LONG;
     break;
 
   case AT_CWINIT:
-    Debug("Initializing Wi-Fi");
+//    Debug("Initializing Wi-Fi");
     ATCommandSend = CWINIT();
     ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME;
     break;
 
   case AT_CWSTATE:
-    Debug("Checking current SSID");
+//    Debug("Checking current SSID");
     ATCommandSend = CWSTATE();
     ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME;
     break;
 
   case AT_CWMODE1:
-    Debug("Setting to station mode");
+//    Debug("Setting to station mode");
     ATCommandSend = CWMODE1();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CWMODE2:
-    Debug("Setting to station mode");
+//    Debug("Setting to station mode");
     ATCommandSend = CWMODE2();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CWAUTOCONN:
-    Debug("Setting auto connect");
+//    Debug("Setting auto connect");
     ATCommandSend = CWAUTOCONN();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
@@ -1387,25 +1378,25 @@ bool AT_Send(AT_Commands state){
     break;
 
   case AT_CWMODE3:
-    Debug("SET in station/soft-ap mode");
+//    Debug("SET in station/soft-ap mode");
     ATCommandSend = CWMODE3();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CWSAP:
-    Debug("SET soft AP mode parameters");
+//    Debug("SET soft AP mode parameters");
     ATCommandSend = CWSAP();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CIPMUX:
-    Debug("ATCommandSend = CIPMUX()");
+//    Debug("ATCommandSend = CIPMUX()");
     ATCommandSend = CIPMUX();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_WEBSERVER:
-    Debug("ATCommandSend = WEBSERVER()");
+//    Debug("ATCommandSend = WEBSERVER()");
     ATCommandSend = WEBSERVER();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
@@ -1416,7 +1407,7 @@ bool AT_Send(AT_Commands state){
     break;
 
   case AT_SENDDATA:
-    Debug("Send the data");
+//    Debug("Send the data");
     ATCommandSend = SENDDATA();
     ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME; // + 7000;
     break;
@@ -1428,31 +1419,31 @@ bool AT_Send(AT_Commands state){
     break;
 
   case AT_CIPSNTPCFG:
-    Debug("Config SNTP client");
+//    Debug("Config SNTP client");
     ATCommandSend = CIPSNTPCFG();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 
   case AT_CIPSNTPTIME:
-    Debug("Get time from internet");
+//    Debug("Get time from internet");
     ATCommandSend = CIPSNTPTIME();
     ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME;
     break;
 
   case AT_CIPSNTPINTV:
-    Debug("Set the interval to timesync");
+//    Debug("Set the interval to timesync");
     ATCommandSend = CIPSNTPINTV();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_TIME;
     break;
 #ifdef USE_MAIL
   case AT_HTTPCPOST_MAILAPI:
-    Debug("Start EMAIL Post via HTTP");
+    Debug("Start EMAIL via API");
     ATCommandSend = HTTPCPOST_MAILAPI();
     ESPTimeStamp = HAL_GetTick() + ESP_RESPONSE_LONG;
     break;
 
   case AT_SENDMAIL:
-    Debug("Send Email content");
+//    Debug("Send Email content");
     ATCommandSend = SENDMAIL();
     ESPTimeStamp = HAL_GetTick() + ESP_WIFI_INIT_TIME; // + 7000;
     break;
@@ -1472,6 +1463,7 @@ void ESP_WakeTest(void) {
 
     case ESP_TEST_INIT:
       if(!EspTurnedOn){
+        EspTurnedOn = true;
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
         HAL_Delay(50);
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_SET);
@@ -1480,10 +1472,11 @@ void ESP_WakeTest(void) {
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
         HAL_Delay(10);
         HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 1);
-        HAL_Delay(10);
+        HAL_Delay(50); // wait for 5RC
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
+        HAL_Delay(100);
+        batteryCharge = ReadBatteryVoltage();  // read voltage in loaded condition
         ESPTimeStamp = HAL_GetTick() + ESP_START_UP_TIME;
-        HAL_Delay(10);
         EspTurnedOn = true;
       }
       if(ESP_Receive(RxBuffer, ESP_MAX_BUFFER_SIZE)) {
@@ -1536,11 +1529,11 @@ void ESP_WakeTest(void) {
 
     case ESP_TEST_DEINIT:
       testRound = false;
-      EspTurnedOn = false;
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
       SetESPMeasurementDone();
+      EspTurnedOn = false;
       break;
 
     default:
@@ -1559,7 +1552,8 @@ ESP_States ESP_Upkeep(void) {
   bool ATSend = false;
   static uint32_t timeoutTimer = 0;
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
-
+// Het lijkt er op dat ESP32  niet meer start indien de batterijspanning onder de 3,77 Volt daalt.
+// Om uart fouten te voorkomen mogelijk ESP niet meer afhandelen.
   if ((EspState != oldEspState) && (GetVerboseLevel() == VERBOSE_ALL)) {
     oldEspState = EspState;
 #ifdef USE_MAIL
@@ -1593,15 +1587,16 @@ ESP_States ESP_Upkeep(void) {
       SetESPIndicator();
       if(!EspTurnedOn){
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
-        HAL_Delay(1);
+        HAL_Delay(10);
         HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_SET);
-        HAL_Delay(1);
+        HAL_Delay(50);
         // Reset ESP, so we're sure that we're in the right state.
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
-        HAL_Delay(1);
+        HAL_Delay(10);
         HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 1);
-        HAL_Delay(1);
+        HAL_Delay(50);
         HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_SET);
+        HAL_Delay(50);
         ESPTimeStamp = HAL_GetTick() + ESP_START_UP_TIME;
         EspTurnedOn = true;
         Debug("ESP powered on.");
@@ -1627,7 +1622,7 @@ ESP_States ESP_Upkeep(void) {
 //      Debug("entry in ESP_STATE_MODE_SELECT");
       memset(ATCommandArray, AT_END, 9);
       if(!InitIsDone || WifiReset){
-        memcpy(ATCommandArray, AT_INIT, 7);
+        memcpy(ATCommandArray, AT_INIT, sizeof(AT_INIT));
         EspState = ESP_STATE_SEND;
         ATCounter = 0;
         Mode = AT_MODE_INIT;
@@ -1642,7 +1637,6 @@ ESP_States ESP_Upkeep(void) {
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-//      if(InitIsDone && ConnectionMade && !beursTest){
       if(InitIsDone && ConnectionMade && !APtested){
         memcpy(ATCommandArray, AT_TEST, 2);
         EspState = ESP_STATE_SEND;
@@ -1661,7 +1655,6 @@ ESP_States ESP_Upkeep(void) {
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
 #endif
-//      if(InitIsDone && ConnectionMade && beursTest && !setTime){
       if(InitIsDone && ConnectionMade && APtested && !setTime && (sendpwremail != DO_PWR_MAIL)){
         memcpy(ATCommandArray, AT_SEND, 3);
         EspState = ESP_STATE_SEND;
@@ -1671,7 +1664,6 @@ ESP_States ESP_Upkeep(void) {
         ATCommand = ATCommandArray[ATCounter];
         ATExpectation = RECEIVE_EXPECTATION_OK;
       }
-//      if(InitIsDone && ConnectionMade && beursTest && setTime){
       if(InitIsDone && ConnectionMade && APtested && setTime && (sendpwremail != DO_PWR_MAIL)){
         memcpy(ATCommandArray, AT_SNTP, 4);
         EspState = ESP_STATE_SEND;
@@ -1683,7 +1675,7 @@ ESP_States ESP_Upkeep(void) {
       }
       if(ReconfigSet){
         memcpy(ATCommandArray, AT_WIFI_RECONFIG, 5);
-        Debug("Reconfig mode voor local wifi config selected");
+        Debug("Reconfig mode for local wifi config selected");
         DisableConnectedDevices();
         usblog = false;
         EspState = ESP_STATE_SEND;
@@ -1713,6 +1705,11 @@ ESP_States ESP_Upkeep(void) {
         if(ATReceived == RECEIVE_STATUS_ERROR){
           if(ATCommand == AT_SENDDATA){
             ATCommand = AT_HTTPCPOST;
+            ATExpectation = RECEIVE_EXPECTATION_START;
+            ATCounter = 1;
+          }
+          if(ATCommand == AT_SENDMAIL){
+            ATCommand = AT_HTTPCPOST_MAILAPI;
             ATExpectation = RECEIVE_EXPECTATION_START;
             ATCounter = 1;
           }
@@ -1782,7 +1779,7 @@ ESP_States ESP_Upkeep(void) {
       }
 #ifdef USE_MAIL
       if(ATCommand == AT_SENDMAIL){
-         ATExpectation = RECEIVE_EXPECTATION_MAIL_API;
+        ATExpectation = RECEIVE_EXPECTATION_OK;
       }
 #endif
       EspState = ESP_STATE_SEND;
@@ -1817,7 +1814,6 @@ ESP_States ESP_Upkeep(void) {
 #ifdef USE_MAIL
         else if (Mode == AT_MODE_MAIL) {
             clearDMABuffer();
-            Info("Email message send");
             ESPTimeStamp = savedESPTimeStamp;
             sendpwremail = DONE;
             EspState = ESP_STATE_DEINIT;
