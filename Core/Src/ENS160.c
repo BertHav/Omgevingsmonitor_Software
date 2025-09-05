@@ -453,10 +453,10 @@ ENS160State ENS_Upkeep(void) {
   case ENS_STATE_PROCESS_RESULTS:
     if (enscnt == 1){
     Info("ENS160 AQI: %d, TVOC: %dppb, eCO2: %dppm", pred._data_aqi, pred._data_tvoc, pred._data_eco2);
-    Info("R HP0: %d Ohm, Baseline: %d", raw._hp0_rs, raw._hp0_bl);
-    Info("R HP1: %d Ohm, Baseline: %d", raw._hp1_rs, raw._hp1_bl);
-    Info("R HP2: %d Ohm, Baseline: %d", raw._hp2_rs, raw._hp2_bl);
-    Info("R HP3: %d Ohm, Baseline: %d", raw._hp3_rs, raw._hp3_bl);
+//    Debug("R HP0: %d Ohm, Baseline: %d", raw._hp0_rs, raw._hp0_bl);
+//    Debug("R HP1: %d Ohm, Baseline: %d", raw._hp1_rs, raw._hp1_bl);
+//    Debug("R HP2: %d Ohm, Baseline: %d", raw._hp2_rs, raw._hp2_bl);
+//    Debug("R HP3: %d Ohm, Baseline: %d", raw._hp3_rs, raw._hp3_bl);
     }
     (enscnt == 5)?enscnt=0:enscnt++;
     setENS160(pred._data_aqi, pred._data_tvoc, pred._data_eco2);

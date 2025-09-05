@@ -438,7 +438,7 @@ void PC_show_Keys() {
 
   ReadUint8ArrayEEprom(hPaConfigAddr, hPaConfig, IdSize);
   uint8ArrayToString(Buffer, hPaConfig);
-  sprintf(msg, "%02d - Air pressure sensor id --------: %s\r\n", hPaConfigCmd, Buffer);
+  sprintf(msg, "%02d - BMP280 Air pressure sensor id -: %s\r\n", hPaConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(UptimeConfigAddr, UptimeConfig, IdSize);
@@ -467,7 +467,7 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB("If the key differs only the last two bytes,");
   HAL_Delay(10);
-  printf_USB(" command example for air pressure => #05,6a\r\n");
+  printf_USB(" command example for air pressure => #28,6a\r\n");
   HAL_Delay(10);
   printf_USB("For the full key variant copy and paste the key sequence");
   HAL_Delay(10);

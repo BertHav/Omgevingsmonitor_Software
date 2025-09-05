@@ -243,6 +243,7 @@ BMP280State BMP_Upkeep(void) {
       if (getSensorLock() == FREE) {
         setSensorLock(BMP280);
       }
+      bmperror = false;
       bool changed = false;
       mode = BMP280_get_mode();
       mode &= BMP280_NORMAL_MODE;

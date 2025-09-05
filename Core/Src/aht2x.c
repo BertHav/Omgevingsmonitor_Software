@@ -1,5 +1,5 @@
 /*
- * bmp280.c
+ * aht2x.c
  *
  *  Created on: Feb 9, 2025
  *      Author: itsme
@@ -90,7 +90,7 @@ void AHT20_register_reset(uint8_t addr){
   ReadRegister(AHT20_ADDRESS, airtemphumraw, 3);
   HAL_Delay(15);
   airtemphumraw[0] = 0xB0;
-  Debug("AHT20 Magic from AOSONG, Readed values from AHTxx device 2nd=0x%02X, 3rd=0x%02X", airtemphumraw[2], airtemphumraw[3]);
+  Debug("AHT20 Magic from AOSONG, Readed values 2nd=0x%02X, 3rd=0x%02X", airtemphumraw[2], airtemphumraw[3]);
   WriteRegister(AHT20_ADDRESS, airtemphumraw, 3);
   HAL_Delay(15);
 }
@@ -170,7 +170,7 @@ bool AHT20_GetMeasurementValues() {
 //  Debug("AHT20_GetMeasurementValues executed");
   AHT20TimeStamp = HAL_GetTick() + 1000;
   while ((AHT20_read_status() & 0x80) == 0x80) {
-    Info("AHT20 Device busy, waiting for results");
+//    Info("AHT20 Device busy, waiting for results");
     if (TimestampIsReached(AHT20TimeStamp)) {
       Error("AHT2x timeout for getting values");
       AHT20TimeStamp = HAL_GetTick() + 2000;
