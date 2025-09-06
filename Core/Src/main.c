@@ -108,6 +108,10 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+void SetBatteryReadTimer(uint32_t ticks) {
+  batteryReadTimer  = HAL_GetTick() + ticks;
+}
+
 void SetTestDone(){
   testDone = true;
   HAL_Delay(250);

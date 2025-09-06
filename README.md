@@ -5,6 +5,7 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.03](#version503)\
 [version 5.02](#version502)\
 [version 5.01](#version501)\
 [version 5.00](#version500)\
@@ -151,7 +152,9 @@ Wait for the "File download complete" dialog.
 
 ![The STM32CubeProgrammer has programmed the Omgevingsmonitor](Images/STMprogrammed.jpg)
 
-Press the RESET button of the Omgevingsmonitor for at least 2 seconds and release. The omgevingsmonitor should now start with LED patterns.
+Press the RESET button of the Omgevingsmonitor for at least 4 seconds and release. The omgevingsmonitor should now start with LED patterns. When flashing with red LEDs, press reset again for about 5 seconds.
+
+__Reset the OMgevingsmonitor twice to reach optimal energy saving mode!__
 
 ## Configuring the Omgevingsmonitor manually by USB <a name="USBconfig"></a>
 
@@ -168,6 +171,9 @@ The STM32CubeProgrammer current consumption during startup in μA.
 
 The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
+
+## version 5.03 <a name="version503"></a>
+When monitoring by UART the charge status is shown every new measurement cycle when operating on batterypower 
 
 ## version 5.02 <a name="version502"></a>
 Mail interval on empty battery is changed to once a day. Some small improvements and optimizations. Corrrections to CLI.
