@@ -25,7 +25,7 @@
 #define PM10ConfigAddr EEPromStartAddr + (IdSize * 8)
 #define BatVoltConfigAddr EEPromStartAddr + (IdSize * 9)
 #define SolVoltConfigAddr EEPromStartAddr + (IdSize * 10)
-#define ChargerStatConfigAddr EEPromStartAddr + (IdSize * 11) // not used
+#define ChargerStatConfigAddr EEPromStartAddr + (IdSize * 11)
 #define CustomNameConfigAddr EEPromStartAddr + (IdSize * 12)
 #define PM1ConfigAddr CustomNameConfigAddr + CustomNameMaxLength
 #define PM4ConfigAddr PM1ConfigAddr + IdSize

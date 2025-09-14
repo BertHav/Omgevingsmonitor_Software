@@ -343,7 +343,8 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   if (sen5x_On) {
     sen5x_Power_Off();
   }
-  Info("Battery voltage %.02fV", batteryCharge);
+//  Info("Battery voltage %.02fV", batteryCharge);
+  batteryChargeCheck();
 //  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);

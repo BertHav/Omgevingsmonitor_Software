@@ -47,10 +47,8 @@ static uint32_t start;
 static uint32_t stop;
 static uint16_t txLength = 0;
 static uint8_t oldEspState = 255;
-//float batteryCharge = 0.0;
 float solarCharge = 0.0;
 static char message[192];
-//static const char header1[] = "\"content-type: application/json\"";
 #define HEADER1 "\"content-type: application/json\""
 static AT_Commands ATCommandArray[10];
 static AT_Commands AT_INIT[] = {AT_WAKEUP, AT_SET_RFPOWER, AT_CHECK_RFPOWER, AT_CWINIT, AT_CWAUTOCONN, AT_CWMODE1, AT_CWJAP, AT_CIPMUX};
@@ -96,7 +94,6 @@ void setESPTimeStamp(uint32_t delayms) {
 }
 
 void setCharges(){
-  batteryCharge = ReadBatteryVoltage();
   solarCharge = ReadSolarVoltage() / 1000.0;
 }
 
@@ -180,29 +177,12 @@ void setVOC(uint16_t voc) {
 
 void setAHT2x(float airtemp, float airhum) {
   MeasVal.AHT2x_humidity = airhum;
-//  if (airhum > MeasVal.AHT2x_humiditymax) {
-//    MeasVal.AHT2x_humiditymax = airhum;
-//  }
   MeasVal.AHT2x_temperature = airtemp;
-//  if (airtemp > MeasVal.AHT2x_temperaturemax) {
-//    MeasVal.AHT2x_temperaturemax = airtemp;
-//  }
 }
 
 void setBMP280(float airtemp, float airhpa) {
   MeasVal.BMP280_temperature = airtemp;
-//  if (airtemp > MeasVal.BMP280_temperaturemax) {
-//    MeasVal.BMP280_temperaturemax = airtemp;
-//  }
   MeasVal.BMP280_airpressure = airhpa;
-//  if (airhpa > MeasVal.BMP280_airpressuremax) {
-//    MeasVal.BMP280_airpressuremax = airhpa;
-//  }
-#ifdef SSD1306
-//  if (SSD1306detected &&(Check_USB_PowerOn() || userToggle)) {
-//    displayhPa();
-//  }
-#endif
 }
 
 void setENS160(uint8_t aqi, uint16_t tvoc, uint16_t eco2) {
@@ -268,14 +248,12 @@ void setPM10(uint16_t PM10) {
 }
 
 void setNOx(uint16_t nox) {
-//  Debug("SetNOx entered");
   MeasVal.airNOx = nox;
   if (nox > MeasVal.airNOxmax) {
     MeasVal.airNOxmax = nox;
   }
 #ifdef SSD1306
   if (SSD1306detected && (Check_USB_PowerOn() || userToggle)) {
-//    Debug("calling display NOx update");
     displayNOx();
   }
 #endif
@@ -294,10 +272,6 @@ void resetMaxMeasurementValues() {
     MeasVal.PM10p0max = 0.0f;
     MeasVal.airNOxmax = 0;
   }
-//  MeasVal.AHT2x_humiditymax = 0.0;
-//  MeasVal.AHT2x_temperaturemax = 0.0;
-//  MeasVal.BMP280_temperaturemax = 0.0;
-//  MeasVal.BMP280_airpressuremax = 0.0;
   MeasVal.eCO2Indexmax = 0;
   MeasVal.AQIndexmax = 0;
 }
@@ -328,7 +302,6 @@ void ESP_Init(UART_HandleTypeDef* espUart) {
 #ifndef OPENSENSEMAP
   ESP_GetUID();
 #endif
-//  beurs = checkEEprom();
 }
 
 static bool ESP_Send(uint8_t* command, uint16_t length) {
@@ -341,7 +314,6 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     char splitchar;
     splitchar = command[SPLIT_POS];
     command[SPLIT_POS] = '\0';
-//    printf_USB((char*)"ESP_Send: ");
     printf_USB((char*)command);
     command[SPLIT_POS] = splitchar;
     printf_USB((char*)&command[SPLIT_POS]);
@@ -386,14 +358,11 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
 #endif
     if (reset) {
       //switch off the ESP and reset the system
-//      HAL_UART_Abort_IT(EspUart);
-//      HAL_UART_DMAStop(EspUart);
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(10);
       HAL_GPIO_WritePin(Wireless_PSU_EN_GPIO_Port, Wireless_PSU_EN_Pin, GPIO_PIN_RESET);
       HAL_Delay(10);
       HAL_GPIO_WritePin(ESP32_BOOT_GPIO_Port, ESP32_BOOT_Pin, 0);
-//      HAL_UART_DMAStop(EspUart);
       // line below from: https://stackoverflow.com/questions/71287996/stm32-uart-in-dma-mode-stops-receiving-after-receiving-from-a-host-with-wrong-ba
       UART_Start_Receive_DMA(EspUart, EspUart->pRxBuffPtr, EspUart->RxXferSize);
       for (uint8_t resl = 0; resl < 10; resl++) { //Wait some time to reset
@@ -540,8 +509,6 @@ uint16_t CreateMessage(bool *txstat, bool send) {
   uint16_t index = 0;
   sprintf(&message[index], "[");
 #ifdef LONGDATAGRAM
-//  memset(message, '\0', 144); \\ unnecessary sprintf terminates with \0
-
   ReadUint8ArrayEEprom(TempConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
@@ -554,7 +521,6 @@ index = strlen(message);
     status = ESP_Send((uint8_t*)message, strlen(message));
     retstat &= status;
   }
-
   ReadUint8ArrayEEprom(HumidConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
@@ -581,11 +547,25 @@ index = strlen(message);
     retstat &= status;
   }
 
+  ReadUint8ArrayEEprom(ChargerStatConfigAddr, keybuffer, IdSize);
+  if (isKeyValid(keybuffer, "ChargeStat", "true/false")) {
+    uint8ArrayToString(Buffer, keybuffer);
+#ifdef OPENSENSEMAP
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
+#else
+    sprintf(&message[0], ",{\"name\":\"charging\", \"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
+#endif
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
+  }
+
   ReadUint8ArrayEEprom(UptimeConfigAddr, keybuffer, IdSize);
   if (isKeyValid(keybuffer, "Uptime", "dhhmm")) {
     uint8ArrayToString(Buffer, keybuffer);
     getUptime(uptimeBuf);
-
 #ifdef OPENSENSEMAP
     sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
 #else
@@ -643,7 +623,6 @@ index = strlen(message);
     retstat &= status;
   }
 
-//  if(!onBeurs){
     ReadUint8ArrayEEprom(SolVoltConfigAddr, keybuffer, IdSize);
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
@@ -702,7 +681,6 @@ index = strlen(message);
       }
     }
 
-
     if (sen5x_Get_sen5x_enable_state()) {
       ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
       if (isKeyValid(keybuffer, "PM1", "particle")) {
@@ -759,7 +737,6 @@ index = strlen(message);
         retstat &= status;
       }
     }
-//  }
 
   if (IsAHT20SensorPresent()) {
     ReadUint8ArrayEEprom(AHTTempConfigAddr, keybuffer, IdSize);
@@ -849,9 +826,7 @@ index = strlen(message);
 #endif
 
 #else
-//  memset(message, '\0', 255);
     uint8_t arridx = 0;
-//    sprintf(&message[index], "[");
     index = strlen(message);
 
 
@@ -1600,6 +1575,7 @@ ESP_States ESP_Upkeep(void) {
         ESPTimeStamp = HAL_GetTick() + ESP_START_UP_TIME;
         EspTurnedOn = true;
         Debug("ESP powered on.");
+        SetBatteryReadTimer(ESP_START_UP_TIME/2);  // read battery voltage during boot of ESP32
       }
       // Wait for ESP to be ready
       // Start reading DMA buffer for AT commands

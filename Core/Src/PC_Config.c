@@ -95,6 +95,9 @@ void ProcessCmd(Receive_MSG msg)
         case SolVoltConfigCmd:  // 10
             WriteUint8ArrayEepromSafe(SolVoltConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
+        case ChargerStatConfigCmd:  // 11
+            WriteUint8ArrayEepromSafe(ChargerStatConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
+        break;
         case CustomNameConfigCmd:  // 12
             WriteUint8ArrayEepromSafe(CustomNameConfigAddr, msg.Payload, msg.PayloadLength, CustomNameMaxLength);
         break;
@@ -252,7 +255,7 @@ void PC_show_Keys() {
   static uint8_t PM10Config[IdSize];         // 8
   static uint8_t batteryConfig[IdSize];      // 9
   static uint8_t solarConfig[IdSize];        // 10
-  static uint8_t ChargerStatConfig[IdSize];  // 11 is not used, see config.h
+  static uint8_t ChargerStatConfig[IdSize];  // 11
   static uint8_t PM1Config[IdSize];          // 13
   static uint8_t PM4Config[IdSize];          // 14
   static uint8_t AHTTempConfig[IdSize];      // 15
@@ -343,7 +346,7 @@ void PC_show_Keys() {
 
   ReadUint8ArrayEEprom(ChargerStatConfigAddr, ChargerStatConfig, IdSize);
   uint8ArrayToString(Buffer, ChargerStatConfig);
-  sprintf(msg, "%02d - Charger status (not used) -----: %s\r\n", ChargerStatConfigCmd, Buffer);
+  sprintf(msg, "%02d - Charger status ----------------: %s\r\n", ChargerStatConfigCmd, Buffer);
   PC_selectout(&msg[0], usb_out);
 
   ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);

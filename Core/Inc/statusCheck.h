@@ -30,16 +30,18 @@ typedef enum {
 extern bool usbPluggedIn;
 extern bool userToggle;
 extern float batteryCharge;
+extern uint8_t batteryChargeMode;
+extern Battery_Status batteryStatus;
 
 void setuserToggle(void);
 void configCheck();
 void SetAllREDLED();
 void WalkAllRedLED();
 void SetAllBlueLED();
-Battery_Status Battery_Upkeep();
-Battery_Status powerCheck();
-Battery_Status batteryChargeCheck();
-void powerDisplay(Battery_Status status);
+void Battery_Upkeep();
+void powerCheck();
+void batteryChargeCheck();
+void powerDisplay();
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue);   // Sets Status LED to (RGB) color
 uint16_t Calculate_LED_ON();
 void SetDBLED(bool red, bool green, bool blue);       // Sets dB LED to (RGB) color

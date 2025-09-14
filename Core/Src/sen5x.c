@@ -55,7 +55,7 @@ void setsen5xSamplecounter(uint8_t samples) {
 
 bool sen5x_enable(uint32_t sleepTime) {
   if (IsPMSensorEnabled()) {
-    if (batteryChargeCheck() == BATTERY_FULL) {
+    if (batteryStatus == BATTERY_FULL) {
       sen5x_Enable = true;
     }
     else {

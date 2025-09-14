@@ -35,7 +35,7 @@
 #define PM10ConfigCmd 8
 #define BatVoltConfigCmd 9
 #define SolVoltConfigCmd 10
-#define ChargerStatConfigCmd 11 // not used
+#define ChargerStatConfigCmd 11
 #define CustomNameConfigCmd 12
 #define SSIDConfigCmd 13
 #define PasswordConfigCmd 14

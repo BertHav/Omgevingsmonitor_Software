@@ -98,7 +98,7 @@
   uint32_t sleepTime = 0;
   uint16_t size = 0;
 
-  Battery_Status charge;
+//  Battery_Status charge;
   extern DMA_HandleTypeDef hdma_spi2_rx;
 
   void check_cli_command();
@@ -235,7 +235,7 @@ int main(void)
     ESP_Programming = true;
   }
   else {
-    charge = batteryChargeCheck();
+    batteryChargeCheck();
 //    batteryCharge = ReadBatteryVoltage();
     Error("Battery voltage is: %.02fV", batteryCharge);
     if(batteryCharge <= 3.68) {
@@ -270,18 +270,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     if(TimestampIsReached(batteryReadTimer)){
-      charge = Battery_Upkeep();
+      Battery_Upkeep();
       batteryReadTimer  = HAL_GetTick() + BATTERY_READ_CYCLE;
       showTime();
     }
     configCheck();
-    if ((charge == BATTERY_LOW || charge == BATTERY_CRITICAL)  && !EspTurnedOn){
+    if ((batteryStatus == BATTERY_LOW || batteryStatus == BATTERY_CRITICAL)  && !EspTurnedOn){
       WalkAllRedLED();
       Sensor.PM_measurementEnabled = false;
 #ifdef USE_MAIL
       pwrmailTodaySend();
-      if (((charge == BATTERY_LOW)  || (charge == BATTERY_CRITICAL)) && (sendpwremail == CLEAR) && !Check_USB_PowerOn()) {
-        Debug("charge: %d, sendpwrmail: %d Check_USB_PowerOn(): %d", charge, sendpwremail, Check_USB_PowerOn());
+      if (((batteryStatus == BATTERY_LOW)  || (batteryStatus == BATTERY_CRITICAL)) && (sendpwremail == CLEAR) && !Check_USB_PowerOn()) {
+        Debug("charge: %d, sendpwrmail: %d Check_USB_PowerOn(): %d", batteryStatus, sendpwremail, Check_USB_PowerOn());
         setModePowerMail();
         ESP_Upkeep();
       }
@@ -304,7 +304,7 @@ int main(void)
 #ifndef STLINK_V3PWR
 //==== disable for power measurements in test condition
     stlinkpwr = false;
-    if (charge == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
+    if (batteryStatus == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
        batteryEmpty = true;
        // we are going in deep sleep, nearly off and no wakeup from RTC Do not use standby mode,
        // because without a modification on the PCB the ESP32 is activated
@@ -335,13 +335,13 @@ int main(void)
       if (Sensor.MIC_measurementEnabled) {
         MICstate = Mic_Upkeep();
       }
-      if ( ((charge >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
+      if ( ((batteryStatus >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
         if (!sen5x_Get_sen5x_enable_state()&& usbPluggedIn ) {
           sen5x_enable(0);  // this forces the sen5x to enable when powered
         }
         sen5x_statemachine();
       }
-      else if ((charge <= BATTERY_LOW) && !stlinkpwr && Sensor.PM_measurementEnabled) {
+      else if ((batteryStatus <= BATTERY_LOW) && !stlinkpwr && Sensor.PM_measurementEnabled) {
         Info("Battery level insufficient for sen5x operation");
         Sensor.PM_measurementEnabled = false;
         VOCNOx = false;
@@ -363,12 +363,7 @@ int main(void)
     if (!usbPluggedIn) {
       if (!userToggle && AllDevicesReady() && ESPTransmitDone) {     // check if all sensors are ready
         EnabledConnectedDevices();
-        if (ReadSolarVoltage() > 4900) {  // if battery is fully charged and sun is shining wake-up about every 5 minutes
-          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM_SUN:WAIT_WITHOUT_PM_SUN);
-        }
-        else {
-          Enter_Stop_Mode(SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
-        }
+        Enter_Stop_Mode((batteryCharge<3.90)?SensorProbe.PM_Present?WAIT_WITH_PM+900:WAIT_WITHOUT_PM+900:SensorProbe.PM_Present?WAIT_WITH_PM:WAIT_WITHOUT_PM);
       }
     }
     if (u1_rx_buff[0] != '\0') {

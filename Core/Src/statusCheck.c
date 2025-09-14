@@ -26,6 +26,9 @@ uint32_t ConfigStamp;
 uint32_t UserbuttonStamp;
 uint32_t PowerStamp = 0;
 float batteryCharge = 0.0;
+uint8_t batteryChargeMode;
+Battery_Status batteryStatus;
+
 
 void InitDone(){
   init = false;
@@ -50,22 +53,21 @@ void InitDone(){
 
  */
 
-Battery_Status batteryChargeCheck(){
-  Battery_Status status;
+void batteryChargeCheck(){
   batteryCharge = ReadBatteryVoltage();
+  Debug("battery: %fV, solar %dmV", batteryCharge, ReadSolarVoltage());
   if(batteryCharge < 3.75){
-    status = BATTERY_CRITICAL;
+    batteryStatus = BATTERY_CRITICAL;
   }
   if(batteryCharge >= 3.75 && batteryCharge < 3.85){
-    status = BATTERY_LOW;
+    batteryStatus = BATTERY_LOW;
   }
   if(batteryCharge >= 3.85 && batteryCharge < 4.00){
-    status = BATTERY_GOOD;
+    batteryStatus = BATTERY_GOOD;
   }
   if(batteryCharge >= 4.00){
-    status = BATTERY_FULL;
+    batteryStatus = BATTERY_FULL;
   }
-  return(status);
 }
 /*
 //==========================
@@ -271,35 +273,33 @@ void SetVOCindicator(uint16_t VOCi) {
 
 }
 
-Battery_Status powerCheck(){
-  Battery_Status status;
+void powerCheck(){
   if(!Check_USB_PowerOn()){
-    status = batteryChargeCheck();
+    batteryChargeCheck();
   }
   else{
-    status = USB_PLUGGED_IN;
+    batteryStatus = USB_PLUGGED_IN;
   }
-
-  return status;
 }
 
-void powerDisplay(Battery_Status status){
-  if(status == USB_PLUGGED_IN){
-    Debug("USB power detected, LED's are okay, battery: %fV, solar %dmV", ReadBatteryVoltage(), ReadSolarVoltage());
+void powerDisplay(){
+  if(batteryStatus == USB_PLUGGED_IN){
+    Debug("USB power detected, battery: %fV", ReadBatteryVoltage());
   }
-  if(status == BATTERY_FULL){
+  if(batteryStatus == BATTERY_FULL){
     Debug("Battery fully charged");
   }
-  if(status == BATTERY_GOOD){
+  if(batteryStatus == BATTERY_GOOD){
     Debug("Battery status good");
   }
-  if(status == BATTERY_LOW){
+  if(batteryStatus == BATTERY_LOW){
     Debug("Battery status low");
   }
-  if(status == BATTERY_CRITICAL){
+  if(batteryStatus == BATTERY_CRITICAL){
     Debug("Battery is critical, stop processes");
   }
-  switch (Read_Charge_Status()) {
+  batteryChargeMode = Read_Charge_Status();
+  switch (batteryChargeMode) {
   case CHARGING_OFF:
     Debug("Battery charging off");
     break;
@@ -391,11 +391,9 @@ void configCheck(){
 
 }
 
-Battery_Status Battery_Upkeep(){
-  Battery_Status status;
-  status = powerCheck();
-  powerDisplay(status);  // output LEDs are okay
-  return status;
+void Battery_Upkeep(){
+  powerCheck();
+  powerDisplay();  // output LEDs are okay
 }
 
 void setuserToggle(void) {
