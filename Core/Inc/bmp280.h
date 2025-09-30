@@ -82,10 +82,9 @@ typedef union {
 } calibration_param_t;
 
 typedef enum {
-    BMP_STATE_START_MEASUREMENTS,
+    BMP_MODE_SELECT,
     BMP_STATE_PROCESS_RESULTS,
-    BMP_STATE_WAIT,
-    BMP_MODE_SELECT
+    BMP_STATE_WAIT
 } BMP280State;
 
 extern BMP280State BMPState;

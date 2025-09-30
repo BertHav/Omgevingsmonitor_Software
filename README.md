@@ -173,6 +173,9 @@ The STM32CubeProgrammer current consumption during startup in μA.
 The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
+## version 5.05 <a name="version504"></a>
+Patch for detecting which sensor causes a hang. Suspect is BMP280 in error state.
+
 ## version 5.04 <a name="version504"></a>
 Battery monitoring variables optimized. Charging status added to opensensemap upload.
  

@@ -27,29 +27,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  0003043c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00036ef2  00000000  00000000  00030464  2**0
+ 12 .debug_info   00036ee6  00000000  00000000  00030464  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00009e51  00000000  00000000  00067356  2**0
+ 13 .debug_abbrev 00009e51  00000000  00000000  0006734a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00002dc8  00000000  00000000  000711a8  2**3
+ 14 .debug_aranges 00002dc8  00000000  00000000  000711a0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00002224  00000000  00000000  00073f70  2**0
+ 15 .debug_rnglists 00002224  00000000  00000000  00073f68  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00024651  00000000  00000000  00076194  2**0
+ 16 .debug_macro  00024651  00000000  00000000  0007618c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00046a43  00000000  00000000  0009a7e5  2**0
+ 17 .debug_line   00046a43  00000000  00000000  0009a7dd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000a35f1  00000000  00000000  000e1228  2**0
+ 18 .debug_str    000a35d4  00000000  00000000  000e1220  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      000000b1  00000000  00000000  00184819  2**0
+ 19 .comment      000000b1  00000000  00000000  001847f4  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000bbfc  00000000  00000000  001848cc  2**2
+ 20 .debug_frame  0000bbfc  00000000  00000000  001848a8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000006d  00000000  00000000  001904c8  2**0
+ 21 .debug_line_str 0000006d  00000000  00000000  001904a4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_loc    0000257c  00000000  00000000  00190535  2**0
+ 22 .debug_loc    0000257c  00000000  00000000  00190511  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 23 .debug_ranges 00000088  00000000  00000000  00192ab1  2**0
+ 23 .debug_ranges 00000088  00000000  00000000  00192a8d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -25435,7 +25435,7 @@ static void BMP280_reset() {
  800b742:	46bd      	mov	sp, r7
  800b744:	b002      	add	sp, #8
  800b746:	bd80      	pop	{r7, pc}
- 800b748:	20000f29 	.word	0x20000f29
+ 800b748:	20000f2a 	.word	0x20000f2a
  800b74c:	0802c2bc 	.word	0x0802c2bc
  800b750:	0802c2d4 	.word	0x0802c2d4
 
@@ -26035,7 +26035,7 @@ static bool BMP280_set_mode() {
  800bb82:	b002      	add	sp, #8
  800bb84:	bd80      	pop	{r7, pc}
  800bb86:	46c0      	nop			@ (mov r8, r8)
- 800bb88:	200000a2 	.word	0x200000a2
+ 800bb88:	200000a1 	.word	0x200000a1
  800bb8c:	0802c490 	.word	0x0802c490
  800bb90:	0802c498 	.word	0x0802c498
  800bb94:	0802c4a0 	.word	0x0802c4a0
@@ -26360,16 +26360,16 @@ BMP280State BMP_Upkeep(void) {
   switch(BMPState) {
  800bdac:	4b87      	ldr	r3, [pc, #540]	@ (800bfcc <BMP_Upkeep+0x244>)
  800bdae:	781b      	ldrb	r3, [r3, #0]
- 800bdb0:	2b03      	cmp	r3, #3
- 800bdb2:	d008      	beq.n	800bdc6 <BMP_Upkeep+0x3e>
- 800bdb4:	dd00      	ble.n	800bdb8 <BMP_Upkeep+0x30>
- 800bdb6:	e0f5      	b.n	800bfa4 <BMP_Upkeep+0x21c>
- 800bdb8:	2b01      	cmp	r3, #1
- 800bdba:	d100      	bne.n	800bdbe <BMP_Upkeep+0x36>
- 800bdbc:	e095      	b.n	800beea <BMP_Upkeep+0x162>
- 800bdbe:	2b02      	cmp	r3, #2
+ 800bdb0:	2b02      	cmp	r3, #2
+ 800bdb2:	d100      	bne.n	800bdb6 <BMP_Upkeep+0x2e>
+ 800bdb4:	e0f2      	b.n	800bf9c <BMP_Upkeep+0x214>
+ 800bdb6:	dd00      	ble.n	800bdba <BMP_Upkeep+0x32>
+ 800bdb8:	e0f4      	b.n	800bfa4 <BMP_Upkeep+0x21c>
+ 800bdba:	2b00      	cmp	r3, #0
+ 800bdbc:	d003      	beq.n	800bdc6 <BMP_Upkeep+0x3e>
+ 800bdbe:	2b01      	cmp	r3, #1
  800bdc0:	d100      	bne.n	800bdc4 <BMP_Upkeep+0x3c>
- 800bdc2:	e0eb      	b.n	800bf9c <BMP_Upkeep+0x214>
+ 800bdc2:	e092      	b.n	800beea <BMP_Upkeep+0x162>
  800bdc4:	e0ee      	b.n	800bfa4 <BMP_Upkeep+0x21c>
   case BMP_MODE_SELECT:
     if ((getSensorLock() == FREE) || (getSensorLock() == BMP280)) {
@@ -26639,10 +26639,10 @@ BMP280State BMP_Upkeep(void) {
  800bf80:	4b13      	ldr	r3, [pc, #76]	@ (800bfd0 <BMP_Upkeep+0x248>)
  800bf82:	2201      	movs	r2, #1
  800bf84:	701a      	strb	r2, [r3, #0]
-      BMP280TimeStamp = HAL_GetTick() + 10000;
+      BMP280TimeStamp = HAL_GetTick() + 5000;
  800bf86:	f008 fce7 	bl	8014958 <HAL_GetTick>
  800bf8a:	0003      	movs	r3, r0
- 800bf8c:	4a1d      	ldr	r2, [pc, #116]	@ (800c004 <BMP_Upkeep+0x27c>)
+ 800bf8c:	4a17      	ldr	r2, [pc, #92]	@ (800bfec <BMP_Upkeep+0x264>)
  800bf8e:	189a      	adds	r2, r3, r2
  800bf90:	4b0d      	ldr	r3, [pc, #52]	@ (800bfc8 <BMP_Upkeep+0x240>)
  800bf92:	601a      	str	r2, [r3, #0]
@@ -26657,7 +26657,7 @@ BMP280State BMP_Upkeep(void) {
   case BMP_STATE_WAIT:
       BMPState = BMP_MODE_SELECT;
  800bf9c:	4b0b      	ldr	r3, [pc, #44]	@ (800bfcc <BMP_Upkeep+0x244>)
- 800bf9e:	2203      	movs	r2, #3
+ 800bf9e:	2200      	movs	r2, #0
  800bfa0:	701a      	strb	r2, [r3, #0]
     break;
  800bfa2:	e00b      	b.n	800bfbc <BMP_Upkeep+0x234>
@@ -26667,7 +26667,7 @@ BMP280State BMP_Upkeep(void) {
     // Handle unexpected state
     BMPState = BMP_MODE_SELECT;
  800bfa4:	4b09      	ldr	r3, [pc, #36]	@ (800bfcc <BMP_Upkeep+0x244>)
- 800bfa6:	2203      	movs	r2, #3
+ 800bfa6:	2200      	movs	r2, #0
  800bfa8:	701a      	strb	r2, [r3, #0]
     if (getSensorLock() == BMP280) {
  800bfaa:	f001 ff3f 	bl	800de2c <getSensorLock>
@@ -26690,9 +26690,9 @@ BMP280State BMP_Upkeep(void) {
  800bfc4:	b004      	add	sp, #16
  800bfc6:	bdb0      	pop	{r4, r5, r7, pc}
  800bfc8:	20000f24 	.word	0x20000f24
- 800bfcc:	200000a1 	.word	0x200000a1
- 800bfd0:	20000f29 	.word	0x20000f29
- 800bfd4:	200000a2 	.word	0x200000a2
+ 800bfcc:	20000f29 	.word	0x20000f29
+ 800bfd0:	20000f2a 	.word	0x20000f2a
+ 800bfd4:	200000a1 	.word	0x200000a1
  800bfd8:	0802c4c4 	.word	0x0802c4c4
  800bfdc:	0802c2d4 	.word	0x0802c2d4
  800bfe0:	0802c4e4 	.word	0x0802c4e4
@@ -29124,7 +29124,7 @@ int main(void)
  800cf00:	200010f9 	.word	0x200010f9
  800cf04:	0802c6a4 	.word	0x0802c6a4
  800cf08:	0802c6d8 	.word	0x0802c6d8
- 800cf0c:	200000a3 	.word	0x200000a3
+ 800cf0c:	200000a2 	.word	0x200000a2
  800cf10:	200010fc 	.word	0x200010fc
  800cf14:	200010f6 	.word	0x200010f6
  800cf18:	200010f4 	.word	0x200010f4
@@ -29318,7 +29318,7 @@ int main(void)
  800d074:	e619      	b.n	800ccaa <main+0x18e>
  800d076:	46c0      	nop			@ (mov r8, r8)
  800d078:	20002161 	.word	0x20002161
- 800d07c:	200000a3 	.word	0x200000a3
+ 800d07c:	200000a2 	.word	0x200000a2
  800d080:	20001118 	.word	0x20001118
  800d084:	0802c6dc 	.word	0x0802c6dc
  800d088:	0802c5d8 	.word	0x0802c5d8
@@ -30976,7 +30976,7 @@ bool AllDevicesReady() {
  800db84:	2101      	movs	r1, #1
  800db86:	400a      	ands	r2, r1
  800db88:	701a      	strb	r2, [r3, #0]
-      if (!status && (prevstatus != status) && (iminute != lastminute)) {
+      if (!status && ((prevstatus != status) || (iminute != lastminute))) {
  800db8a:	1dfb      	adds	r3, r7, #7
  800db8c:	781b      	ldrb	r3, [r3, #0]
  800db8e:	2201      	movs	r2, #1
@@ -30989,7 +30989,7 @@ bool AllDevicesReady() {
  800db9c:	1dfa      	adds	r2, r7, #7
  800db9e:	7812      	ldrb	r2, [r2, #0]
  800dba0:	429a      	cmp	r2, r3
- 800dba2:	d038      	beq.n	800dc16 <AllDevicesReady+0x1d6>
+ 800dba2:	d105      	bne.n	800dbb0 <AllDevicesReady+0x170>
  800dba4:	4b44      	ldr	r3, [pc, #272]	@ (800dcb8 <AllDevicesReady+0x278>)
  800dba6:	781a      	ldrb	r2, [r3, #0]
  800dba8:	4b44      	ldr	r3, [pc, #272]	@ (800dcbc <AllDevicesReady+0x27c>)

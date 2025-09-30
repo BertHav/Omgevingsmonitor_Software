@@ -3225,119 +3225,119 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
                 0x08008720      0x138 ./Core/Src/bmp280.o
                 0x08008720                BMP280_DeviceConnected
  .text.BMP_Upkeep
-                0x08008858      0x374 ./Core/Src/bmp280.o
+                0x08008858      0x37c ./Core/Src/bmp280.o
                 0x08008858                BMP_Upkeep
  .text.MX_DMA_Init
-                0x08008bcc       0x3c ./Core/Src/dma.o
-                0x08008bcc                MX_DMA_Init
+                0x08008bd4       0x3c ./Core/Src/dma.o
+                0x08008bd4                MX_DMA_Init
  .text.WriteUint8ArrayEeprom
-                0x08008c08       0x34 ./Core/Src/eeprom.o
-                0x08008c08                WriteUint8ArrayEeprom
+                0x08008c10       0x34 ./Core/Src/eeprom.o
+                0x08008c10                WriteUint8ArrayEeprom
  .text.WriteUint8ArrayEepromSafe
-                0x08008c3c        0xc ./Core/Src/eeprom.o
-                0x08008c3c                WriteUint8ArrayEepromSafe
+                0x08008c44        0xc ./Core/Src/eeprom.o
+                0x08008c44                WriteUint8ArrayEepromSafe
  .text.ReadUint8ArrayEEprom
-                0x08008c48       0x14 ./Core/Src/eeprom.o
-                0x08008c48                ReadUint8ArrayEEprom
+                0x08008c50       0x14 ./Core/Src/eeprom.o
+                0x08008c50                ReadUint8ArrayEEprom
  .text.ClearEEprom
-                0x08008c5c       0x22 ./Core/Src/eeprom.o
-                0x08008c5c                ClearEEprom
+                0x08008c64       0x22 ./Core/Src/eeprom.o
+                0x08008c64                ClearEEprom
  .text.correctIntFracNumber
-                0x08008c7e       0x52 ./Core/Src/efficient_10log10.o
-                0x08008c7e                correctIntFracNumber
+                0x08008c86       0x52 ./Core/Src/efficient_10log10.o
+                0x08008c86                correctIntFracNumber
  .text.efficient10log10
-                0x08008cd0       0x58 ./Core/Src/efficient_10log10.o
-                0x08008cd0                efficient10log10
+                0x08008cd8       0x58 ./Core/Src/efficient_10log10.o
+                0x08008cd8                efficient10log10
  .text.MX_GPIO_Init
-                0x08008d28      0x198 ./Core/Src/gpio.o
-                0x08008d28                MX_GPIO_Init
+                0x08008d30      0x198 ./Core/Src/gpio.o
+                0x08008d30                MX_GPIO_Init
  .text.GPIO_InitPWMLEDs
-                0x08008ec0       0x54 ./Core/Src/gpio.o
-                0x08008ec0                GPIO_InitPWMLEDs
+                0x08008ec8       0x54 ./Core/Src/gpio.o
+                0x08008ec8                GPIO_InitPWMLEDs
  .text.MX_I2C1_Init
-                0x08008f14       0x5c ./Core/Src/i2c.o
-                0x08008f14                MX_I2C1_Init
+                0x08008f1c       0x5c ./Core/Src/i2c.o
+                0x08008f1c                MX_I2C1_Init
  .text.MX_I2C2_Init
-                0x08008f70       0x5c ./Core/Src/i2c.o
-                0x08008f70                MX_I2C2_Init
+                0x08008f78       0x5c ./Core/Src/i2c.o
+                0x08008f78                MX_I2C2_Init
  .text.HAL_I2C_MspInit
-                0x08008fcc      0x11c ./Core/Src/i2c.o
-                0x08008fcc                HAL_I2C_MspInit
+                0x08008fd4      0x11c ./Core/Src/i2c.o
+                0x08008fd4                HAL_I2C_MspInit
  .text.MX_I2S2_Init
-                0x080090e8       0x38 ./Core/Src/i2s.o
-                0x080090e8                MX_I2S2_Init
+                0x080090f0       0x38 ./Core/Src/i2s.o
+                0x080090f0                MX_I2S2_Init
  .text.HAL_I2S_MspInit
-                0x08009120       0x90 ./Core/Src/i2s.o
-                0x08009120                HAL_I2S_MspInit
+                0x08009128       0x90 ./Core/Src/i2s.o
+                0x08009128                HAL_I2S_MspInit
  .text.SetBatteryReadTimer
-                0x080091b0       0x14 ./Core/Src/main.o
-                0x080091b0                SetBatteryReadTimer
+                0x080091b8       0x14 ./Core/Src/main.o
+                0x080091b8                SetBatteryReadTimer
  .text.SetTestDone
-                0x080091c4       0x4c ./Core/Src/main.o
-                0x080091c4                SetTestDone
+                0x080091cc       0x4c ./Core/Src/main.o
+                0x080091cc                SetTestDone
  .text.check_cli_command
-                0x08009210      0x11c ./Core/Src/main.o
-                0x08009210                check_cli_command
+                0x08009218      0x11c ./Core/Src/main.o
+                0x08009218                check_cli_command
  .text.HAL_UART_RxCpltCallback
-                0x0800932c       0x24 ./Core/Src/main.o
-                0x0800932c                HAL_UART_RxCpltCallback
+                0x08009334       0x24 ./Core/Src/main.o
+                0x08009334                HAL_UART_RxCpltCallback
  .text.HAL_GPIO_EXTI_Callback
-                0x08009350       0x28 ./Core/Src/main.o
-                0x08009350                HAL_GPIO_EXTI_Callback
+                0x08009358       0x28 ./Core/Src/main.o
+                0x08009358                HAL_GPIO_EXTI_Callback
  .text.Error_Handler
-                0x08009378       0x28 ./Core/Src/main.o
-                0x08009378                Error_Handler
+                0x08009380       0x28 ./Core/Src/main.o
+                0x08009380                Error_Handler
  .text.SystemClock_Config
-                0x080093a0       0xb0 ./Core/Src/main.o
-                0x080093a0                SystemClock_Config
+                0x080093a8       0xb0 ./Core/Src/main.o
+                0x080093a8                SystemClock_Config
  .text.startup.main
-                0x08009450      0x488 ./Core/Src/main.o
-                0x08009450                main
+                0x08009458      0x488 ./Core/Src/main.o
+                0x08009458                main
  .text.testInit
-                0x080098d8       0x34 ./Core/Src/measurement.o
-                0x080098d8                testInit
+                0x080098e0       0x34 ./Core/Src/measurement.o
+                0x080098e0                testInit
  .text.GetPMSensorPresence
-                0x0800990c        0xc ./Core/Src/measurement.o
-                0x0800990c                GetPMSensorPresence
+                0x08009914        0xc ./Core/Src/measurement.o
+                0x08009914                GetPMSensorPresence
  .text.DisablePMSensor
-                0x08009918        0xc ./Core/Src/measurement.o
-                0x08009918                DisablePMSensor
+                0x08009920        0xc ./Core/Src/measurement.o
+                0x08009920                DisablePMSensor
  .text.IsAHT20SensorPresent
-                0x08009924        0xc ./Core/Src/measurement.o
-                0x08009924                IsAHT20SensorPresent
+                0x0800992c        0xc ./Core/Src/measurement.o
+                0x0800992c                IsAHT20SensorPresent
  .text.IsBMP280SensorPresent
-                0x08009930        0xc ./Core/Src/measurement.o
-                0x08009930                IsBMP280SensorPresent
+                0x08009938        0xc ./Core/Src/measurement.o
+                0x08009938                IsBMP280SensorPresent
  .text.IsENS160SensorPresent
-                0x0800993c        0xc ./Core/Src/measurement.o
-                0x0800993c                IsENS160SensorPresent
+                0x08009944        0xc ./Core/Src/measurement.o
+                0x08009944                IsENS160SensorPresent
  .text.IsSGPPresent
-                0x08009948        0xc ./Core/Src/measurement.o
-                0x08009948                IsSGPPresent
+                0x08009950        0xc ./Core/Src/measurement.o
+                0x08009950                IsSGPPresent
  .text.SetVOCSensorDIS_ENA
-                0x08009954       0x38 ./Core/Src/measurement.o
-                0x08009954                SetVOCSensorDIS_ENA
+                0x0800995c       0x38 ./Core/Src/measurement.o
+                0x0800995c                SetVOCSensorDIS_ENA
  .text.IsPMSensorEnabled
-                0x0800998c        0xc ./Core/Src/measurement.o
-                0x0800998c                IsPMSensorEnabled
+                0x08009994        0xc ./Core/Src/measurement.o
+                0x08009994                IsPMSensorEnabled
  .text.SetVOCSensorStatus
-                0x08009998       0x18 ./Core/Src/measurement.o
-                0x08009998                SetVOCSensorStatus
+                0x080099a0       0x18 ./Core/Src/measurement.o
+                0x080099a0                SetVOCSensorStatus
  .text.SetPMSensorStatus
-                0x080099b0        0xc ./Core/Src/measurement.o
-                0x080099b0                SetPMSensorStatus
+                0x080099b8        0xc ./Core/Src/measurement.o
+                0x080099b8                SetPMSensorStatus
  .text.SetESPMeasurementDone
-                0x080099bc        0xc ./Core/Src/measurement.o
-                0x080099bc                SetESPMeasurementDone
+                0x080099c4        0xc ./Core/Src/measurement.o
+                0x080099c4                SetESPMeasurementDone
  .text.Device_Init
-                0x080099c8      0x2d8 ./Core/Src/measurement.o
-                0x080099c8                Device_Init
+                0x080099d0      0x2d8 ./Core/Src/measurement.o
+                0x080099d0                Device_Init
  .text.Device_Test
-                0x08009ca0       0xcc ./Core/Src/measurement.o
-                0x08009ca0                Device_Test
+                0x08009ca8       0xcc ./Core/Src/measurement.o
+                0x08009ca8                Device_Test
  .text.AllDevicesReady
-                0x08009d6c      0x1d4 ./Core/Src/measurement.o
-                0x08009d6c                AllDevicesReady
+                0x08009d74      0x1cc ./Core/Src/measurement.o
+                0x08009d74                AllDevicesReady
  .text.EnabledConnectedDevices
                 0x08009f40       0xb8 ./Core/Src/measurement.o
                 0x08009f40                EnabledConnectedDevices
@@ -5464,12 +5464,9 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .data.AHT20_start
                 0x20000021        0x3 ./Core/Src/aht2x.o
  .data.mode     0x20000024        0x1 ./Core/Src/bmp280.o
- .data.BMPState
-                0x20000025        0x1 ./Core/Src/bmp280.o
-                0x20000025                BMPState
  .data.bmp280I2Caddr
-                0x20000026        0x1 ./Core/Src/bmp280.o
- *fill*         0x20000027        0x1 
+                0x20000025        0x1 ./Core/Src/bmp280.o
+ *fill*         0x20000026        0x2 
  .data.batteryReadTimer
                 0x20000028        0x4 ./Core/Src/main.o
                 0x20000028                batteryReadTimer
@@ -5589,7 +5586,7 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .igot.plt      0x200003b8        0x0 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/crtbegin.o
                 0x200003b8                        . = ALIGN (0x4)
 
-.bss            0x200003b8     0x3494 load address 0x0801fa00
+.bss            0x200003b8     0x3498 load address 0x0801fa00
                 0x200003b8                        _sbss = .
                 0x200003b8                        __bss_start__ = _sbss
  *(.bss)
@@ -5832,343 +5829,345 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
                 0x20000e50        0x4 ./Core/Src/aht2x.o
  .bss.raw_mpa   0x20000e54        0x4 ./Core/Src/bmp280.o
  .bss.raw_temp  0x20000e58        0x4 ./Core/Src/bmp280.o
+ .bss.BMPState  0x20000e5c        0x1 ./Core/Src/bmp280.o
+                0x20000e5c                BMPState
+ *fill*         0x20000e5d        0x3 
  .bss.BMP280TimeStamp
-                0x20000e5c        0x4 ./Core/Src/bmp280.o
- .bss.t_fine    0x20000e60        0x4 ./Core/Src/bmp280.o
- .bss.dig       0x20000e64       0x18 ./Core/Src/bmp280.o
+                0x20000e60        0x4 ./Core/Src/bmp280.o
+ .bss.t_fine    0x20000e64        0x4 ./Core/Src/bmp280.o
+ .bss.dig       0x20000e68       0x18 ./Core/Src/bmp280.o
  .bss.ReadMemFunction
-                0x20000e7c        0x4 ./Core/Src/bmp280.o
- .bss.WriteMemFunction
                 0x20000e80        0x4 ./Core/Src/bmp280.o
- .bss.addr.0    0x20000e84        0x4 ./Core/Src/eeprom.o
+ .bss.WriteMemFunction
+                0x20000e84        0x4 ./Core/Src/bmp280.o
+ .bss.addr.0    0x20000e88        0x4 ./Core/Src/eeprom.o
  .bss.hdma_i2c1_tx
-                0x20000e88       0x48 ./Core/Src/i2c.o
-                0x20000e88                hdma_i2c1_tx
+                0x20000e8c       0x48 ./Core/Src/i2c.o
+                0x20000e8c                hdma_i2c1_tx
  .bss.hdma_i2c1_rx
-                0x20000ed0       0x48 ./Core/Src/i2c.o
-                0x20000ed0                hdma_i2c1_rx
- .bss.hi2c2     0x20000f18       0x54 ./Core/Src/i2c.o
-                0x20000f18                hi2c2
- .bss.hi2c1     0x20000f6c       0x54 ./Core/Src/i2c.o
-                0x20000f6c                hi2c1
+                0x20000ed4       0x48 ./Core/Src/i2c.o
+                0x20000ed4                hdma_i2c1_rx
+ .bss.hi2c2     0x20000f1c       0x54 ./Core/Src/i2c.o
+                0x20000f1c                hi2c2
+ .bss.hi2c1     0x20000f70       0x54 ./Core/Src/i2c.o
+                0x20000f70                hi2c1
  .bss.hdma_spi2_rx
-                0x20000fc0       0x48 ./Core/Src/i2s.o
-                0x20000fc0                hdma_spi2_rx
- .bss.hi2s2     0x20001008       0x3c ./Core/Src/i2s.o
-                0x20001008                hi2s2
+                0x20000fc4       0x48 ./Core/Src/i2s.o
+                0x20000fc4                hdma_spi2_rx
+ .bss.hi2s2     0x2000100c       0x3c ./Core/Src/i2s.o
+                0x2000100c                hi2s2
  .bss.deviceTimeOut
-                0x20001044        0x4 ./Core/Src/main.o
-                0x20001044                deviceTimeOut
+                0x20001048        0x4 ./Core/Src/main.o
+                0x20001048                deviceTimeOut
  .bss.sendpwrmaildate
-                0x20001048        0x1 ./Core/Src/main.o
-                0x20001048                sendpwrmaildate
+                0x2000104c        0x1 ./Core/Src/main.o
+                0x2000104c                sendpwrmaildate
  .bss.u1_rx_buff
-                0x20001049       0x10 ./Core/Src/main.o
-                0x20001049                u1_rx_buff
- .bss.ESPstate  0x20001059        0x1 ./Core/Src/main.o
-                0x20001059                ESPstate
- .bss.MICstate  0x2000105a        0x1 ./Core/Src/main.o
-                0x2000105a                MICstate
+                0x2000104d       0x10 ./Core/Src/main.o
+                0x2000104d                u1_rx_buff
+ .bss.ESPstate  0x2000105d        0x1 ./Core/Src/main.o
+                0x2000105d                ESPstate
+ .bss.MICstate  0x2000105e        0x1 ./Core/Src/main.o
+                0x2000105e                MICstate
  .bss.priorUSBpluggedIn
-                0x2000105b        0x1 ./Core/Src/main.o
- .bss.sendpwremail
-                0x2000105c        0x1 ./Core/Src/main.o
-                0x2000105c                sendpwremail
- .bss.espfailshown
-                0x2000105d        0x1 ./Core/Src/main.o
-                0x2000105d                espfailshown
- .bss.usblog    0x2000105e        0x1 ./Core/Src/main.o
-                0x2000105e                usblog
- .bss.batteryEmpty
                 0x2000105f        0x1 ./Core/Src/main.o
-                0x2000105f                batteryEmpty
- .bss.ESP_Programming
+ .bss.sendpwremail
                 0x20001060        0x1 ./Core/Src/main.o
-                0x20001060                ESP_Programming
- .bss.testDone  0x20001061        0x1 ./Core/Src/main.o
-                0x20001061                testDone
+                0x20001060                sendpwremail
+ .bss.espfailshown
+                0x20001061        0x1 ./Core/Src/main.o
+                0x20001061                espfailshown
+ .bss.usblog    0x20001062        0x1 ./Core/Src/main.o
+                0x20001062                usblog
+ .bss.batteryEmpty
+                0x20001063        0x1 ./Core/Src/main.o
+                0x20001063                batteryEmpty
+ .bss.ESP_Programming
+                0x20001064        0x1 ./Core/Src/main.o
+                0x20001064                ESP_Programming
+ .bss.testDone  0x20001065        0x1 ./Core/Src/main.o
+                0x20001065                testDone
  .bss.allinwait.0
-                0x20001062        0x1 ./Core/Src/measurement.o
+                0x20001066        0x1 ./Core/Src/measurement.o
  .bss.iminute.1
-                0x20001063        0x1 ./Core/Src/measurement.o
+                0x20001067        0x1 ./Core/Src/measurement.o
  .bss.sensorsdisablereq
-                0x20001064        0x1 ./Core/Src/measurement.o
- .bss.ENSstate  0x20001065        0x1 ./Core/Src/measurement.o
- .bss.BMPstate  0x20001066        0x1 ./Core/Src/measurement.o
- .bss.AHTstate  0x20001067        0x1 ./Core/Src/measurement.o
- .bss.HIDSstate
                 0x20001068        0x1 ./Core/Src/measurement.o
- .bss.SGPstate  0x20001069        0x1 ./Core/Src/measurement.o
+ .bss.ENSstate  0x20001069        0x1 ./Core/Src/measurement.o
+ .bss.BMPstate  0x2000106a        0x1 ./Core/Src/measurement.o
+ .bss.AHTstate  0x2000106b        0x1 ./Core/Src/measurement.o
+ .bss.HIDSstate
+                0x2000106c        0x1 ./Core/Src/measurement.o
+ .bss.SGPstate  0x2000106d        0x1 ./Core/Src/measurement.o
  .bss.SensorHasLock
-                0x2000106a        0x1 ./Core/Src/measurement.o
+                0x2000106e        0x1 ./Core/Src/measurement.o
  .bss.SensorProbe
-                0x2000106b        0x9 ./Core/Src/measurement.o
-                0x2000106b                SensorProbe
- .bss.Sensor    0x20001074        0x7 ./Core/Src/measurement.o
-                0x20001074                Sensor
+                0x2000106f        0x9 ./Core/Src/measurement.o
+                0x2000106f                SensorProbe
+ .bss.Sensor    0x20001078        0x7 ./Core/Src/measurement.o
+                0x20001078                Sensor
  .bss.MicState.1
-                0x2000107b        0x1 ./Core/Src/microphone.o
+                0x2000107f        0x1 ./Core/Src/microphone.o
  .bss.soundData
-                0x2000107c       0x12 ./Core/Src/microphone.o
-                0x2000107c                soundData
- *fill*         0x2000108e        0x2 
+                0x20001080       0x12 ./Core/Src/microphone.o
+                0x20001080                soundData
+ *fill*         0x20001092        0x2 
  .bss.MICTimeStamp
-                0x20001090        0x4 ./Core/Src/microphone.o
+                0x20001094        0x4 ./Core/Src/microphone.o
  .bss.samplebufferfilled
-                0x20001094        0x1 ./Core/Src/microphone.o
-                0x20001094                samplebufferfilled
- .bss.counter   0x20001095        0x1 ./Core/Src/microphone.o
-                0x20001095                counter
- *fill*         0x20001096        0x2 
- .bss.dBAmax    0x20001098        0x4 ./Core/Src/microphone.o
-                0x20001098                dBAmax
- .bss.dBValue   0x2000109c        0x4 ./Core/Src/microphone.o
-                0x2000109c                dBValue
- .bss.dBAsum    0x200010a0        0x4 ./Core/Src/microphone.o
-                0x200010a0                dBAsum
+                0x20001098        0x1 ./Core/Src/microphone.o
+                0x20001098                samplebufferfilled
+ .bss.counter   0x20001099        0x1 ./Core/Src/microphone.o
+                0x20001099                counter
+ *fill*         0x2000109a        0x2 
+ .bss.dBAmax    0x2000109c        0x4 ./Core/Src/microphone.o
+                0x2000109c                dBAmax
+ .bss.dBValue   0x200010a0        0x4 ./Core/Src/microphone.o
+                0x200010a0                dBValue
+ .bss.dBAsum    0x200010a4        0x4 ./Core/Src/microphone.o
+                0x200010a4                dBAsum
  .bss.dBAAverage
-                0x200010a4        0x4 ./Core/Src/microphone.o
-                0x200010a4                dBAAverage
+                0x200010a8        0x4 ./Core/Src/microphone.o
+                0x200010a8                dBAAverage
  .bss.dBASamples
-                0x200010a8       0x28 ./Core/Src/microphone.o
-                0x200010a8                dBASamples
- .bss.dBA       0x200010d0        0x4 ./Core/Src/microphone.o
+                0x200010ac       0x28 ./Core/Src/microphone.o
+                0x200010ac                dBASamples
+ .bss.dBA       0x200010d4        0x4 ./Core/Src/microphone.o
  .bss.mPabuffer
-                0x200010d4        0xc ./Core/Src/microphone.o
-                0x200010d4                mPabuffer
- .bss.hrtc      0x200010e0       0x24 ./Core/Src/rtc.o
-                0x200010e0                hrtc
+                0x200010d8        0xc ./Core/Src/microphone.o
+                0x200010d8                mPabuffer
+ .bss.hrtc      0x200010e4       0x24 ./Core/Src/rtc.o
+                0x200010e4                hrtc
  .bss.sen5x_data
-                0x20001104       0x10 ./Core/Src/sen5x.o
-                0x20001104                sen5x_data
+                0x20001108       0x10 ./Core/Src/sen5x.o
+                0x20001108                sen5x_data
  .bss.sen5xReadTimer
-                0x20001114        0x4 ./Core/Src/sen5x.o
-                0x20001114                sen5xReadTimer
+                0x20001118        0x4 ./Core/Src/sen5x.o
+                0x20001118                sen5xReadTimer
  .bss.sen5xErrors
-                0x20001118        0x1 ./Core/Src/sen5x.o
-                0x20001118                sen5xErrors
+                0x2000111c        0x1 ./Core/Src/sen5x.o
+                0x2000111c                sen5xErrors
  .bss.sen5xSamples
-                0x20001119        0x1 ./Core/Src/sen5x.o
-                0x20001119                sen5xSamples
+                0x2000111d        0x1 ./Core/Src/sen5x.o
+                0x2000111d                sen5xSamples
  .bss.product_name
-                0x2000111a        0x8 ./Core/Src/sen5x.o
-                0x2000111a                product_name
+                0x2000111e        0x8 ./Core/Src/sen5x.o
+                0x2000111e                product_name
  .bss.sen5x_Enable
-                0x20001122        0x1 ./Core/Src/sen5x.o
- .bss.VOCNOx    0x20001123        0x1 ./Core/Src/sen5x.o
-                0x20001123                VOCNOx
- .bss.sen5x_On  0x20001124        0x1 ./Core/Src/sen5x.o
-                0x20001124                sen5x_On
+                0x20001126        0x1 ./Core/Src/sen5x.o
+ .bss.VOCNOx    0x20001127        0x1 ./Core/Src/sen5x.o
+                0x20001127                VOCNOx
+ .bss.sen5x_On  0x20001128        0x1 ./Core/Src/sen5x.o
+                0x20001128                sen5x_On
  .bss.fanCleaningDone
-                0x20001125        0x1 ./Core/Src/sen5x.o
-                0x20001125                fanCleaningDone
+                0x20001129        0x1 ./Core/Src/sen5x.o
+                0x20001129                fanCleaningDone
  .bss.SGPState.0
-                0x20001126        0x1 ./Core/Src/sgp40.o
- *fill*         0x20001127        0x1 
- .bss.vocIndex  0x20001128        0x4 ./Core/Src/sgp40.o
+                0x2000112a        0x1 ./Core/Src/sgp40.o
+ *fill*         0x2000112b        0x1 
+ .bss.vocIndex  0x2000112c        0x4 ./Core/Src/sgp40.o
  .bss.SGP_MsgSent
-                0x2000112c        0x1 ./Core/Src/sgp40.o
+                0x20001130        0x1 ./Core/Src/sgp40.o
  .bss.HT_MeasurementReceived
-                0x2000112d        0x1 ./Core/Src/sgp40.o
- *fill*         0x2000112e        0x2 
- .bss.params    0x20001130       0xa4 ./Core/Src/sgp40.o
+                0x20001131        0x1 ./Core/Src/sgp40.o
+ *fill*         0x20001132        0x2 
+ .bss.params    0x20001134       0xa4 ./Core/Src/sgp40.o
  .bss.MeasurementIsReady
-                0x200011d4        0x1 ./Core/Src/sgp40.o
+                0x200011d8        0x1 ./Core/Src/sgp40.o
  .bss.HeatUpIsDone
-                0x200011d5        0x1 ./Core/Src/sgp40.o
- *fill*         0x200011d6        0x2 
+                0x200011d9        0x1 ./Core/Src/sgp40.o
+ *fill*         0x200011da        0x2 
  .bss.SGP40TimeStamp
-                0x200011d8        0x4 ./Core/Src/sgp40.o
+                0x200011dc        0x4 ./Core/Src/sgp40.o
  .bss.sgp40samplecounter
-                0x200011dc        0x1 ./Core/Src/sgp40.o
+                0x200011e0        0x1 ./Core/Src/sgp40.o
  .bss.SGP_AmountOfSamplesDone
-                0x200011dd        0x1 ./Core/Src/sgp40.o
+                0x200011e1        0x1 ./Core/Src/sgp40.o
  .bss.SGP_ReadBuffer
-                0x200011de        0x9 ./Core/Src/sgp40.o
- *fill*         0x200011e7        0x1 
+                0x200011e2        0x9 ./Core/Src/sgp40.o
+ *fill*         0x200011eb        0x1 
  .bss.WriteFunction
-                0x200011e8        0x4 ./Core/Src/sgp40.o
- .bss.ReadFunction
                 0x200011ec        0x4 ./Core/Src/sgp40.o
- .bss.sgpinitdone
-                0x200011f0        0x1 ./Core/Src/sgp40.o
- *fill*         0x200011f1        0x3 
- .bss.FFTdata.1
-                0x200011f4      0x400 ./Core/Src/sound_measurement.o
- .bss.lastData.2
-                0x200015f4        0x4 ./Core/Src/sound_measurement.o
- .bss.filtered.3
-                0x200015f8        0x4 ./Core/Src/sound_measurement.o
- .bss.spl_sum_count
-                0x200015fc        0x4 ./Core/Src/sound_measurement.o
- .bss.band_spl_frac1dp_sum
-                0x20001600       0x18 ./Core/Src/sound_measurement.o
- .bss.band_spl_int_sum
-                0x20001618       0x18 ./Core/Src/sound_measurement.o
- .bss.spl_frac1dp_sum
-                0x20001630        0x4 ./Core/Src/sound_measurement.o
- .bss.spl_int_sum
-                0x20001634        0x4 ./Core/Src/sound_measurement.o
- .bss.hi2s2     0x20001638        0x4 ./Core/Src/sound_measurement.o
- .bss.htim6     0x2000163c        0x4 ./Core/Src/sound_measurement.o
- .bss.dataBuffer
-                0x20001640      0x200 ./Core/Src/sound_measurement.o
- .bss.dmaBuffer
-                0x20001840      0x800 ./Core/Src/sound_measurement.o
- .bss.bandSPL_frac_1dp
-                0x20002040       0x18 ./Core/Src/sound_measurement.o
- .bss.bandSPL_int
-                0x20002058       0x18 ./Core/Src/sound_measurement.o
- .bss.SPL_frac_1dp
-                0x20002070        0x4 ./Core/Src/sound_measurement.o
- .bss.SPL_int   0x20002074        0x4 ./Core/Src/sound_measurement.o
- .bss.maximumAmplitude
-                0x20002078        0x4 ./Core/Src/sound_measurement.o
- .bss.amplitudeSettlingPeriods
-                0x2000207c        0x4 ./Core/Src/sound_measurement.o
- .bss.SPLcalcComplete
-                0x20002080        0x1 ./Core/Src/sound_measurement.o
- .bss.DMAinterruptEnabled
-                0x20002081        0x1 ./Core/Src/sound_measurement.o
- .bss.SPLcalcEnabled
-                0x20002082        0x1 ./Core/Src/sound_measurement.o
- .bss.micEnabled
-                0x20002083        0x1 ./Core/Src/sound_measurement.o
-                0x20002083                micEnabled
- .bss.DataReady
-                0x20002084        0x1 ./Core/Src/sound_measurement.o
-                0x20002084                DataReady
- *fill*         0x20002085        0x1 
- .bss.solmV.4   0x20002086        0x2 ./Core/Src/statusCheck.o
- .bss.batteryStatus
-                0x20002088        0x1 ./Core/Src/statusCheck.o
-                0x20002088                batteryStatus
- .bss.batteryChargeMode
-                0x20002089        0x1 ./Core/Src/statusCheck.o
-                0x20002089                batteryChargeMode
- *fill*         0x2000208a        0x2 
- .bss.batteryCharge
-                0x2000208c        0x4 ./Core/Src/statusCheck.o
-                0x2000208c                batteryCharge
- .bss.UserbuttonStamp
-                0x20002090        0x4 ./Core/Src/statusCheck.o
-                0x20002090                UserbuttonStamp
- .bss.ConfigStamp
-                0x20002094        0x4 ./Core/Src/statusCheck.o
-                0x20002094                ConfigStamp
- .bss.usedMicLEDcolor
-                0x20002098        0x1 ./Core/Src/statusCheck.o
- .bss.userbuttonHeld
-                0x20002099        0x1 ./Core/Src/statusCheck.o
- .bss.userToggle
-                0x2000209a        0x1 ./Core/Src/statusCheck.o
-                0x2000209a                userToggle
- .bss.usbPluggedIn
-                0x2000209b        0x1 ./Core/Src/statusCheck.o
-                0x2000209b                usbPluggedIn
- .bss.configSet
-                0x2000209c        0x1 ./Core/Src/statusCheck.o
-                0x2000209c                configSet
- *fill*         0x2000209d        0x3 
- .bss.__sbrk_heap_end
-                0x200020a0        0x4 ./Core/Src/sysmem.o
- .bss.htim6     0x200020a4       0x40 ./Core/Src/tim.o
-                0x200020a4                htim6
- .bss.htim3     0x200020e4       0x40 ./Core/Src/tim.o
-                0x200020e4                htim3
- .bss.htim2     0x20002124       0x40 ./Core/Src/tim.o
-                0x20002124                htim2
- .bss.hdma_usart4_tx
-                0x20002164       0x48 ./Core/Src/usart.o
-                0x20002164                hdma_usart4_tx
- .bss.hdma_usart4_rx
-                0x200021ac       0x48 ./Core/Src/usart.o
-                0x200021ac                hdma_usart4_rx
- .bss.huart4    0x200021f4       0xb8 ./Core/Src/usart.o
-                0x200021f4                huart4
- .bss.huart1    0x200022ac       0xb8 ./Core/Src/usart.o
-                0x200022ac                huart1
- .bss.hlpuart1  0x20002364       0xb8 ./Core/Src/usart.o
-                0x20002364                hlpuart1
- .bss.HIDSState.0
-                0x2000241c        0x1 ./Core/Src/wsenHIDS.o
- *fill*         0x2000241d        0x3 
- .bss.HIDSTimeStamp
-                0x20002420        0x4 ./Core/Src/wsenHIDS.o
- .bss.MeasurementDone
-                0x20002424        0x1 ./Core/Src/wsenHIDS.o
- *fill*         0x20002425        0x3 
- .bss.HIDS_LastHeaterInRTC
-                0x20002428        0x4 ./Core/Src/wsenHIDS.o
- .bss.MeasureBuffer
-                0x2000242c        0x6 ./Core/Src/wsenHIDS.o
- .bss.SerialBuffer
-                0x20002432        0x6 ./Core/Src/wsenHIDS.o
- .bss.WriteFunction
-                0x20002438        0x4 ./Core/Src/wsenHIDS.o
  .bss.ReadFunction
+                0x200011f0        0x4 ./Core/Src/sgp40.o
+ .bss.sgpinitdone
+                0x200011f4        0x1 ./Core/Src/sgp40.o
+ *fill*         0x200011f5        0x3 
+ .bss.FFTdata.1
+                0x200011f8      0x400 ./Core/Src/sound_measurement.o
+ .bss.lastData.2
+                0x200015f8        0x4 ./Core/Src/sound_measurement.o
+ .bss.filtered.3
+                0x200015fc        0x4 ./Core/Src/sound_measurement.o
+ .bss.spl_sum_count
+                0x20001600        0x4 ./Core/Src/sound_measurement.o
+ .bss.band_spl_frac1dp_sum
+                0x20001604       0x18 ./Core/Src/sound_measurement.o
+ .bss.band_spl_int_sum
+                0x2000161c       0x18 ./Core/Src/sound_measurement.o
+ .bss.spl_frac1dp_sum
+                0x20001634        0x4 ./Core/Src/sound_measurement.o
+ .bss.spl_int_sum
+                0x20001638        0x4 ./Core/Src/sound_measurement.o
+ .bss.hi2s2     0x2000163c        0x4 ./Core/Src/sound_measurement.o
+ .bss.htim6     0x20001640        0x4 ./Core/Src/sound_measurement.o
+ .bss.dataBuffer
+                0x20001644      0x200 ./Core/Src/sound_measurement.o
+ .bss.dmaBuffer
+                0x20001844      0x800 ./Core/Src/sound_measurement.o
+ .bss.bandSPL_frac_1dp
+                0x20002044       0x18 ./Core/Src/sound_measurement.o
+ .bss.bandSPL_int
+                0x2000205c       0x18 ./Core/Src/sound_measurement.o
+ .bss.SPL_frac_1dp
+                0x20002074        0x4 ./Core/Src/sound_measurement.o
+ .bss.SPL_int   0x20002078        0x4 ./Core/Src/sound_measurement.o
+ .bss.maximumAmplitude
+                0x2000207c        0x4 ./Core/Src/sound_measurement.o
+ .bss.amplitudeSettlingPeriods
+                0x20002080        0x4 ./Core/Src/sound_measurement.o
+ .bss.SPLcalcComplete
+                0x20002084        0x1 ./Core/Src/sound_measurement.o
+ .bss.DMAinterruptEnabled
+                0x20002085        0x1 ./Core/Src/sound_measurement.o
+ .bss.SPLcalcEnabled
+                0x20002086        0x1 ./Core/Src/sound_measurement.o
+ .bss.micEnabled
+                0x20002087        0x1 ./Core/Src/sound_measurement.o
+                0x20002087                micEnabled
+ .bss.DataReady
+                0x20002088        0x1 ./Core/Src/sound_measurement.o
+                0x20002088                DataReady
+ *fill*         0x20002089        0x1 
+ .bss.solmV.4   0x2000208a        0x2 ./Core/Src/statusCheck.o
+ .bss.batteryStatus
+                0x2000208c        0x1 ./Core/Src/statusCheck.o
+                0x2000208c                batteryStatus
+ .bss.batteryChargeMode
+                0x2000208d        0x1 ./Core/Src/statusCheck.o
+                0x2000208d                batteryChargeMode
+ *fill*         0x2000208e        0x2 
+ .bss.batteryCharge
+                0x20002090        0x4 ./Core/Src/statusCheck.o
+                0x20002090                batteryCharge
+ .bss.UserbuttonStamp
+                0x20002094        0x4 ./Core/Src/statusCheck.o
+                0x20002094                UserbuttonStamp
+ .bss.ConfigStamp
+                0x20002098        0x4 ./Core/Src/statusCheck.o
+                0x20002098                ConfigStamp
+ .bss.usedMicLEDcolor
+                0x2000209c        0x1 ./Core/Src/statusCheck.o
+ .bss.userbuttonHeld
+                0x2000209d        0x1 ./Core/Src/statusCheck.o
+ .bss.userToggle
+                0x2000209e        0x1 ./Core/Src/statusCheck.o
+                0x2000209e                userToggle
+ .bss.usbPluggedIn
+                0x2000209f        0x1 ./Core/Src/statusCheck.o
+                0x2000209f                usbPluggedIn
+ .bss.configSet
+                0x200020a0        0x1 ./Core/Src/statusCheck.o
+                0x200020a0                configSet
+ *fill*         0x200020a1        0x3 
+ .bss.__sbrk_heap_end
+                0x200020a4        0x4 ./Core/Src/sysmem.o
+ .bss.htim6     0x200020a8       0x40 ./Core/Src/tim.o
+                0x200020a8                htim6
+ .bss.htim3     0x200020e8       0x40 ./Core/Src/tim.o
+                0x200020e8                htim3
+ .bss.htim2     0x20002128       0x40 ./Core/Src/tim.o
+                0x20002128                htim2
+ .bss.hdma_usart4_tx
+                0x20002168       0x48 ./Core/Src/usart.o
+                0x20002168                hdma_usart4_tx
+ .bss.hdma_usart4_rx
+                0x200021b0       0x48 ./Core/Src/usart.o
+                0x200021b0                hdma_usart4_rx
+ .bss.huart4    0x200021f8       0xb8 ./Core/Src/usart.o
+                0x200021f8                huart4
+ .bss.huart1    0x200022b0       0xb8 ./Core/Src/usart.o
+                0x200022b0                huart1
+ .bss.hlpuart1  0x20002368       0xb8 ./Core/Src/usart.o
+                0x20002368                hlpuart1
+ .bss.HIDSState.0
+                0x20002420        0x1 ./Core/Src/wsenHIDS.o
+ *fill*         0x20002421        0x3 
+ .bss.HIDSTimeStamp
+                0x20002424        0x4 ./Core/Src/wsenHIDS.o
+ .bss.MeasurementDone
+                0x20002428        0x1 ./Core/Src/wsenHIDS.o
+ *fill*         0x20002429        0x3 
+ .bss.HIDS_LastHeaterInRTC
+                0x2000242c        0x4 ./Core/Src/wsenHIDS.o
+ .bss.MeasureBuffer
+                0x20002430        0x6 ./Core/Src/wsenHIDS.o
+ .bss.SerialBuffer
+                0x20002436        0x6 ./Core/Src/wsenHIDS.o
+ .bss.WriteFunction
                 0x2000243c        0x4 ./Core/Src/wsenHIDS.o
- .bss.temp      0x20002440        0x4 ./Core/Src/wsenHIDS.o
- .bss.humid     0x20002444        0x4 ./Core/Src/wsenHIDS.o
- .bss.uwTick    0x20002448        0x4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
-                0x20002448                uwTick
- .bss.pFlash    0x2000244c       0x18 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
-                0x2000244c                pFlash
- .bss.cfgidx.0  0x20002464        0x1 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
- *fill*         0x20002465        0x3 
+ .bss.ReadFunction
+                0x20002440        0x4 ./Core/Src/wsenHIDS.o
+ .bss.temp      0x20002444        0x4 ./Core/Src/wsenHIDS.o
+ .bss.humid     0x20002448        0x4 ./Core/Src/wsenHIDS.o
+ .bss.uwTick    0x2000244c        0x4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
+                0x2000244c                uwTick
+ .bss.pFlash    0x20002450       0x18 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
+                0x20002450                pFlash
+ .bss.cfgidx.0  0x20002468        0x1 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
+ *fill*         0x20002469        0x3 
  .bss.hUsbDeviceFS
-                0x20002468      0x2c4 ./USB_DEVICE/App/usb_device.o
-                0x20002468                hUsbDeviceFS
+                0x2000246c      0x2c4 ./USB_DEVICE/App/usb_device.o
+                0x2000246c                hUsbDeviceFS
  .bss.UserTxBufferFS
-                0x2000272c      0x400 ./USB_DEVICE/App/usbd_cdc_if.o
-                0x2000272c                UserTxBufferFS
+                0x20002730      0x400 ./USB_DEVICE/App/usbd_cdc_if.o
+                0x20002730                UserTxBufferFS
  .bss.UserRxBufferFS
-                0x20002b2c      0x400 ./USB_DEVICE/App/usbd_cdc_if.o
-                0x20002b2c                UserRxBufferFS
+                0x20002b30      0x400 ./USB_DEVICE/App/usbd_cdc_if.o
+                0x20002b30                UserRxBufferFS
  .bss.UsbRxDataSize
-                0x20002f2c        0x4 ./USB_DEVICE/App/usbd_cdc_if.o
-                0x20002f2c                UsbRxDataSize
- .bss.UsedUart  0x20002f30       0xb8 ./USB_DEVICE/App/usbd_cdc_if.o
-                0x20002f30                UsedUart
- .bss.ESPProg   0x20002fe8        0x1 ./USB_DEVICE/App/usbd_cdc_if.o
-                0x20002fe8                ESPProg
- *fill*         0x20002fe9        0x3 
+                0x20002f30        0x4 ./USB_DEVICE/App/usbd_cdc_if.o
+                0x20002f30                UsbRxDataSize
+ .bss.UsedUart  0x20002f34       0xb8 ./USB_DEVICE/App/usbd_cdc_if.o
+                0x20002f34                UsedUart
+ .bss.ESPProg   0x20002fec        0x1 ./USB_DEVICE/App/usbd_cdc_if.o
+                0x20002fec                ESPProg
+ *fill*         0x20002fed        0x3 
  .bss.USBD_StrDesc
-                0x20002fec      0x200 ./USB_DEVICE/App/usbd_desc.o
-                0x20002fec                USBD_StrDesc
- .bss.mem.0     0x200031ec      0x220 ./USB_DEVICE/Target/usbd_conf.o
+                0x20002ff0      0x200 ./USB_DEVICE/App/usbd_desc.o
+                0x20002ff0                USBD_StrDesc
+ .bss.mem.0     0x200031f0      0x220 ./USB_DEVICE/Target/usbd_conf.o
  .bss.hpcd_USB_FS
-                0x2000340c      0x2f4 ./USB_DEVICE/Target/usbd_conf.o
-                0x2000340c                hpcd_USB_FS
- .bss.__sf      0x20003700      0x138 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-findfp.o)
-                0x20003700                __sf
+                0x20003410      0x2f4 ./USB_DEVICE/Target/usbd_conf.o
+                0x20003410                hpcd_USB_FS
+ .bss.__sf      0x20003704      0x138 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-findfp.o)
+                0x20003704                __sf
  .bss.__stdio_exit_handler
-                0x20003838        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-findfp.o)
-                0x20003838                __stdio_exit_handler
- .bss.errno     0x2000383c        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-reent.o)
-                0x2000383c                errno
+                0x2000383c        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-findfp.o)
+                0x2000383c                __stdio_exit_handler
+ .bss.errno     0x20003840        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-reent.o)
+                0x20003840                errno
  .bss.__lock___malloc_recursive_mutex
-                0x20003840        0x1 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-lock.o)
-                0x20003840                __lock___malloc_recursive_mutex
+                0x20003844        0x1 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-lock.o)
+                0x20003844                __lock___malloc_recursive_mutex
  .bss.__lock___sfp_recursive_mutex
-                0x20003841        0x1 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-lock.o)
-                0x20003841                __lock___sfp_recursive_mutex
- *fill*         0x20003842        0x2 
+                0x20003845        0x1 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-lock.o)
+                0x20003845                __lock___sfp_recursive_mutex
+ *fill*         0x20003846        0x2 
  .bss.__malloc_sbrk_start
-                0x20003844        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-mallocr.o)
-                0x20003844                __malloc_sbrk_start
- .bss.__malloc_free_list
                 0x20003848        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-mallocr.o)
-                0x20003848                __malloc_free_list
+                0x20003848                __malloc_sbrk_start
+ .bss.__malloc_free_list
+                0x2000384c        0x4 C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(libc_a-mallocr.o)
+                0x2000384c                __malloc_free_list
  *(COMMON)
-                0x2000384c                        . = ALIGN (0x4)
-                0x2000384c                        _ebss = .
-                0x2000384c                        __bss_end__ = _ebss
+                0x20003850                        . = ALIGN (0x4)
+                0x20003850                        _ebss = .
+                0x20003850                        __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x2000384c      0x504 load address 0x0801fa00
+                0x20003850      0x500 load address 0x0801fa00
                 0x20003850                        . = ALIGN (0x8)
- *fill*         0x2000384c        0x4 
                 [!provide]                        PROVIDE (end = .)
                 0x20003850                        PROVIDE (_end = .)
                 0x20003950                        . = (. + _Min_Heap_Size)

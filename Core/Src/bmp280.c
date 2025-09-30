@@ -305,7 +305,7 @@ BMP280State BMP_Upkeep(void) {
     else {
       Error("BMP280 value out of valid range, not stored/used");
       bmperror = true;
-      BMP280TimeStamp = HAL_GetTick() + 10000;
+      BMP280TimeStamp = HAL_GetTick() + 5000;
     }
     BMPState = BMP_STATE_WAIT;
     break;

@@ -293,7 +293,7 @@ bool AllDevicesReady() {
     if ((ESPstate == ESP_STATE_RESET) || (ESPstate == ESP_STATE_INIT)) {
       bool status = !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
           Sensor.ENS_measurementEnabled | Sensor.PM_measurementEnabled | Sensor.MIC_measurementEnabled);
-      if (!status && (prevstatus != status) && (iminute != lastminute)) {
+      if (!status && ((prevstatus != status) || (iminute != lastminute))) {
         Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d, Lock is from sensor column : %d (0 is FREE)",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
           Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled, getSensorLock());
         prevstatus = status;
