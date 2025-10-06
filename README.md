@@ -5,6 +5,8 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.06](#version506)\
+[version 5.05](#version505)\
 [version 5.04](#version504)\
 [version 5.03](#version503)\
 [version 5.02](#version502)\
@@ -173,7 +175,10 @@ The STM32CubeProgrammer current consumption during startup in μA.
 The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
-## version 5.05 <a name="version504"></a>
+## version 5.06 <a name="version506"></a>
+Battery capacity differentation. LARGEBATTERY define is in main.h. When sen5x is disabled by low batterypower, no values for sen5x are uploaded to opensensemap.
+
+## version 5.05 <a name="version505"></a>
 Patch for detecting which sensor causes a hang. Suspect is BMP280 in error state.
 
 ## version 5.04 <a name="version504"></a>

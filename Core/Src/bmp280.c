@@ -125,16 +125,16 @@ static bool BMP280_get_measurement_values() {
   int8_t rslt = 1;
   uint8_t bmpData[6];
   HAL_Delay(9);
-  BMP280TimeStamp = HAL_GetTick() + 1500;
+  BMP280TimeStamp = HAL_GetTick() + 1500;  // time for local loop
   do {
-    HAL_Delay(10);
-    ReadMemRegister(BMP280_REG_STATUS, 1, &bmpData[0], 1);
+    ReadMemRegister(BMP280_REG_STATUS, 1, &bmpData[0], 1); // store at start address of array
     if(TimestampIsReached(BMP280TimeStamp)) {
       Error("BMP280 timeout while waiting for ready.");
       return false;
     }
     HAL_Delay(10);
-  } while (((bmpData[0] & BMP280_NVM_RDY) == BMP280_NVM_RDY) || ((bmpData[0] & BMP280_MEAS_RDY) == BMP280_MEAS_RDY));
+  } while ((bmpData[0] & (BMP280_NVM_RDY | BMP280_MEAS_RDY)) != 0);
+  //  } while (((bmpData[0] & BMP280_NVM_RDY) == BMP280_NVM_RDY) || ((bmpData[0] & BMP280_MEAS_RDY) == BMP280_MEAS_RDY));
   rslt = ReadMemRegister(BMP280_REG_PRESS_MSB, 1, &bmpData[0], 6);
   raw_mpa = (int32_t)((((uint32_t)bmpData[0]) << 12) + (((uint32_t)bmpData[1]) << 4) + (((uint32_t)bmpData[2]) >> 4));
   if (bmpData[0] == 0x80) {
@@ -148,7 +148,7 @@ static bool BMP280_get_measurement_values() {
     Debug("Data[3]: 0x%02X, Data[4]: 0x%02X, Data[5]: 0x%02X, VALUE=0x%06X", bmpData[3], bmpData[4], bmpData[5], raw_temp);
     SetAllBlueLED();
   }
-//  Debug("raw_mpa: %ld, raw_temp: %ld ", raw_mpa, raw_temp);
+//  Debug("raw_mpa: %ld, raw_temp: %ld, rslt: %s", raw_mpa, raw_temp, rslt?"success":"fail");
   return rslt;
 }
 

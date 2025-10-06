@@ -322,9 +322,9 @@ void EnabledConnectedDevices() {
   if ((SensorProbe.AHT20_Present) && (AHTState != AHT_STATE_OFF)) {
     Sensor.AHT_measurementEnabled = true;
   }
-  if ((SensorProbe.AHT20_Present) && (AHTState == AHT_STATE_OFF)) {
-    Info("AHT2x sensor is disabled");
-  }
+//  if ((SensorProbe.AHT20_Present) && (AHTState == AHT_STATE_OFF)) {
+//    Info("AHT2x sensor is disabled");
+//  }
   if (SensorProbe.BMP280_Present) {
     Sensor.BMP_measurementEnabled = true;
   }

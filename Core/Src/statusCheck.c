@@ -48,24 +48,40 @@ void InitDone(){
   5%------3.45V
   0%------3.00V
 
-  "De Omgevingsmonitor" will refuse to upload data to openSenseMap.org if the voltage under load drops below 3.77V with SEN5x attached.
+  "De Omgevingsmonitor" will refuse to upload data to openSenseMap.org if the battery voltage under load drops below 3.77V with SEN5x attached.
   Without a SEN5x attached the Omgevingsmonitor stops sending to OpenSenseMap at 3.75V
-
+  Above values with standard battery
  */
 
 void batteryChargeCheck(){
   batteryCharge = ReadBatteryVoltage();
   Debug("battery: %fV, solar %dmV", batteryCharge, ReadSolarVoltage());
-  if(batteryCharge < 3.75){
+#ifdef LARGEBATTERY
+  if (batteryCharge < 3.50) {
+#else
+  if (batteryCharge < 3.75) {
+#endif
     batteryStatus = BATTERY_CRITICAL;
   }
-  if(batteryCharge >= 3.75 && batteryCharge < 3.85){
+#ifdef LARGEBATTERY
+  if (batteryCharge >= 3.50 && batteryCharge < 3.80) {
+#else
+  if (batteryCharge >= 3.75 && batteryCharge < 3.85) {
+#endif
     batteryStatus = BATTERY_LOW;
   }
-  if(batteryCharge >= 3.85 && batteryCharge < 4.00){
+#ifdef LARGEBATTERY
+  if (batteryCharge >= 3.80 && batteryCharge < 3.98) {
+#else
+    if (batteryCharge >= 3.85 && batteryCharge < 4.00) {
+#endif
     batteryStatus = BATTERY_GOOD;
   }
-  if(batteryCharge >= 4.00){
+#ifdef LARGEBATTERY
+  if (batteryCharge >= 3.98) {
+#else
+  if (batteryCharge >= 4.00) {
+#endif
     batteryStatus = BATTERY_FULL;
   }
 }

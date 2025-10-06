@@ -221,7 +221,6 @@ int main(void)
 
   // General TODO 's
 	/*
-	 * : Put SSID in EEPROM
 	 * : Turn on heater if humidity is too high
 	 * : LEDs indicator for air quality
 	 * : Network not found? Sleep
@@ -238,7 +237,11 @@ int main(void)
     batteryChargeCheck();
 //    batteryCharge = ReadBatteryVoltage();
     Error("Battery voltage is: %.02fV", batteryCharge);
+#ifdef LARGEBATTERY
+    if(batteryCharge <= 3.58) {
+#else
     if(batteryCharge <= 3.68) {
+#endif
       SetAllREDLED();
       Error("Battery voltage is critical: %.02fV, going in deep sleep. Waking for LED indication %s seconds", batteryCharge, DEEP_SLEEP);
       WalkAllRedLED();

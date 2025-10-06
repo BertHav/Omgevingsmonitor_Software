@@ -681,7 +681,7 @@ index = strlen(message);
       }
     }
 
-    if (sen5x_Get_sen5x_enable_state()) {
+    if (sen5x_Get_sen5x_enable_state() && (batteryStatus > BATTERY_LOW)) {
       ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
       if (isKeyValid(keybuffer, "PM1", "particle")) {
         uint8ArrayToString(Buffer, keybuffer);

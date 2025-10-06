@@ -100,11 +100,23 @@ uint8_t GetVerboseLevel() {
 
 
 void BinaryReleaseInfo() {
+#ifndef LARGEBATTERY
   char msgout[42];
-#ifdef DEBUG
-  sprintf(msgout,"Software version: %s, Debug build", SRC_VERSION);
 #else
+  char msgout[56];
+#endif
+#ifdef DEBUG
+  #ifndef LARGEBATTERY
+  sprintf(msgout,"Software version: %s, Debug build", SRC_VERSION);
+  #else
+  sprintf(msgout,"Software version: %s Large Battery, Debug build", SRC_VERSION);
+  #endif
+#else
+  #ifndef LARGEBATTERY
   sprintf(msgout,"Software version: %s, Release build", SRC_VERSION);
+  #else
+  sprintf(msgout,"Software version: %s Large Battery, Release build", SRC_VERSION);
+  #endif
 #endif
   if (!usblog) {
     printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
