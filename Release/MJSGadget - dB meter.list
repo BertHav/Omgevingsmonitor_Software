@@ -23280,15 +23280,15 @@ Disassembly of section .text:
 
 0800cd68 <powerCheck>:
  800cd68:	b510      	push	{r4, lr}
- 800cd6a:	f7fa fc47 	bl	80075fc <Check_USB_PowerOn>
- 800cd6e:	2800      	cmp	r0, #0
- 800cd70:	d102      	bne.n	800cd78 <powerCheck+0x10>
- 800cd72:	f7ff fd31 	bl	800c7d8 <batteryChargeCheck>
- 800cd76:	bd10      	pop	{r4, pc}
- 800cd78:	2204      	movs	r2, #4
- 800cd7a:	4b01      	ldr	r3, [pc, #4]	@ (800cd80 <powerCheck+0x18>)
- 800cd7c:	701a      	strb	r2, [r3, #0]
- 800cd7e:	e7fa      	b.n	800cd76 <powerCheck+0xe>
+ 800cd6a:	f7ff fd35 	bl	800c7d8 <batteryChargeCheck>
+ 800cd6e:	f7fa fc45 	bl	80075fc <Check_USB_PowerOn>
+ 800cd72:	2800      	cmp	r0, #0
+ 800cd74:	d002      	beq.n	800cd7c <powerCheck+0x14>
+ 800cd76:	2204      	movs	r2, #4
+ 800cd78:	4b01      	ldr	r3, [pc, #4]	@ (800cd80 <powerCheck+0x18>)
+ 800cd7a:	701a      	strb	r2, [r3, #0]
+ 800cd7c:	bd10      	pop	{r4, pc}
+ 800cd7e:	46c0      	nop			@ (mov r8, r8)
  800cd80:	2000208c 	.word	0x2000208c
 
 0800cd84 <powerDisplay>:

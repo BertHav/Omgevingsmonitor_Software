@@ -290,10 +290,8 @@ void SetVOCindicator(uint16_t VOCi) {
 }
 
 void powerCheck(){
-  if(!Check_USB_PowerOn()){
-    batteryChargeCheck();
-  }
-  else{
+  batteryChargeCheck();
+  if(Check_USB_PowerOn()){
     batteryStatus = USB_PLUGGED_IN;
   }
 }
