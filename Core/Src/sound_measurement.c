@@ -167,8 +167,7 @@ bool soundInit(DMA_HandleTypeDef* h_hdma_spi2_rx,
     hi2s2 = h_hi2s2;
     htim6 = h_htim6;
     hdma_spi2_rx = h_hdma_spi2_rx;
-    DMA_Channel_IRQn = DMA_Channel_IRQn;
-
+//    DMA_Channel_IRQn = DMAChIRQn;
     return true;
 }
 

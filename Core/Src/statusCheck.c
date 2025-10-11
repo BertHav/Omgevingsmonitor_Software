@@ -21,7 +21,6 @@ bool usbPluggedIn = false;
 bool userToggle = false;
 static bool init = true;
 static bool userbuttonHeld = false;
-static uint8_t usedMicLEDcolor;
 uint32_t ConfigStamp;
 uint32_t UserbuttonStamp;
 uint32_t PowerStamp = 0;
@@ -55,7 +54,7 @@ void InitDone(){
 
 void batteryChargeCheck(){
   batteryCharge = ReadBatteryVoltage();
-  Debug("battery: %fV, solar %dmV", batteryCharge, ReadSolarVoltage());
+  Debug("battery: %.02fV, solar: %dmV", batteryCharge, ReadSolarVoltage());
 #ifdef LARGEBATTERY
   if (batteryCharge < 3.50) {
 #else
@@ -64,14 +63,14 @@ void batteryChargeCheck(){
     batteryStatus = BATTERY_CRITICAL;
   }
 #ifdef LARGEBATTERY
-  if (batteryCharge >= 3.50 && batteryCharge < 3.80) {
+  if (batteryCharge >= 3.50 && batteryCharge < 3.69) {
 #else
   if (batteryCharge >= 3.75 && batteryCharge < 3.85) {
 #endif
     batteryStatus = BATTERY_LOW;
   }
 #ifdef LARGEBATTERY
-  if (batteryCharge >= 3.80 && batteryCharge < 3.98) {
+  if (batteryCharge >= 3.69 && batteryCharge < 3.98) {
 #else
     if (batteryCharge >= 3.85 && batteryCharge < 4.00) {
 #endif
@@ -108,7 +107,7 @@ uint16_t Calculate_LED_ON() {
 }
 
 void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue){
-  if(usbPluggedIn || init || userToggle){
+  if(init || userToggle){
     TIM2 -> CCR1 = red;
     TIM2 -> CCR3 = green;
     TIM2 -> CCR4 = blue;
@@ -118,7 +117,7 @@ void SetStatusLED(uint16_t red, uint16_t green, uint16_t blue){
 // Sets dB LED to (RGB) color
 void SetDBLED(bool red, bool green, bool blue){
   // RED LED
-  if(usbPluggedIn || init || userToggle){
+  if(init || userToggle){
     HAL_GPIO_WritePin(MCU_LED_C_R_GPIO_Port, MCU_LED_C_R_Pin, !red);
     HAL_GPIO_WritePin(MCU_LED_C_G_GPIO_Port, MCU_LED_C_G_Pin, !green);
     HAL_GPIO_WritePin(MCU_LED_C_B_GPIO_Port, MCU_LED_C_B_Pin, !blue);
@@ -127,7 +126,7 @@ void SetDBLED(bool red, bool green, bool blue){
 
 // Sets VOC LED to (RGB) color
 void SetVocLED(uint16_t red, uint16_t green, uint16_t blue){
-  if(usbPluggedIn || init || userToggle){
+  if(init || userToggle){
     TIM3 -> CCR1 = red;
     TIM3 -> CCR2 = green;
     TIM3 -> CCR3 = blue;
@@ -135,56 +134,50 @@ void SetVocLED(uint16_t red, uint16_t green, uint16_t blue){
 }
 
 void SetMeasurementIndicator(){
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR3 = Calculate_LED_ON();
   }
 }
 void ResetMeasurementIndicator(){
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR3 = LED_OFF;
   }
 }
-void SetMICIndicator(){
-  if(usbPluggedIn||userToggle){
-    TIM2 -> CCR1 = Calculate_LED_ON();
+
+void SetChargeIndicator(){
+  if(usbPluggedIn){
+    if (batteryChargeMode == CHARGING_ON) {
+      TIM2 -> CCR1 = Calculate_LED_ON();  // red
+      TIM2 -> CCR3 = Calculate_LED_ON();  //green
+    }
+  }
+  // in case of not charging or full only one color is active.
+  if (batteryCharge > 3.7) {
+    TIM2 -> CCR3 = Calculate_LED_ON();  // green
   }
   else {
-    if (batteryCharge > 3.7) {
-      TIM2 -> CCR3 = Calculate_LED_ON();
-      usedMicLEDcolor = LED_GREEN;
-    }
-    else {
-      TIM2 -> CCR1 = Calculate_LED_ON();
-      usedMicLEDcolor = LED_RED;
-    }
+    TIM2 -> CCR1 = Calculate_LED_ON();  //red
   }
 }
-void ResetMICIndicator(){
-  if(usbPluggedIn||userToggle){
-    TIM2 -> CCR1 = LED_OFF;
-  }
-  else {
-    if (usedMicLEDcolor == LED_GREEN) {
+
+void ResetChargeIndicator(){
       TIM2 -> CCR3 = LED_OFF;
-    }
-    else {
       TIM2 -> CCR1 = LED_OFF;
-    }
-  }
 }
+
 void SetESPIndicator(){
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR4 = Calculate_LED_ON();
   }
 }
 void ResetESPIndicator(){
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR4 = LED_OFF;
   }
 }
 
 void SetPMIndicator() {
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR4 = Calculate_LED_ON();
     TIM2 -> CCR1 = Calculate_LED_ON();
     TIM2 -> CCR3 = Calculate_LED_ON();
@@ -192,7 +185,7 @@ void SetPMIndicator() {
 }
 
 void ResetPMIndicator() {
-  if(usbPluggedIn||userToggle){
+  if(userToggle){
     TIM2 -> CCR4 = LED_OFF;
     TIM2 -> CCR1 = LED_OFF;
     TIM2 -> CCR3 = LED_OFF;
@@ -268,8 +261,6 @@ void SetAllBlueLED() {
 }
 
 void SetVOCindicator(uint16_t VOCi) {
-//  *vocIndex = VOCi;
-//  if(*vocIndex > 0 && *vocIndex <= 100){
   static uint16_t Red;
   static uint16_t Blue;
   static uint16_t Green;

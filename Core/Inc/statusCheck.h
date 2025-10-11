@@ -17,8 +17,7 @@
 
 #define LED_OFF 4000
 #define LED_ON 3000
-#define LED_RED 1
-#define LED_GREEN 2
+
 typedef enum {
   BATTERY_CRITICAL,
   BATTERY_LOW,
@@ -51,8 +50,8 @@ void SetVOCindicator(uint16_t VOCi);
 void InitDone();
 void SetMeasurementIndicator();
 void ResetMeasurementIndicator();
-void SetMICIndicator();
-void ResetMICIndicator();
+void SetChargeIndicator();
+void ResetChargeIndicator();
 void SetESPIndicator();
 void ResetESPIndicator();
 void SetPMIndicator();

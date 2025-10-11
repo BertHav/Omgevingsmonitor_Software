@@ -99,7 +99,7 @@ bool MIC_MeasurementDone(void) {
   if(DataReady) {
     MIC_Print();
 //    Debug("MIC measurement is done with %i samples.", Samples);
-    ResetMICIndicator();
+    ResetChargeIndicator();
     return true;
   }
   return false;
@@ -111,7 +111,7 @@ bool MIC_TestMeasurementDone(void) {
   if(DataReady) {
     Check = micEnabled;
     Info("status micEnabled: %d",micEnabled );
-    ResetMICIndicator();
+    ResetChargeIndicator();
     return Check;
   }
   return false;
@@ -154,9 +154,9 @@ MicrophoneState Mic_Upkeep(){
       if (!enableMicrophone(false)) {
         errorHandler(__func__, __LINE__, __FILE__);
       }
-      MICTimeStamp = HAL_GetTick() + 755;  // about every second
+      MICTimeStamp = HAL_GetTick() + 430;  // about twice second
       MicState = MIC_STATE_WAIT;
-      ResetMICIndicator();
+      ResetChargeIndicator();
     }
     break;
 
@@ -166,7 +166,7 @@ MicrophoneState Mic_Upkeep(){
         errorHandler(__func__, __LINE__, __FILE__);
       }
       MicState = MIC_STATE_START_MEASUREMENT;
-      SetMICIndicator();
+      SetChargeIndicator();
     }
     break;
 
