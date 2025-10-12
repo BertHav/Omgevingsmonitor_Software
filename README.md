@@ -178,7 +178,7 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 ## version 5.08 <a name="version508"></a>
-Change of LED behaviour. On USB (charging)power the LEDS are now standard off except for the status LED. The status LED shows the status of the charging process. Flashing orange means charging, if battery is full then the LED flashes green. To force the LED's the to show all status as in prior versions, press the userbuttton.
+Change of LED behaviour. On USB (charging)power the LEDS are now standard off except for the status LED. The status LED shows the status of the charging process. Flashing yellow means charging, if battery is full then the LED flashes green. To force the LED's the to show all status as in prior versions, press the userbuttton.
 
 ## version 5.07 <a name="version507"></a>
 Bugfix for not reading the battery charge during USB charge proces

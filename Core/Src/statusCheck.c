@@ -148,7 +148,7 @@ void SetChargeIndicator(){
   if(usbPluggedIn){
     if (batteryChargeMode == CHARGING_ON) {
       TIM2 -> CCR1 = Calculate_LED_ON();  // red
-      TIM2 -> CCR3 = Calculate_LED_ON();  //green
+      TIM2 -> CCR3 = Calculate_LED_ON();  //green, create yellow statusled
     }
   }
   // in case of not charging or full only one color is active.
