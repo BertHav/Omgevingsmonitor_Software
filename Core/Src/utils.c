@@ -118,6 +118,9 @@ void BinaryReleaseInfo() {
   sprintf(msgout,"Software version: %s Large Battery, Release build", SRC_VERSION);
   #endif
 #endif
+#ifdef IGNORE_PARITY_ERRORS
+  sprintf(msgout,"Build ignores parity errors from ESP32");
+#endif
   if (!usblog) {
     printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
   }

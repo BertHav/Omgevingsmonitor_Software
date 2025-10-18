@@ -103,6 +103,8 @@ void MX_USART4_UART_Init(void)
   /* USER CODE END USART4_Init 0 */
 
   /* USER CODE BEGIN USART4_Init 1 */
+  CLEAR_BIT(huart4.Instance->CR1, USART_CR1_PCE);
+  CLEAR_BIT(huart4.Instance->CR1, USART_CR1_PEIE);
 
   /* USER CODE END USART4_Init 1 */
   huart4.Instance = USART4;
@@ -115,6 +117,8 @@ void MX_USART4_UART_Init(void)
   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
   huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  CLEAR_BIT(huart4.Instance->CR1, USART_CR1_PCE);
+  CLEAR_BIT(huart4.Instance->CR1, USART_CR1_PEIE);
   if (HAL_UART_Init(&huart4) != HAL_OK)
   {
     Error_Handler();

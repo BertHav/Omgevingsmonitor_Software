@@ -224,8 +224,8 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
   Info("SensorProbe.ENS160_Present: %s", SensorProbe.ENS160_Present?"yes":"no");
   Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
   Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
-  ESP_Init(espUart);
   Debug("Sensors initialized, probing ESP.");
+  ESP_Init(espUart);
 }
 
 void Device_Test(){

@@ -49,7 +49,7 @@
 #define hPaConfigAddr SEN55HumidConfigAddr + IdSize
 #define USBlogstatusConfigAddr hPaConfigAddr + IdSize  // uint8_tSize has size of uint8_tSize
 #define UptimeConfigAddr USBlogstatusConfigAddr + IdSize
-#define ConfigSize USBlogstatusConfigAddr + uint8_tSize - EEPromStartAddr
+#define ConfigSize UptimeConfigAddr + uint8_tSize - EEPromStartAddr
 
 #define SSIDStartAddr 0x08080200
 #define SSIDConfigAddr SSIDStartAddr

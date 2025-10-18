@@ -262,7 +262,7 @@ int main(void)
   deviceTimeOut = HAL_GetTick() + DEVICE_INIT_TIMEOUT;
   priorUSBpluggedIn = !Check_USB_PowerOn(); // force the status of the SGP40
   if (Check_USB_PowerOn()) {
-    printf_USB("input command followed by Enter or type Helpme\r\n");
+    printf_USB("Input command followed by Enter or type Helpme\r\n");
   }
 #ifdef STLINK_V3PWR
   sen5x_Power_Off(); // to prevent the sen5x and the ESP is during init of the ESP

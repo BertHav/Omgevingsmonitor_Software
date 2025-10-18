@@ -166,6 +166,7 @@ __Reset the Omgevingsmonitor twice to reach optimal energy saving mode!__
 It is possible to interact with the omgevingsmonitor using Putty or TeraTerm. The omgevingsmonitor must be awake for generating a comport on the host PC.
 
 While the virtual USB comport is active, type Helpme for more information.
+If logging is enabled to the USB port, disable logging by a capital L <Enter>
 
 All keys kan be changed as well as the name of De omgevingsmonitor and several other settings.
 

@@ -160,13 +160,15 @@ void ProcessCmd(Receive_MSG msg)
           WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case URLToUploadConfigCmd: // 30
-          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+          printf_USB("command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
           WriteUint8ArrayEepromSafe(URLToUploadConfigAddr, msg.Payload, msg.PayloadLength, URLToUploadMaxLength);
         break;
 
         case ClearConfigCmd: // 253
-            ClearEEprom(EEPromStartAddr, ConfigSize);
-            ClearEEprom(SSIDStartAddr, IPrelatedConfigSize);
+          printf_USB("command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+          printf_USB("CLEAR CONFIGURATION MEMORY!");
+          ClearEEprom(EEPromStartAddr, ConfigSize);
+          ClearEEprom(SSIDStartAddr, IPrelatedConfigSize);
         break;
         case ClearEepromCmd: //254
         {
@@ -490,6 +492,8 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB("B - show build information\r\n");
   HAL_Delay(10);
+  printf_USB("E31, - Erase configuration memory\r\n");
+  HAL_Delay(10);
   if (!usb_out) {
     printf("A sensor key can only be changed by USB input or the by configuration programm.\r\n");
   }
@@ -522,10 +526,12 @@ bool Process_USB_input(uint8_t* data) {
   uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
   if ((length == 1) && (message != NULL) && (len != 28)){
       len = 28;
+      printf_USB("len = %", len);
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_S);  // zoek op S
   if ((length == 1) && (message != NULL) && (len != pwdMaxLength)){
       len = pwdMaxLength;
+      printf_USB("len = %", len);
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_L);  // Search for 'L'to toggle USB logging
   if ((length == 1) && (message != NULL)){
@@ -569,7 +575,7 @@ bool Process_USB_input(uint8_t* data) {
       if (data[3] == ',') {
         if ((data[0] == 'S') || (data[0] == 'E')) {
           if ((data[0] == 'E') && (received.Command == clearDefsCmd)) {
-//            printf_USB("\r\nClear EEPROM request\r\n");
+            printf_USB("\r\nClear EEPROM request\r\n");
             received.Command = ClearConfigCmd;
           }
         }
@@ -578,12 +584,12 @@ bool Process_USB_input(uint8_t* data) {
             HAL_Delay(10);
             if (isxdigit(data[i])) {
               result = (result << 4) | (isdigit(data[i]) ? data[i] - '0' : toupper(data[i]) - 'A' + 10);
-//              printf_USB("Result is 0x%02X\r\n", result);
+              printf_USB("Result is 0x%02X\r\n", result);
               HAL_Delay(10);
               if (len == 28) {
                 if ((i % 2) == 1) {
                   data[r] = result;
-//                  printf_USB("data[%d] = 0x%02X",r, data[r]);
+                  printf_USB("data[%d] = 0x%02X",r, data[r]);
                   r++;
                 }
               }
@@ -602,6 +608,7 @@ bool Process_USB_input(uint8_t* data) {
         }
         if (len < pwdMaxLength) {
           if (len == 6) {
+            printf_USB("len = %, overwriting last byte", len);
             ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
             boxConfig[11] = result; //overwrite the last byte of the key
             memcpy(received.Payload, boxConfig, IdSize);

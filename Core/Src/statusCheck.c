@@ -289,7 +289,7 @@ void powerCheck(){
 
 void powerDisplay(){
   if(batteryStatus == USB_PLUGGED_IN){
-    Debug("USB power detected, battery: %fV", ReadBatteryVoltage());
+    Debug("USB power detected, battery: %.03fV", ReadBatteryVoltage());
   }
   if(batteryStatus == BATTERY_FULL){
     Debug("Battery fully charged");

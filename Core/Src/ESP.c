@@ -325,7 +325,9 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
 }
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
   RxComplete = false;
+#ifndef IGNORE_PARITY_ERRORS
   bool reset = false;
+#endif
   HAL_StatusTypeDef status = HAL_UART_Receive_DMA(EspUart, reply, length);
   if (status != HAL_OK) {
     Error("Error in HAL_UART_Receive_DMA. errorcode: %d", EspUart->ErrorCode);
@@ -333,11 +335,15 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
     char uartespmod[] =" error in UART to ESP module";
     if (status & HAL_UART_ERROR_PE) {
       Error("Parity%s", uartespmod);
+#ifndef IGNORE_PARITY_ERRORS
       reset = true;
+#endif
     }
     if (status & HAL_UART_ERROR_NE) {
       Error("Noise%s", uartespmod);
+#ifndef IGNORE_PARITY_ERRORS
       reset = true;
+#endif
     }
     if (status & HAL_UART_ERROR_FE) {
       Error("Frame%s", uartespmod);
@@ -356,6 +362,7 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
       Error("Invalid Callback%s", uartespmod);
     }
 #endif
+#ifndef IGNORE_PARITY_ERRORS
     if (reset) {
       //switch off the ESP and reset the system
       HAL_GPIO_WritePin(ESP32_EN_GPIO_Port, ESP32_EN_Pin, GPIO_PIN_RESET);
@@ -373,6 +380,7 @@ static bool ESP_Receive(uint8_t* reply, uint16_t length) {
     }
     RxComplete = true;
     return false;
+#endif
 #endif
   }
   return true;
@@ -395,7 +403,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     if (huart->ErrorCode == 4) {
       return;
     }
-    Debug("A callback error has occurred, errorcode %0X", huart->ErrorCode);
+    Error("A callback error has occurred, errorcode: 0x%X", huart->ErrorCode);
     switch (huart->ErrorCode) {
       case HAL_UART_TX_HALFCOMPLETE_CB_ID:
         Error("%sTx Half%s%s", espconnuart, comcalb, cid);
@@ -433,14 +441,19 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
       default:
         Error("%sUnknown error");
     }
+    HAL_UART_Abort(huart);
   }
 }
 
 bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
-  if ((data[0] > 66) && (data[0] != 0xFF))
+  if ((data[0] > 66) && (data[0] != 0xFF)) {
     return true;
+  }
   else {
-    Error("Error sensor %s has no stored key for %s: ", sensormodel, sensortype);
+    uint8ArrayToString(message, data);
+    data[12] = '\0';
+    Error("Error key for %s has no stored key for %s: %s\r\n", sensormodel, sensortype, message);
+ /*
     for (int i = 0; i < 12; i++) {
       if (usblog && Check_USB_PowerOn()) {
         printf_USB("%02x", data[i]);
@@ -451,6 +464,7 @@ bool isKeyValid(uint8_t data[], char *sensormodel, char *sensortype) {
       printf_USB("\r\n");
     }
     printf("\r\n");
+*/
     return false;
   }
 }
@@ -611,19 +625,22 @@ index = strlen(message);
   }
 
   ReadUint8ArrayEEprom(dBAConfigAddr, keybuffer, IdSize);
-  uint8ArrayToString(Buffer, keybuffer);
+  if (isKeyValid(keybuffer, "MIC", "dBA")) {
+    uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-  sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.dBApeak);
+    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.dBApeak);
 #else
-  sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
+    sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
 #endif
-  index += strlen(message);
-  if (send) {
-    status = ESP_Send((uint8_t*)message, strlen(message));
-    retstat &= status;
+    index += strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
   }
 
-    ReadUint8ArrayEEprom(SolVoltConfigAddr, keybuffer, IdSize);
+  ReadUint8ArrayEEprom(SolVoltConfigAddr, keybuffer, IdSize);
+  if (isKeyValid(keybuffer, "Solar", "Volt")) {
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
     sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, solarCharge);
@@ -635,9 +652,11 @@ index = strlen(message);
       status = ESP_Send((uint8_t*)message, strlen(message));
       retstat &= status;
     }
+  }
 
-    if ((product_name[4] == '5') && Check_USB_PowerOn()) {  // the NOx has only sense in case of continuous operation
-      ReadUint8ArrayEEprom(NOxIndexConfigAddr, keybuffer, IdSize);
+  if ((product_name[4] == '5') && Check_USB_PowerOn()) {  // the NOx has only sense in case of continuous operation
+    ReadUint8ArrayEEprom(NOxIndexConfigAddr, keybuffer, IdSize);
+    if (isKeyValid(keybuffer, "NOx", "NOxr")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.airNOxmax);
@@ -650,10 +669,12 @@ index = strlen(message);
         retstat &= status;
       }
     }
+  }
 
-    ReadUint8ArrayEEprom(SEN55TempConfigAddr, keybuffer, IdSize);
-    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "temperature")) {
-      uint8ArrayToString(Buffer, keybuffer);
+  ReadUint8ArrayEEprom(SEN55TempConfigAddr, keybuffer, IdSize);
+  if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "temperature")) {
+    uint8ArrayToString(Buffer, keybuffer);
+    if (isKeyValid(keybuffer, "Sen5x", "temp")) {
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_temperature);
 #else
@@ -665,10 +686,12 @@ index = strlen(message);
         retstat &= status;
       }
     }
+  }
 
-    ReadUint8ArrayEEprom(SEN55HumidConfigAddr, keybuffer, IdSize);
-    if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "humidity")) {
-      uint8ArrayToString(Buffer, keybuffer);
+  ReadUint8ArrayEEprom(SEN55HumidConfigAddr, keybuffer, IdSize);
+  if (((product_name[4] == '4') || (product_name[4] == '5')) && isKeyValid(keybuffer, "SEN54/5", "humidity")) {
+    uint8ArrayToString(Buffer, keybuffer);
+    if (isKeyValid(keybuffer, "Sen5x", "hum")) {
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_humidity);
 #else
@@ -680,23 +703,25 @@ index = strlen(message);
         retstat &= status;
       }
     }
+  }
 
-    if (sen5x_Get_sen5x_enable_state() && (batteryStatus > BATTERY_LOW)) {
-      ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer, "PM1", "particle")) {
-        uint8ArrayToString(Buffer, keybuffer);
+  if (sen5x_Get_sen5x_enable_state() && (batteryStatus > BATTERY_LOW)) {
+    ReadUint8ArrayEEprom(PM1ConfigAddr, keybuffer, IdSize);
+    if (isKeyValid(keybuffer, "PM1", "particle")) {
+      uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-        sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
 #else
-        sprintf(&message[0], ",{\"name\":\"PM1\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM1p0max);
+      sprintf(&message[0], ",{\"name\":\"PM1\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM1p0max);
 #endif
-        index += strlen(message);
-        if (send) {
-          status = ESP_Send((uint8_t*)message, strlen(message));
-          retstat &= status;
-        }
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
       }
-      ReadUint8ArrayEEprom(PM2ConfigAddr, keybuffer, IdSize);
+    }
+    ReadUint8ArrayEEprom(PM2ConfigAddr, keybuffer, IdSize);
+    if (isKeyValid(keybuffer, "PM2p5", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM2p5max);
@@ -708,23 +733,24 @@ index = strlen(message);
         status = ESP_Send((uint8_t*)message, strlen(message));
         retstat &= status;
       }
-
-      ReadUint8ArrayEEprom(PM4ConfigAddr, keybuffer, IdSize);
-      if (isKeyValid(keybuffer, "PM4", "particle")) {
-        uint8ArrayToString(Buffer, keybuffer);
+    }
+    ReadUint8ArrayEEprom(PM4ConfigAddr, keybuffer, IdSize);
+    if (isKeyValid(keybuffer, "PM4", "particle")) {
+      uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-        sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
+      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
 #else
-        sprintf(&message[0], ",{\"name\":\"PM4\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM4p0max);
+      sprintf(&message[0], ",{\"name\":\"PM4\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM4p0max);
 #endif
-        index += strlen(message);
-        if (send) {
-          status = ESP_Send((uint8_t*)message, strlen(message));
-          retstat &= status;
-        }
+      index += strlen(message);
+      if (send) {
+        status = ESP_Send((uint8_t*)message, strlen(message));
+        retstat &= status;
       }
+    }
 
-      ReadUint8ArrayEEprom(PM10ConfigAddr, keybuffer, IdSize);
+    ReadUint8ArrayEEprom(PM10ConfigAddr, keybuffer, IdSize);
+    if (isKeyValid(keybuffer, "PM10", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
       sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM10p0max);
@@ -737,6 +763,7 @@ index = strlen(message);
         retstat &= status;
       }
     }
+  }
 
   if (IsAHT20SensorPresent()) {
     ReadUint8ArrayEEprom(AHTTempConfigAddr, keybuffer, IdSize);
@@ -1431,6 +1458,20 @@ bool AT_Send(AT_Commands state){
   return(ATCommandSend);
 }
 
+bool is_OM_configured(void) {
+//bert
+  uint8_t boxConfig[IdSize];
+  char Buffer[1+(2*IdSize)];
+  ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
+  uint8ArrayToString(Buffer, boxConfig);
+  Buffer[12] = '\0';
+  if (!isKeyValid(boxConfig, "box", "upload")) {
+    ESPTimeStamp = HAL_GetTick() + ESP_UNTIL_NEXT_SEND;
+    return false;
+  }
+  return true;
+}
+
 void ESP_WakeTest(void) {
   bool ATSend = false;
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
@@ -1825,7 +1866,7 @@ ESP_States ESP_Upkeep(void) {
     case ESP_STATE_RESET:
       if(TimestampIsReached(ESPTimeStamp) || ReconfigSet){
         ESPTransmitDone = false;
-        if(Mode == AT_MODE_INIT){
+        if((Mode == AT_MODE_INIT) && is_OM_configured()){
           InitIsDone = true;
           EspState = ESP_STATE_MODE_SELECT;
         }
@@ -1833,11 +1874,11 @@ ESP_States ESP_Upkeep(void) {
           ConnectionMade = true;
           EspState = ESP_STATE_MODE_SELECT;
         }
-        if(Mode == AT_MODE_SEND){
+        if((Mode == AT_MODE_SEND) && is_OM_configured()) {
           EspState = ESP_STATE_INIT;
         }
 #ifdef USE_MAIL
-        if(Mode == AT_MODE_MAIL){
+        if((Mode == AT_MODE_MAIL) && is_OM_configured()){
           EspState = ESP_STATE_CONFIG;
         }
 #endif
