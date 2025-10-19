@@ -4,7 +4,9 @@ uint32_t WriteUint8ArrayEeprom(uint32_t startAddr, uint8_t data[], uint16_t size
 {
     static uint32_t addr;
     addr = startAddr;
+    __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_WRPERR);
     HAL_FLASHEx_DATAEEPROM_Unlock();
+    HAL_Delay(3);
     for (uint16_t i = 0; i < size; i++)
     {
         HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE, addr, data[i]);
