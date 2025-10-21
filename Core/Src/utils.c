@@ -105,6 +105,12 @@ void BinaryReleaseInfo() {
 #else
   char msgout[56];
 #endif
+#ifdef IGNORE_PARITY_ERRORS
+  sprintf(msgout,"Build ignores parity errors from ESP32");
+  if (!usblog) {
+    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
+  }
+#endif
 #ifdef DEBUG
   #ifndef LARGEBATTERY
   sprintf(msgout,"Software version: %s, Debug build", SRC_VERSION);
@@ -118,16 +124,13 @@ void BinaryReleaseInfo() {
   sprintf(msgout,"Software version: %s Large Battery, Release build", SRC_VERSION);
   #endif
 #endif
-#ifdef IGNORE_PARITY_ERRORS
-  sprintf(msgout,"Build ignores parity errors from ESP32");
-#endif
   if (!usblog) {
     printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
   }
   Info(msgout);
   sprintf(msgout,"Build on: %s at %s", __DATE__, __TIME__);
   if (!usblog) {
-    printf_USB("%s\r\n", msgout);  // alway forced shown even if usb logging is off
+    printf_USB("%s\r\n", msgout);  // always forced shown even if usb logging is off
   }
   Info(msgout);
   // Format: YY'w'WWv

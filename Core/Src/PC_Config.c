@@ -87,10 +87,10 @@ void ProcessCmd(Receive_MSG msg)
             WriteUint8ArrayEepromSafe(PM2ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case PM10ConfigCmd:  // 8
-            char Buffer[1+(2*IdSize)];
-            uint8ArrayToString(Buffer, msg.Payload);
-            Buffer[24] = '\0';
-            printf_USB("command: %d, payload: %s, length: %d\r\n",msg.Command, Buffer, msg.PayloadLength);
+//            char Buffer[1+(2*IdSize)];
+//            uint8ArrayToString(Buffer, msg.Payload);
+//            Buffer[24] = '\0';
+//            printf_USB("command: %d, payload: %s, length: %d\r\n",msg.Command, Buffer, msg.PayloadLength);
             WriteUint8ArrayEepromSafe(PM10ConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case BatVoltConfigCmd:  // 9
@@ -111,7 +111,7 @@ void ProcessCmd(Receive_MSG msg)
         break;
         case PasswordConfigCmd: // 14 was 22
           ClearEEprom(pwdConfigAddr, pwdMaxLength);
-          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+ //         printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
           WriteUint8ArrayEepromSafe(pwdConfigAddr, msg.Payload, msg.PayloadLength, pwdMaxLength);
         break;
         case PM1ConfigCmd:  // 21 was 13
@@ -150,7 +150,7 @@ void ProcessCmd(Receive_MSG msg)
         break;
         case SendToNameConfigCmd:  // 26
           ClearEEprom(SendToNameConfigAddr, SendToNameMaxLength);
-          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+//          printf_USB("(command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
           WriteUint8ArrayEepromSafe(SendToNameConfigAddr, msg.Payload, msg.PayloadLength, SendToNameMaxLength);
         break;
         case MailAPIKeyConfigCmd:  // 27
@@ -164,7 +164,7 @@ void ProcessCmd(Receive_MSG msg)
           WriteUint8ArrayEepromSafe(UptimeConfigAddr, msg.Payload, msg.PayloadLength, IdSize);
         break;
         case URLToUploadConfigCmd: // 30
-          printf_USB("command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
+//          printf_USB("command: %d, payload to write: %s, length: %d\r\n",msg.Command, msg.Payload, msg.PayloadLength);
           WriteUint8ArrayEepromSafe(URLToUploadConfigAddr, msg.Payload, msg.PayloadLength, URLToUploadMaxLength);
         break;
 
@@ -530,12 +530,12 @@ bool Process_USB_input(uint8_t* data) {
   uint8_t* message = (unsigned char*)strstr((const char*)data, PREAMBLE_F);  // zoek op $
   if ((length == 1) && (message != NULL) && (len != 28)){
       len = 28;
-      printf_USB("len = %d\r\n", len);
+//      printf_USB("len = %d\r\n", len);
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_S);  // zoek op S
   if ((length == 1) && (message != NULL) && (len != pwdMaxLength)){
       len = pwdMaxLength;
-      printf_USB("len = %d\r\n", len);
+//      printf_USB("len = %d\r\n", len);
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_L);  // Search for 'L'to toggle USB logging
   if ((length == 1) && (message != NULL)){
@@ -561,12 +561,13 @@ bool Process_USB_input(uint8_t* data) {
   if ((length >= len) || (data[length-1] == 13)) {
     // 'S' is for entering a ASCII string
     if (data[length-1] == 13) {
-      printf_USB("Inputstring detected, string terminated\r\n");
+//      printf_USB("Inputstring detected, string terminated\r\n");
       data[length-1] = 0;
     }
     if((data[0] == '#') || (data[0] == '$') || (data[0] == 'S') || (data[0] == 'E')) {
       received.Command = ascii_to_uint8(&data[1]);  // calculate the command number
-      printf_USB("\r\nCommand nr determined: %d \r\n", received.Command);
+      printf_USB("\r\n");
+//      printf_USB("\r\nCommand nr determined: %02d \r\n", received.Command);
       if (received.Command == 100) {
         printf_USB("\r\nCommandvalue out of range.\r\n");
         ResetUsbRxDataSize();
@@ -579,7 +580,7 @@ bool Process_USB_input(uint8_t* data) {
       if (data[3] == ',') {
         if ((data[0] == 'S') || (data[0] == 'E')) {
           if ((data[0] == 'E') && (received.Command == clearDefsCmd)) {
-            printf_USB("\r\nClear EEPROM request\r\n");
+//            printf_USB("\r\nClear EEPROM request\r\n");
             received.Command = ClearConfigCmd;
           }
         }
@@ -588,12 +589,11 @@ bool Process_USB_input(uint8_t* data) {
             HAL_Delay(10);
             if (isxdigit(data[i])) {
               result = (result << 4) | (isdigit(data[i]) ? data[i] - '0' : toupper(data[i]) - 'A' + 10);
-//              printf_USB("Result is 0x%02X\r\n", result);
               HAL_Delay(10);
               if (len == 28) {
                 if ((i % 2) == 1) {
                   data[r] = result;
-                  printf_USB("data[%d] = 0x%02X\r\n",r, data[r]);
+//                  printf_USB("data[%d] = 0x%02X\r\n",r, data[r]);
                   r++;
                 }
               }
@@ -612,7 +612,7 @@ bool Process_USB_input(uint8_t* data) {
         }
         if (len < pwdMaxLength) {
           if (len == 6) {
-            printf_USB("len = %, overwriting last byte\r\n", len);
+//            printf_USB("len = %, overwriting last byte\r\n", len);
             ReadUint8ArrayEEprom(BoxConfigAddr, boxConfig, IdSize);
             boxConfig[11] = result; //overwrite the last byte of the key
             memcpy(received.Payload, boxConfig, IdSize);
@@ -632,7 +632,7 @@ bool Process_USB_input(uint8_t* data) {
         else if (len == pwdMaxLength) {
           memcpy(received.Payload, &data[4], received.PayloadLength);
         }
-        printf_USB("payload length: %d\r\n", received.PayloadLength);
+//        printf_USB("payload length: %d\r\n", received.PayloadLength);
         ProcessCmd(received);
         ResetUsbRxDataSize();
         PC_show_Keys();
@@ -663,4 +663,3 @@ bool Process_USB_input(uint8_t* data) {
   GetUsbRxNextChunk(length);
   return false;
 }
-
