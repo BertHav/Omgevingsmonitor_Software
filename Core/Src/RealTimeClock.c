@@ -24,7 +24,6 @@ typedef struct {
 
 
 bool firstTimeUpdate = true;
-bool dstchkd = false;
 uint8_t lastminute = 0;
 uint8_t lasthour;
 uint8_t weekday;
@@ -38,7 +37,6 @@ RTC_TimeTypeDef currentTime;
 RTC_DateTypeDef currentDate;
 
 
-//char systemUptime[16] = {0};
 char strbuf[24] = {0}; //fi length -> 22-jan-24 23h:12m:23s
 
 uint32_t makeTime(RTC_DateTypeDef* currentDate, RTC_TimeTypeDef* currentTime);
@@ -51,8 +49,6 @@ void getUptime(char* uptbuffer) {
 #endif
 
 uint8_t getDate() {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   return currentDate.Date;
 }
@@ -63,12 +59,47 @@ void showUpTime() {
         currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes);  // alway forced shown even if usb logging is off
 }
 
+
+void set_DST() {
+  bool dst = false;
+  dst = !((currentDate.Month < 3) || (currentDate.Month > 10)); // between october and march
+  if (dst)
+  {
+    if ((currentDate.Month == 3) && (currentDate.WeekDay == 7) && (currentDate.Date < 25)) {
+      // starts last sunday of march
+      // weekday -> sunday returns 7
+        dst = false;
+    }
+    else if ((currentDate.Month == 10) && (currentDate.WeekDay == 7) && (currentDate.Date >= 25)) {
+        dst = false;
+    }
+  }
+//  Debug("Daylight Saving statusbit %d.", HAL_RTC_DST_ReadStoreOperation(RealTime_Handle));
+  if (dst) {
+    Info("Daylight Saving Time active");
+    if (HAL_RTC_DST_ReadStoreOperation(RealTime_Handle) == 0) {
+      HAL_Delay(1000);
+      HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
+      HAL_RTC_DST_SetStoreOperation(RealTime_Handle);  // mark summertime
+      HAL_Delay(1000);
+    }
+  }
+  else {
+    if (HAL_RTC_DST_ReadStoreOperation(RealTime_Handle) != 0) {
+      HAL_Delay(1000);
+      HAL_RTC_DST_ClearStoreOperation(RealTime_Handle);  // clear summertime
+      HAL_RTC_DST_Sub1Hour(RealTime_Handle);
+      HAL_Delay(1000);
+    }
+  }
+  RTC_GetTime(&currentTime, &currentDate);
+  Debug("Current RTC time after update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
+}
+
 void showTime() {
   if (posixBootTime == 0) {
     return;
   }
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   lasthour = currentTime.Hours;
   weekday = currentDate.WeekDay;
@@ -79,24 +110,20 @@ void showTime() {
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
   }
-  if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && !dstchkd && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
-    dstchkd = true;
-    setESPTimeStamp(0); // check for summer/wintertime
+  if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
+//    setESPTimeStamp(0); // check for summer/wintertime
+    set_DST();
   }
 }
 
 
 uint32_t calculateNextNTPTime(void) {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   return makeTime(&currentDate, &currentTime);
 }
 
 
 void UpdateSystemUptime() {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   uint32_t uxUptime;
   uint32_t time;
   RTC_GetTime(&currentTime, &currentDate);
@@ -147,8 +174,6 @@ uint8_t aBuff2int(char* aBuff, uint8_t start, uint8_t stop) {
 }
 
 void ParseTime(char* buffer) {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   currentTime.Hours = aBuff2int(buffer, 24, 25);
   currentTime.Minutes = aBuff2int(buffer, 27, 28);
@@ -161,37 +186,9 @@ void ParseTime(char* buffer) {
   Debug("Current RTC date before update is: %02d-%02d-%02d", currentDate.Date , currentDate.Month, currentDate.Year  );
   RTC_SetTime(&currentTime);
   RTC_SetDate(&currentDate);
-/* DST insert === */
-  // DST == DaySavingTime == Zomertijd
-  bool dst = false;
-
-  int mnd = currentDate.Month;
-  dst = !((mnd < 3) || (mnd > 10)); // between october and march
-  if (dst)
-  {
-    if ((mnd == 3) && (currentDate.WeekDay == 7) && (currentDate.Date < 25)) {
-      // starts last sunday of march
-      // weekday -> sunday returns 7
-        dst = false;
-    }
-    else if ((mnd == 10) && (currentDate.WeekDay == 7) && (currentDate.Date < 25))
-    {
-        dst = false;
-    }
-  }
-  if (dst) {
-    Info("Daylight Saving Time active");
-    HAL_Delay(1000);
-    HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
-    HAL_Delay(1000);
-    RTC_GetTime(&currentTime, &currentDate);
-    Debug("Current RTC time after update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
-  }
-
-//=================
+  set_DST();
   if (currentDate.WeekDay == 2) {
     reset_fanCleaningDone(); // reset the cleaning flag done
-    dstchkd = false; // reset the dst flag done
   }
   if (posixBootTime == 0) {
     posixBootTime = makeTime(&currentDate, &currentTime);
@@ -227,11 +224,8 @@ void RTC_SetDate(RTC_DateTypeDef* sDate) {
 void RTC_GetTime(RTC_TimeTypeDef* gTime, RTC_DateTypeDef* gDate) {
 uint8_t t = 1;
 uint8_t prevValue = 0;
-// Battery_Status status;
-//  status = powerCheck();
-//  if ( status == BATTERY_CRITICAL) {
   if (batteryCharge  < 3.77) {
-    //    To be able to read the RTC calendar register when the APB1 clock frequency is less than
+//    To be able to read the RTC calendar register when the APB1 clock frequency is less than
 //    seven times the RTC clock frequency (7*RTCLCK), the software must read the calendar
 //    time and date registers twice.
     t++; //
@@ -243,7 +237,6 @@ uint8_t prevValue = 0;
     if (HAL_RTC_GetDate(RealTime_Handle, gDate, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting date from RTC");
     }
-//    if ( status == BATTERY_CRITICAL) {
     if (batteryCharge  < 3.77) {
       if (prevValue != gTime->Hours) {
         prevValue = gTime->Hours;
@@ -258,15 +251,11 @@ uint8_t prevValue = 0;
 
 // Functie om de tijd uit te lezen
 uint32_t getPosixTime(void) {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   RTC_GetTime(&currentTime, &currentDate);
   return makeTime(&currentDate, &currentTime);
 }
 
 void getUTCfromPosixTime(uint32_t posixTime, char* strbuf1) {
-//  RTC_TimeTypeDef currentTime;
-//  RTC_DateTypeDef currentDate;
   breakPosixTime(posixTime, &currentDate, &currentTime);
   sprintf(strbuf1, "%02d-%02d-%02d %02dh:%02dm:%02ds\r\n", currentDate.Date, currentDate.Month, currentDate.Year,
       currentTime.Hours, currentTime.Minutes, currentTime.Seconds);
@@ -325,7 +314,6 @@ void Enter_Stop_Mode_for_empty_battery(uint16_t sleepTime)
     sen5x_Power_Off();
   }
   Info("Battery voltage %.02fV", batteryCharge);
-//  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);
@@ -345,7 +333,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   }
 //  Info("Battery voltage %.02fV", batteryCharge);
   batteryChargeCheck();
-//  powerDisplay(powerCheck());
   Debug("Entering STOP mode for %d seconds", sleepTime);
   getUTCfromPosixTime(getPosixTime() + sleepTime, strbuf);
   Info("The system will wake up at %s.", strbuf);

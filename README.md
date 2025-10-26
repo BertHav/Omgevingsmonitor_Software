@@ -5,6 +5,7 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.10](#version510)\
 [version 5.09](#version509)\
 [version 5.08](#version508)\
 [version 5.07](#version507)\
@@ -160,7 +161,7 @@ Wait for the "File download complete" dialog.
 
 Press the RESET button of the Omgevingsmonitor for at least 4 seconds and release. The omgevingsmonitor should now start with LED patterns. When flashing with red LEDs, press reset again for about 5 seconds.
 
-__Reset the Omgevingsmonitor twice to reach optimal energy saving mode!__
+__Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
 
 ## Configuring the Omgevingsmonitor manually by USB <a name="USBconfig"></a>
 
@@ -179,7 +180,10 @@ The STM32CubeProgrammer current consumption during startup in μA.
 The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280. The current in standby with this additional sensors soldered te the I2C bus is about 2300μA, without these sensors it is about 2250μA. 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
-__Reset the Omgevingsmonitor twice to reach optimal energy saving mode!__
+__Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
+
+## version 5.10 <a name="version510"></a>
+fix for updating time to DST if started on tuesday or later before the sunday DST changes.
 
 ## version 5.09 <a name="version509"></a>
 Small improvement to USB interface. The default is now Ignore Parity Errors from ESP32.
@@ -191,7 +195,7 @@ Change of LED behaviour. On USB (charging)power the LEDS are now standard off ex
 Bugfix for not reading the battery charge during USB charge proces
 
 ## version 5.06 <a name="version506"></a>
-Battery capacity differentation. LARGEBATTERY define is in main.h. When sen5x is disabled by low batterypower, no values for sen5x are uploaded to opensensemap.
+Battery capacity differentation. LARGEBATTERY definition is in main.h. When sen5x is disabled by low batterypower, no values for sen5x are uploaded to opensensemap.
 
 ## version 5.05 <a name="version505"></a>
 Patch for detecting which sensor causes a hang. Suspect is BMP280 in error state.

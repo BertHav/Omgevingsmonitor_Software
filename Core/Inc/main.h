@@ -112,8 +112,8 @@ extern bool usblog;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "5.09 BH"
-#define CURRENT_WEEK "2025w42-6"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.10 BH"
+#define CURRENT_WEEK "2025w42-7"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go
@@ -126,7 +126,7 @@ extern bool usblog;
 //#define STLINK_V3PWR true
 
 // Some PCB insist for parity albeight it is configured without parity enabled
-#define IGNORE_PARITY_ERRORS
+//#define IGNORE_PARITY_ERRORS
 
 #define WAIT_WITH_PM 860
 #define WAIT_WITHOUT_PM 880
