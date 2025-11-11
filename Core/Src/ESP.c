@@ -1568,10 +1568,12 @@ ESP_States ESP_Upkeep(void) {
   bool ATSend = false;
   static uint32_t timeoutTimer = 0;
   static Receive_Status ATReceived = RECEIVE_STATUS_INCOMPLETE;
+  static uint8_t espminute;
 // Het lijkt er op dat ESP32  niet meer start indien de batterijspanning onder de 3,77 Volt daalt.
 // Om uart fouten te voorkomen mogelijk ESP niet meer afhandelen.
   if ((EspState != oldEspState) && (GetVerboseLevel() == VERBOSE_ALL)) {
     oldEspState = EspState;
+    espminute = lastminute;
 #ifdef USE_MAIL
     if ( !((oldEspState == 3) && ((ATCommand == AT_HTTPCPOST) || (ATCommand == AT_HTTPCPOST_MAILAPI))) ) {
 #else
@@ -1597,7 +1599,9 @@ ESP_States ESP_Upkeep(void) {
 //      Debug("entry in ESP_STATE_INIT");
       deviceTimeOut = 0;
       if (!AllDevicesReady()) {
-//        Debug("Waiting for all devices ready");
+        if (espminute != lastminute) {
+          Debug("ESP_STATE_INIT Waiting for all devices ready");
+        }
         break;
       }
       SetESPIndicator();

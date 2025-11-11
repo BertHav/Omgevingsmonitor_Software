@@ -61,6 +61,7 @@ void setSensorLock(uint8_t sensor);
 uint8_t getSensorLock();
 bool AllDevicesReady();
 void Device_Test();
+void showOMstatus();
 void SetESPMeasurementDone();
 bool IsSGPPresent();
 bool IsAHT20SensorPresent();

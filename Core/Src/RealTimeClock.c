@@ -101,7 +101,6 @@ void showTime() {
     return;
   }
   RTC_GetTime(&currentTime, &currentDate);
-  lasthour = currentTime.Hours;
   weekday = currentDate.WeekDay;
   UpdateSystemUptime();
   if (lastminute != currentTime.Minutes) {
@@ -110,9 +109,12 @@ void showTime() {
       currentDate.Date, monthNames[currentDate.Month-1], currentDate.Year, currentTime.Hours, currentTime.Minutes,
       currentTime.Seconds, myUpTime.Day, myUpTime.Hour, myUpTime.Minutes, myUpTime.Seconds);
   }
-  if ((weekday == 7) && (lasthour == 3) && (currentTime.Minutes < 17) && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
-//    setESPTimeStamp(0); // check for summer/wintertime
+  if ((weekday == 7) && (currentTime.Hours == 3) && (currentTime.Minutes < 17) && (currentDate.Date > 24) && ((currentDate.Month == 3) || (currentDate.Month == 10))) {
     set_DST();
+  }
+  if (lasthour != currentTime.Hours) {
+    showOMstatus();
+    lasthour = currentTime.Hours;
   }
 }
 

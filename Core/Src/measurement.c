@@ -260,6 +260,12 @@ void Device_Test(){
   }
 }
 
+void showOMstatus() {
+  Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d, ESPstate %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
+    Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled, ESPstate);
+  Debug("Lock is from sensor column : %d (0 is FREE)", getSensorLock());
+}
+
 bool AllDevicesReady() {
   static bool prevstatus = true;
   static bool allinwait = false;
@@ -294,8 +300,7 @@ bool AllDevicesReady() {
       bool status = !(Sensor.HT_measurementEnabled | Sensor.VOC_measurementEnabled | Sensor.AHT_measurementEnabled | Sensor.BMP_measurementEnabled |
           Sensor.ENS_measurementEnabled | Sensor.PM_measurementEnabled | Sensor.MIC_measurementEnabled);
       if (!status && ((prevstatus != status) || (iminute != lastminute))) {
-        Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d, Lock is from sensor column : %d (0 is FREE)",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
-          Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled, getSensorLock());
+        showOMstatus();
         prevstatus = status;
         allinwait = false;
         iminute = lastminute;
@@ -381,5 +386,9 @@ void UpkeepI2Csensors() {
   }
   if (Sensor.ENS_measurementEnabled) {
     ENSstate = ENS_Upkeep();
+  }
+  // we also service the i2s device
+  if (Sensor.MIC_measurementEnabled) {
+    MICstate = Mic_Upkeep();
   }
 }

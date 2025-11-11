@@ -112,8 +112,8 @@ extern bool usblog;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "5.10 BH"
-#define CURRENT_WEEK "2025w42-7"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.11 BH"
+#define CURRENT_WEEK "2025w46-2"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go

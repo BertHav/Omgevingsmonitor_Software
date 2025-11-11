@@ -307,7 +307,7 @@ int main(void)
 #ifndef STLINK_V3PWR
 //==== disable for power measurements in test condition
     stlinkpwr = false;
-    if (batteryStatus == BATTERY_CRITICAL && ESPstate == ESP_STATE_RESET){
+    if ((batteryStatus == BATTERY_CRITICAL) && (ESPstate == ESP_STATE_RESET) && !Check_USB_PowerOn()){
        batteryEmpty = true;
        // we are going in deep sleep, nearly off and no wakeup from RTC Do not use standby mode,
        // because without a modification on the PCB the ESP32 is activated
@@ -335,9 +335,6 @@ int main(void)
         priorUSBpluggedIn = usbPluggedIn;
       }
       UpkeepI2Csensors();
-      if (Sensor.MIC_measurementEnabled) {
-        MICstate = Mic_Upkeep();
-      }
       if ( ((batteryStatus >= BATTERY_GOOD) || stlinkpwr) && Sensor.PM_measurementEnabled) {
         if (!sen5x_Get_sen5x_enable_state()&& usbPluggedIn ) {
           sen5x_enable(0);  // this forces the sen5x to enable when powered
