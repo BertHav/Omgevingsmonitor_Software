@@ -16009,84 +16009,84 @@ LOAD C:/ST/STM32CubeIDE_1.16.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_line    0x000467d7      0x156 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
  .debug_line    0x0004692d      0x168 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
 
-.debug_str      0x00000000    0xa35dc
- .debug_str     0x00000000    0xa35dc ./Core/Src/ENS160.o
-                              0x90a2e (size before relaxing)
- .debug_str     0x000a35dc    0x90ea2 ./Core/Src/ESP.o
- .debug_str     0x000a35dc    0x91248 ./Core/Src/I2CSensors.o
- .debug_str     0x000a35dc    0x90133 ./Core/Src/PC_Config.o
- .debug_str     0x000a35dc    0x8d9b4 ./Core/Src/PowerUtils.o
- .debug_str     0x000a35dc    0x91863 ./Core/Src/RealTimeClock.o
- .debug_str     0x000a35dc    0x89ea7 ./Core/Src/adc.o
- .debug_str     0x000a35dc    0x90921 ./Core/Src/aht2x.o
- .debug_str     0x000a35dc    0x90315 ./Core/Src/bmp280.o
- .debug_str     0x000a35dc    0x89b63 ./Core/Src/dma.o
- .debug_str     0x000a35dc    0x8ce2c ./Core/Src/eeprom.o
- .debug_str     0x000a35dc     0x3e44 ./Core/Src/efficient_10log10.o
- .debug_str     0x000a35dc    0x8a15d ./Core/Src/gpio.o
- .debug_str     0x000a35dc    0x8a1d6 ./Core/Src/i2c.o
- .debug_str     0x000a35dc    0x89e24 ./Core/Src/i2s.o
- .debug_str     0x000a35dc    0x924fc ./Core/Src/main.o
- .debug_str     0x000a35dc    0x925bc ./Core/Src/measurement.o
- .debug_str     0x000a35dc    0x8f75d ./Core/Src/microphone.o
- .debug_str     0x000a35dc    0x89e8c ./Core/Src/rtc.o
- .debug_str     0x000a35dc    0x903f1 ./Core/Src/sen5x.o
- .debug_str     0x000a35dc    0x8d6c7 ./Core/Src/sen5x_i2c.o
- .debug_str     0x000a35dc     0x75e1 ./Core/Src/sensirion_common.o
- .debug_str     0x000a35dc     0x9866 ./Core/Src/sensirion_gas_index_algorithm.o
- .debug_str     0x000a35dc    0x8cc5d ./Core/Src/sensirion_i2c.o
- .debug_str     0x000a35dc    0x90d7c ./Core/Src/sgp40.o
- .debug_str     0x000a35dc     0x415b ./Core/Src/sound_LUTs.o
- .debug_str     0x000a35dc    0x917c6 ./Core/Src/sound_measurement.o
- .debug_str     0x000a35dc     0x8517 ./Core/Src/sound_utilities.o
- .debug_str     0x000a35dc    0x8fa74 ./Core/Src/statusCheck.o
- .debug_str     0x000a35dc    0x89970 ./Core/Src/stm32l0xx_hal_msp.o
- .debug_str     0x000a35dc    0x8f1a2 ./Core/Src/stm32l0xx_it.o
- .debug_str     0x000a35dc     0x98f4 ./Core/Src/syscalls.o
- .debug_str     0x000a35dc     0x7692 ./Core/Src/sysmem.o
- .debug_str     0x000a35dc    0x89416 ./Core/Src/system_stm32l0xx.o
- .debug_str     0x000a35dc    0x8a0b0 ./Core/Src/tim.o
- .debug_str     0x000a35dc    0x8a20c ./Core/Src/usart.o
- .debug_str     0x000a35dc    0x8eb94 ./Core/Src/utils.o
- .debug_str     0x000a35dc    0x90618 ./Core/Src/wsenHIDS.o
- .debug_str     0x000a35dc       0x89 ./Core/Startup/startup_stm32l072rztx.o
- .debug_str     0x000a35dc    0x89b7a ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
- .debug_str     0x000a35dc    0x89b3b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_adc.o
- .debug_str     0x000a35dc    0x898ce ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_cortex.o
- .debug_str     0x000a35dc    0x897c3 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_dma.o
- .debug_str     0x000a35dc    0x89659 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
- .debug_str     0x000a35dc    0x899a8 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash_ex.o
- .debug_str     0x000a35dc    0x895ef ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_gpio.o
- .debug_str     0x000a35dc    0x8a75d ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c.o
- .debug_str     0x000a35dc    0x899dd ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c_ex.o
- .debug_str     0x000a35dc    0x899f4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2s.o
- .debug_str     0x000a35dc    0x89ca7 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd.o
- .debug_str     0x000a35dc    0x89903 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd_ex.o
- .debug_str     0x000a35dc    0x896da ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pwr.o
- .debug_str     0x000a35dc    0x8999c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc.o
- .debug_str     0x000a35dc    0x89940 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc_ex.o
- .debug_str     0x000a35dc    0x89905 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc.o
- .debug_str     0x000a35dc    0x89be4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc_ex.o
- .debug_str     0x000a35dc    0x8a717 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim.o
- .debug_str     0x000a35dc    0x898cc ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim_ex.o
- .debug_str     0x000a35dc    0x8a521 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart.o
- .debug_str     0x000a35dc    0x89bb8 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart_ex.o
- .debug_str     0x000a35dc    0x897e4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_ll_usb.o
- .debug_str     0x000a35dc    0x8e933 ./Middlewares/USB_Device_Library/usbd_cdc.o
- .debug_str     0x000a35dc    0x8e237 ./Middlewares/USB_Device_Library/usbd_core.o
- .debug_str     0x000a35dc    0x8e151 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
- .debug_str     0x000a35dc    0x8e07e ./Middlewares/USB_Device_Library/usbd_ioreq.o
- .debug_str     0x000a35dc    0x8e841 ./USB_DEVICE/App/usb_device.o
- .debug_str     0x000a35dc    0x8ee40 ./USB_DEVICE/App/usbd_cdc_if.o
- .debug_str     0x000a35dc    0x8df81 ./USB_DEVICE/App/usbd_desc.o
- .debug_str     0x000a35dc    0x8ed9b ./USB_DEVICE/Target/usbd_conf.o
- .debug_str     0x000a35dc      0xcfd C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_const_structs.o)
- .debug_str     0x000a35dc      0x6e2 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_common_tables.o)
- .debug_str     0x000a35dc      0x32a C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_q31.o)
- .debug_str     0x000a35dc      0x372 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_radix4_q31.o)
- .debug_str     0x000a35dc      0x255 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cmplx_mag_squared_q31.o)
- .debug_str     0x000a35dc      0x242 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
- .debug_str     0x000a35dc      0x240 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
+.debug_str      0x00000000    0xa35de
+ .debug_str     0x00000000    0xa35de ./Core/Src/ENS160.o
+                              0x90a30 (size before relaxing)
+ .debug_str     0x000a35de    0x90ea4 ./Core/Src/ESP.o
+ .debug_str     0x000a35de    0x9124a ./Core/Src/I2CSensors.o
+ .debug_str     0x000a35de    0x90135 ./Core/Src/PC_Config.o
+ .debug_str     0x000a35de    0x8d9b4 ./Core/Src/PowerUtils.o
+ .debug_str     0x000a35de    0x91865 ./Core/Src/RealTimeClock.o
+ .debug_str     0x000a35de    0x89ea7 ./Core/Src/adc.o
+ .debug_str     0x000a35de    0x90923 ./Core/Src/aht2x.o
+ .debug_str     0x000a35de    0x90317 ./Core/Src/bmp280.o
+ .debug_str     0x000a35de    0x89b63 ./Core/Src/dma.o
+ .debug_str     0x000a35de    0x8ce2c ./Core/Src/eeprom.o
+ .debug_str     0x000a35de     0x3e44 ./Core/Src/efficient_10log10.o
+ .debug_str     0x000a35de    0x8a15d ./Core/Src/gpio.o
+ .debug_str     0x000a35de    0x8a1d6 ./Core/Src/i2c.o
+ .debug_str     0x000a35de    0x89e24 ./Core/Src/i2s.o
+ .debug_str     0x000a35de    0x924fe ./Core/Src/main.o
+ .debug_str     0x000a35de    0x925be ./Core/Src/measurement.o
+ .debug_str     0x000a35de    0x8f75f ./Core/Src/microphone.o
+ .debug_str     0x000a35de    0x89e8c ./Core/Src/rtc.o
+ .debug_str     0x000a35de    0x903f3 ./Core/Src/sen5x.o
+ .debug_str     0x000a35de    0x8d6c7 ./Core/Src/sen5x_i2c.o
+ .debug_str     0x000a35de     0x75e1 ./Core/Src/sensirion_common.o
+ .debug_str     0x000a35de     0x9866 ./Core/Src/sensirion_gas_index_algorithm.o
+ .debug_str     0x000a35de    0x8cc5d ./Core/Src/sensirion_i2c.o
+ .debug_str     0x000a35de    0x90d7e ./Core/Src/sgp40.o
+ .debug_str     0x000a35de     0x415b ./Core/Src/sound_LUTs.o
+ .debug_str     0x000a35de    0x917c8 ./Core/Src/sound_measurement.o
+ .debug_str     0x000a35de     0x8517 ./Core/Src/sound_utilities.o
+ .debug_str     0x000a35de    0x8fa76 ./Core/Src/statusCheck.o
+ .debug_str     0x000a35de    0x89970 ./Core/Src/stm32l0xx_hal_msp.o
+ .debug_str     0x000a35de    0x8f1a2 ./Core/Src/stm32l0xx_it.o
+ .debug_str     0x000a35de     0x98f4 ./Core/Src/syscalls.o
+ .debug_str     0x000a35de     0x7692 ./Core/Src/sysmem.o
+ .debug_str     0x000a35de    0x89416 ./Core/Src/system_stm32l0xx.o
+ .debug_str     0x000a35de    0x8a0b0 ./Core/Src/tim.o
+ .debug_str     0x000a35de    0x8a20c ./Core/Src/usart.o
+ .debug_str     0x000a35de    0x8eb94 ./Core/Src/utils.o
+ .debug_str     0x000a35de    0x9061a ./Core/Src/wsenHIDS.o
+ .debug_str     0x000a35de       0x89 ./Core/Startup/startup_stm32l072rztx.o
+ .debug_str     0x000a35de    0x89b7a ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal.o
+ .debug_str     0x000a35de    0x89b3b ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_adc.o
+ .debug_str     0x000a35de    0x898ce ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_cortex.o
+ .debug_str     0x000a35de    0x897c3 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_dma.o
+ .debug_str     0x000a35de    0x89659 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash.o
+ .debug_str     0x000a35de    0x899a8 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_flash_ex.o
+ .debug_str     0x000a35de    0x895ef ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_gpio.o
+ .debug_str     0x000a35de    0x8a75d ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c.o
+ .debug_str     0x000a35de    0x899dd ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2c_ex.o
+ .debug_str     0x000a35de    0x899f4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_i2s.o
+ .debug_str     0x000a35de    0x89ca7 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd.o
+ .debug_str     0x000a35de    0x89903 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pcd_ex.o
+ .debug_str     0x000a35de    0x896da ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_pwr.o
+ .debug_str     0x000a35de    0x8999c ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc.o
+ .debug_str     0x000a35de    0x89940 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rcc_ex.o
+ .debug_str     0x000a35de    0x89905 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc.o
+ .debug_str     0x000a35de    0x89be4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_rtc_ex.o
+ .debug_str     0x000a35de    0x8a717 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim.o
+ .debug_str     0x000a35de    0x898cc ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_tim_ex.o
+ .debug_str     0x000a35de    0x8a521 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart.o
+ .debug_str     0x000a35de    0x89bb8 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_hal_uart_ex.o
+ .debug_str     0x000a35de    0x897e4 ./Drivers/STM32L0xx_HAL_Driver/stm32l0xx_ll_usb.o
+ .debug_str     0x000a35de    0x8e933 ./Middlewares/USB_Device_Library/usbd_cdc.o
+ .debug_str     0x000a35de    0x8e237 ./Middlewares/USB_Device_Library/usbd_core.o
+ .debug_str     0x000a35de    0x8e151 ./Middlewares/USB_Device_Library/usbd_ctlreq.o
+ .debug_str     0x000a35de    0x8e07e ./Middlewares/USB_Device_Library/usbd_ioreq.o
+ .debug_str     0x000a35de    0x8e841 ./USB_DEVICE/App/usb_device.o
+ .debug_str     0x000a35de    0x8ee40 ./USB_DEVICE/App/usbd_cdc_if.o
+ .debug_str     0x000a35de    0x8df81 ./USB_DEVICE/App/usbd_desc.o
+ .debug_str     0x000a35de    0x8ed9b ./USB_DEVICE/Target/usbd_conf.o
+ .debug_str     0x000a35de      0xcfd C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_const_structs.o)
+ .debug_str     0x000a35de      0x6e2 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_common_tables.o)
+ .debug_str     0x000a35de      0x32a C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_q31.o)
+ .debug_str     0x000a35de      0x372 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cfft_radix4_q31.o)
+ .debug_str     0x000a35de      0x255 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_cmplx_mag_squared_q31.o)
+ .debug_str     0x000a35de      0x242 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_mult_q31.o)
+ .debug_str     0x000a35de      0x240 C:\Users\itsme\OneDrive\Documenten\GitHub\MJSGadget - dB meter\Drivers\CMSIS\Lib\GCC\libarm_cortexM0l_math.a(arm_add_q31.o)
 
 .comment        0x00000000       0xb1
  .comment       0x00000000       0xb1 ./Core/Src/ENS160.o

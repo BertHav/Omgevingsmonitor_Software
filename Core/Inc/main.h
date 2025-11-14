@@ -112,8 +112,8 @@ extern bool usblog;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "5.11 BH"
-#define CURRENT_WEEK "2025w46-2"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.12 BH"
+#define CURRENT_WEEK "2025w46-5"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go
@@ -128,12 +128,12 @@ extern bool usblog;
 // Some PCB insist for parity albeight it is configured without parity enabled
 //#define IGNORE_PARITY_ERRORS
 
-#define WAIT_WITH_PM 860
-#define WAIT_WITHOUT_PM 880
+#define WAIT_WITH_PM 860  // time in seconds with compensation for transmission to upload about every 15 minutes, with PM measurement enabled
+#define WAIT_WITHOUT_PM 880 // time in seconds with compensation for transmission to upload about every 15 minutes
 #define WAIT_WITH_PM_SUN 260 // with sun shining and battery full loaded with sen5x
 #define WAIT_WITHOUT_PM_SUN 280  // with sun shining and battery full loaded
-#define BATTERY_READ_CYCLE 50000  // About once a minute
-#define DEEP_SLEEP 3600
+#define BATTERY_READ_CYCLE 44570  // About once a minute
+#define DEEP_SLEEP 3600 // every hour wakeup
 #define DEVICE_INIT_TIMEOUT 25000 // This is the initial time out for sensors during startup
 #define DEVICE_TIMEOUT 4500 // during battery power the device become about 4,5 second to take 3 samples after they are disabled
 

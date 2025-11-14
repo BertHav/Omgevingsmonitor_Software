@@ -5,6 +5,8 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.12](#version512)\
+[version 5.11](#version511)\
 [version 5.10](#version510)\
 [version 5.09](#version509)\
 [version 5.08](#version508)\
@@ -181,6 +183,12 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
+
+## version 5.12 <a name="version512"></a>
+Upload time correction while USB power plugged in, due to two sound samples per second
+
+## version 5.11 <a name="version511"></a>
+More tracing for unindentified disfunction.
 
 ## version 5.10 <a name="version510"></a>
 fix for updating time to DST if started on tuesday or later before the sunday DST changes.
