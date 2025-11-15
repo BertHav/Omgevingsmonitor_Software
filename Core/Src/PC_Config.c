@@ -492,11 +492,13 @@ void PC_show_Keys() {
   HAL_Delay(10);
   printf_USB("To clear a string: $30,000000000000000000000000\r\n");
   HAL_Delay(10);
-  printf_USB("L - toggle logging on/off, current: %s\r\n", usblog?"on":"off");
+  printf_USB("E31, - Erase configuration memory\r\n");
   HAL_Delay(10);
   printf_USB("B - show build information\r\n");
   HAL_Delay(10);
-  printf_USB("E31, - Erase configuration memory\r\n");
+  printf_USB("L - toggle logging on/off, current: %s\r\n", usblog?"on":"off");
+  HAL_Delay(10);
+  printf_USB("W - show sensor & ESP status\r\n");
   HAL_Delay(10);
   if (!usb_out) {
     printf("A sensor key can only be changed by USB input or the by configuration programm.\r\n");
@@ -553,6 +555,19 @@ bool Process_USB_input(uint8_t* data) {
   if ((length == 1) && (message != NULL)){
     BinaryReleaseInfo();
     showUpTime();
+    length = 0;
+    data[0] = '\0';
+    ResetUsbRxDataSize();
+    return true;
+  }
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_W);  // Search for 'w'to show why the system is waiting for transmission
+  if ((length == 1) && (message != NULL)){
+    bool prevUSBlog = usblog;
+    if (!usblog) {
+      usblog = true;
+    }
+    showOMstatus();
+    usblog = prevUSBlog;
     length = 0;
     data[0] = '\0';
     ResetUsbRxDataSize();

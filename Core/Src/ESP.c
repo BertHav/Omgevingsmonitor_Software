@@ -85,6 +85,10 @@ static ESP_Test TestState = ESP_TEST_INIT;
 
 MeasurementValues MeasVal;
 
+void showESPcontrols() {
+  Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
+}
+
 void forceNTPupdate() {
   ESPNTPTimeStamp = 0;
 }
@@ -1579,7 +1583,7 @@ ESP_States ESP_Upkeep(void) {
 #else
       if ( !((oldEspState == 3) && (ATCommand == AT_HTTPCPOST)) ) {
 #endif
-      Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
+        showESPcontrols();
     }
   }
   switch (EspState) {

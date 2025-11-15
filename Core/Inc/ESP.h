@@ -199,6 +199,7 @@ extern bool ESPTransmitDone;
 extern bool EspTurnedOn;
 extern bool ReconfigSet;
 extern uint32_t ESPNTPTimeStamp;
+void showESPcontrols();
 void uint8ArrayToString(char *destination, uint8_t data[]);
 bool GetReconfigMode();
 void ESP_Init(UART_HandleTypeDef* espUart);
