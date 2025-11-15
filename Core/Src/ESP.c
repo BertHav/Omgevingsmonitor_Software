@@ -511,9 +511,9 @@ uint16_t CreateMessage(bool *txstat, bool send) {
   static bool status = false;
   static bool retstat = true;
   static uint8_t nameConfig[CustomNameMaxLength];
-  static uint8_t keybuffer[IdSize];
   static char uptimeBuf[14];
 #ifdef LONGDATAGRAM
+  static uint8_t keybuffer[IdSize];
   static char Buffer[(IdSize*2)+1];
 #endif
 
@@ -860,41 +860,35 @@ index = strlen(message);
     uint8_t arridx = 0;
     index = strlen(message);
 
-
-    sprintf(&message[index], "{\"Temperature\":%.2f},", MeasVal.Temperature);
+    sprintf(&message[index], "{\"Temperature\":%.2f},", MeasVal.Temperature);  // 22
     index = strlen(message);
 
+    sprintf(&message[index], "{\"Humidity\":%.1f},", MeasVal.Humidity); // 19
+    index = strlen(message);
 
-    sprintf(&message[index], "{\"Humidity\":%.1f},", MeasVal.Humidity);
-    index += strlen(message);
+    sprintf(&message[index], "{\"Sound\":%.2f},", MeasVal.dBApeak); // 18
+    index = strlen(message);
 
+    sprintf(&message[index], "{\"VOC\":%d},", MeasVal.VOCIndex); // 12
+    index = strlen(message);
 
-    sprintf(&message[index], "{\"Sound\":%.2f},", MeasVal.dBApeak);
-    index += strlen(message);
-
-
-    sprintf(&message[index], "{\"VOC\":%d},", MeasVal.VOCIndexmax);
-    index += strlen(message);
-
-
-    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},", batteryCharge);
-    index += strlen(message);
+    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},", batteryCharge); // 24
+    index = strlen(message);
     if (send) {
       status = ESP_Send((uint8_t*)message, strlen(message));
       retstat &= status;
     }
 
-    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f}", solarCharge);
-    arridx += strlen(message);
+    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f}", solarCharge);  // 22
+    arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"PM2p5\":%.2f}", MeasVal.PM2p5max);
-    arridx += strlen(message);
+    sprintf(&message[arridx], "{\"PM2p5\":%.1f}", MeasVal.PM2p5max);  // 15
+    arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"PM10\":%.2f}", MeasVal.PM10p0max);
-    arridx += strlen(message);
-    index +=arridx;
+    sprintf(&message[arridx], "{\"PM10\":%.1f}", MeasVal.PM10p0max);  // 14
+    arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);
+    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);  // 8
 #endif
   sprintf(&message[strlen(message)], "]");
   index += strlen(message);

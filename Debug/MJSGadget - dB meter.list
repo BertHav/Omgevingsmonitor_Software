@@ -11370,8 +11370,8 @@ uint16_t CreateMessage(bool *txstat, bool send) {
  8005570:	000a      	movs	r2, r1
  8005572:	1cfb      	adds	r3, r7, #3
  8005574:	701a      	strb	r2, [r3, #0]
-  static char uptimeBuf[14];
 #ifdef LONGDATAGRAM
+  static uint8_t keybuffer[IdSize];
   static char Buffer[(IdSize*2)+1];
 #endif
 
@@ -13297,10 +13297,10 @@ index = strlen(message);
  80063d8:	9301      	str	r3, [sp, #4]
  80063da:	0022      	movs	r2, r4
  80063dc:	f020 f968 	bl	80266b0 <siprintf>
-    arridx += strlen(message);
-    index +=arridx;
 
-    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);
+    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);  // 8
+//    arridx = strlen(message);
+//    index = arridx;
 #endif
   sprintf(&message[strlen(message)], "]");
  80063e0:	4b20      	ldr	r3, [pc, #128]	@ (8006464 <CreateMessage+0xefc>)
