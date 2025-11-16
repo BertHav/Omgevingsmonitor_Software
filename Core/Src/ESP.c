@@ -320,7 +320,7 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     command[SPLIT_POS] = '\0';
     printf_USB((char*)command);
     command[SPLIT_POS] = splitchar;
-    printf_USB((char*)&command[SPLIT_POS]);
+    printf_USB((char*)command+SPLIT_POS);
     printf("ESP_Send: %s", command);
   }
   else
@@ -860,35 +860,40 @@ index = strlen(message);
     uint8_t arridx = 0;
     index = strlen(message);
 
-    sprintf(&message[index], "{\"Temperature\":%.2f},", MeasVal.Temperature);  // 22
+    sprintf(&message[index], "{\"Temperature\":%.2f},\r\n", MeasVal.Temperature);  // 22
     index = strlen(message);
 
-    sprintf(&message[index], "{\"Humidity\":%.1f},", MeasVal.Humidity); // 19
+    sprintf(&message[index], "{\"Humidity\":%.1f},\r\n", MeasVal.Humidity); // 19
     index = strlen(message);
 
-    sprintf(&message[index], "{\"Sound\":%.2f},", MeasVal.dBApeak); // 18
+    sprintf(&message[index], "{\"Sound\":%.2f},\r\n", MeasVal.dBApeak); // 18
     index = strlen(message);
 
-    sprintf(&message[index], "{\"VOC\":%d},", MeasVal.VOCIndex); // 12
+    sprintf(&message[index], "{\"VOC\":%d},\r\n", MeasVal.VOCIndex); // 12
     index = strlen(message);
 
-    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},", batteryCharge); // 24
+    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},\r\n", batteryCharge); // 24
     index = strlen(message);
     if (send) {
       status = ESP_Send((uint8_t*)message, strlen(message));
       retstat &= status;
     }
 
-    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f}", solarCharge);  // 22
+    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f},\r\n", solarCharge);  // 22
     arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"PM2p5\":%.1f}", MeasVal.PM2p5max);  // 15
+    sprintf(&message[arridx], "{\"PM2p5\":%.1f},\r\n", MeasVal.PM2p5max);  // 15
     arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"PM10\":%.1f}", MeasVal.PM10p0max);  // 14
+    sprintf(&message[arridx], "{\"PM10\":%.1f},\r\n", MeasVal.PM10p0max);  // 14
     arridx = strlen(message);
 
-    sprintf(&message[arridx], "{\"NOX\":%d}", MeasVal.airNOxmax);  // 8
+    sprintf(&message[arridx], "{\"NOX\":%d},\r\n", MeasVal.airNOxmax);  // 8
+    arridx = strlen(message);
+
+    getUptime(uptimeBuf);
+    sprintf(&message[arridx], "{\"Uptime\" :%s}", uptimeBuf);  // 18
+
 #endif
   sprintf(&message[strlen(message)], "]");
   index += strlen(message);

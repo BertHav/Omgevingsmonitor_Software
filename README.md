@@ -5,6 +5,7 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.14](#version514)\
 [version 5.13](#version513)\
 [version 5.12](#version512)\
 [version 5.11](#version511)\
@@ -184,6 +185,9 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
+
+## version 5.14 <a name="version514"></a>
+fix for issue #4 short datagram for local services
 
 ## version 5.13 <a name="version513"></a>
 Show status of sensors and ESP on USB port with W key.
