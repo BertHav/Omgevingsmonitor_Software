@@ -187,7 +187,7 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
 
-## version 5.14 <a name="version514"></a>
+## version 5.15 <a name="version515"></a>
 Credits to AgriVision for fixing issue #4 short datagram for local services, code cleaning for ESP datagram transmission. 
 
 ## version 5.14 <a name="version514"></a>
