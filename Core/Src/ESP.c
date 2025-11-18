@@ -29,7 +29,7 @@ extern DMA_HandleTypeDef hdma_usart4_rx;
 static volatile bool RxComplete = false;
 
 static uint8_t RxBuffer[ESP_MAX_BUFFER_SIZE] = {0};
-static const char user[] = "Test";
+//static const char user[] = "Test";
 static bool testRound = true;
 bool EspTurnedOn = false;
 static bool InitIsDone = false;
@@ -327,6 +327,7 @@ static bool ESP_Send(uint8_t* command, uint16_t length) {
     Debug("ESP_Send: %s", command);
   return true;
 }
+
 static bool ESP_Receive(uint8_t* reply, uint16_t length) {
   RxComplete = false;
 #ifndef IGNORE_PARITY_ERRORS
@@ -521,18 +522,17 @@ uint16_t CreateMessage(bool *txstat, bool send) {
     ReadUint8ArrayEEprom(CustomNameConfigAddr, nameConfig, CustomNameMaxLength);
   }
   else{
-    strncpy((char*)nameConfig, user, 5);
+    strncpy((char*)nameConfig, "Test", 5);
   }
   setCharges();
   uint16_t index = 0;
-  sprintf(&message[index], "[");
 #ifdef LONGDATAGRAM
   ReadUint8ArrayEEprom(TempConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-  sprintf(&message[1], "{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.Temperature);
+  sprintf(message, "[{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.Temperature);
 #else
-  sprintf(&message[1], "{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
+  sprintf(message, "[{\"name\":\"temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Temperature);
 #endif
 index = strlen(message);
   if (send) {
@@ -542,9 +542,9 @@ index = strlen(message);
   ReadUint8ArrayEEprom(HumidConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-  sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.Humidity);
+  sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.Humidity);
 #else
-  sprintf(&message[0], ",{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
+  sprintf(message, ",{\"name\":\"humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.Humidity);
 #endif
   index += strlen(message);
   if (send) {
@@ -555,9 +555,9 @@ index = strlen(message);
   ReadUint8ArrayEEprom(VocIndexConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-  sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.VOCIndex);
+  sprintf(message, ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.VOCIndex);
 #else
-  sprintf(&message[0], ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndex);
+  sprintf(message, ",{\"name\":\"voc\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"VOCi\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.VOCIndex);
 #endif
   index += strlen(message);
   if (send) {
@@ -569,9 +569,9 @@ index = strlen(message);
   if (isKeyValid(keybuffer, "ChargeStat", "true/false")) {
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
+    sprintf(message, ",{\"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
 #else
-    sprintf(&message[0], ",{\"name\":\"charging\", \"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
+    sprintf(message, ",{\"name\":\"charging\", \"sensor\": \"%s\", \"value\":\"%d\"}", Buffer, batteryChargeMode);
 #endif
     index += strlen(message);
     if (send) {
@@ -585,9 +585,9 @@ index = strlen(message);
     uint8ArrayToString(Buffer, keybuffer);
     getUptime(uptimeBuf);
 #ifdef OPENSENSEMAP
-    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
+    sprintf(message, ",{\"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
 #else
-    sprintf(&message[0], ",{\"name\":\"uptime\", \"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
+    sprintf(message, ",{\"name\":\"uptime\", \"sensor\": \"%s\", \"value\":\"%s\"}", Buffer, uptimeBuf);
 #endif
     index += strlen(message);
     if (send) {
@@ -601,9 +601,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "BMP280", "hPa") && MeasVal.BMP280_airpressure) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_airpressure);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_airpressure);
 #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_airpressure);
+      sprintf(message, ",{\"name\":\"BMP280 hPa\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"hPa\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_airpressure);
 #endif
       index += strlen(message);
       if (send) {
@@ -616,9 +616,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "BMP280", "Temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperature);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.BMP280_temperature);
   #else
-      sprintf(&message[0], ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperature);
+      sprintf(message, ",{\"name\":\"BMP280 Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.BMP280_temperature);
   #endif
       index += strlen(message);
       if (send) {
@@ -632,9 +632,9 @@ index = strlen(message);
   if (isKeyValid(keybuffer, "MIC", "dBA")) {
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.dBApeak);
+    sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.dBApeak);
 #else
-    sprintf(&message[0], ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
+    sprintf(message, ",{\"name\":\"Sound\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"dB(A)\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.dBApeak);
 #endif
     index += strlen(message);
     if (send) {
@@ -647,9 +647,9 @@ index = strlen(message);
   if (isKeyValid(keybuffer, "Solar", "Volt")) {
     uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-    sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, solarCharge);
+    sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, solarCharge);
 #else
-    sprintf(&message[0], ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
+    sprintf(message, ",{\"name\":\"Solar voltage\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, solarCharge);
 #endif
     index += strlen(message);
     if (send) {
@@ -663,9 +663,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "NOx", "NOxr")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.airNOxmax);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.airNOxmax);
 #else
-      sprintf(&message[0], ",{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
+      sprintf(message, ",{\"name\":\"NOx\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"NOxr\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.airNOxmax);
 #endif
       index += strlen(message);
       if (send) {
@@ -680,9 +680,9 @@ index = strlen(message);
     uint8ArrayToString(Buffer, keybuffer);
     if (isKeyValid(keybuffer, "Sen5x", "temp")) {
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_temperature);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_temperature);
 #else
-      sprintf(&message[0], ",{\"name\":\"SEN54/5 temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_temperature);
+      sprintf(message, ",{\"name\":\"SEN54/5 temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_temperature);
 #endif
       index += strlen(message);
       if (send) {
@@ -697,9 +697,9 @@ index = strlen(message);
     uint8ArrayToString(Buffer, keybuffer);
     if (isKeyValid(keybuffer, "Sen5x", "hum")) {
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_humidity);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.1f}", Buffer, MeasVal.sen55_humidity);
 #else
-      sprintf(&message[0], ",{\"name\":\"SEN54/5 humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_humidity);
+      sprintf(message, ",{\"name\":\"SEN54/5 humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.sen55_humidity);
 #endif
       index += strlen(message);
       if (send) {
@@ -714,9 +714,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "PM1", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM1p0max);
 #else
-      sprintf(&message[0], ",{\"name\":\"PM1\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM1p0max);
+      sprintf(message, ",{\"name\":\"PM1\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM1p0max);
 #endif
       index += strlen(message);
       if (send) {
@@ -728,9 +728,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "PM2p5", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM2p5max);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM2p5max);
 #else
-      sprintf(&message[0], ",{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
+      sprintf(message, ",{\"name\":\"PM2.5\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM2p5max);
 #endif
       index += strlen(message);
       if (send) {
@@ -742,9 +742,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "PM4", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM4p0max);
 #else
-      sprintf(&message[0], ",{\"name\":\"PM4\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM4p0max);
+      sprintf(message, ",{\"name\":\"PM4\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM4p0max);
 #endif
       index += strlen(message);
       if (send) {
@@ -757,9 +757,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "PM10", "particle")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM10p0max);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.PM10p0max);
 #else
-      sprintf(&message[0], ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
+      sprintf(message, ",{\"name\":\"PM10\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"µg/m3\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.PM10p0max);
 #endif
       index += strlen(message);
       if (send) {
@@ -774,9 +774,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "AHT2x", "temperature")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperature);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_temperature);
 #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperature);
+      sprintf(message, ",{\"name\":\"AHT2x Temp\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"C\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_temperature);
 #endif
       index += strlen(message);
       if (send) {
@@ -789,9 +789,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "AHT2x", "humidity")) {
       uint8ArrayToString(Buffer, keybuffer);
   #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humidity);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, MeasVal.AHT2x_humidity);
   #else
-      sprintf(&message[0], ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humidity);
+      sprintf(message, ",{\"name\":\"AHT2x humid\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.1f, \"unit\":\"%%\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AHT2x_humidity);
   #endif
       index += strlen(message);
       if (send) {
@@ -806,9 +806,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "ENS160", "air quality index")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.AQIndexmax);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.AQIndexmax);
 #else
-      sprintf(&message[0], ",{\"name\":\"ENS160 AQI\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"i\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AQIndexmax);
+      sprintf(message, ",{\"name\":\"ENS160 AQI\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"i\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.AQIndexmax);
 #endif
       index += strlen(message);
       if (send) {
@@ -821,9 +821,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "ENS160", "TVOC")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.TVOCIndex);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.TVOCIndex);
 #else
-      sprintf(&message[0], ",{\"name\":\"ENS160 TVOC\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"ppb\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.TVOCIndex);
+      sprintf(message, ",{\"name\":\"ENS160 TVOC\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"ppb\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.TVOCIndex);
 #endif
       index += strlen(message);
       if (send) {
@@ -836,9 +836,9 @@ index = strlen(message);
     if (isKeyValid(keybuffer, "ENS160", "eCO2")) {
       uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-      sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.eCO2Indexmax);
+      sprintf(message, ",{\"sensor\": \"%s\", \"value\":%d}", Buffer, MeasVal.eCO2Indexmax);
 #else
-      sprintf(&message[0], ",{\"name\":\"ENS160 eCO2\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"ppm\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.eCO2Indexmax);
+      sprintf(message, ",{\"name\":\"ENS160 eCO2\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%d, \"unit\":\"ppm\"}", uid[2], (char*)nameConfig, Buffer, MeasVal.eCO2Indexmax);
 #endif
       index += strlen(message);
       if (send) {
@@ -851,52 +851,34 @@ index = strlen(message);
   ReadUint8ArrayEEprom(BatVoltConfigAddr, keybuffer, IdSize);
   uint8ArrayToString(Buffer, keybuffer);
 #ifdef OPENSENSEMAP
-  sprintf(&message[0], ",{\"sensor\": \"%s\", \"value\":%.2f}", Buffer, batteryCharge);
+  sprintf(message, ",{\"sensor\": \"%s\", \"value\":%.2f}]\r\n", Buffer, batteryCharge);
 #else
-  sprintf(&message[0], ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}", uid[2], (char*)nameConfig, Buffer, batteryCharge);
+  sprintf(message, ",{\"name\":\"battery\", \"id\": %ld, \"user\": \"%s\", \"sensor\": \"%s\", \"value\":%.2f, \"unit\":\"V\"}]\r\n", uid[2], (char*)nameConfig, Buffer, batteryCharge);
 #endif
+  index += strlen(message);
 
 #else
-    uint8_t arridx = 0;
+    sprintf(message, "[{\"Temperature\":%.2f},{\"Humidity\":%.1f},{\"Sound\":%.2f},{\"VOC\":%d},", MeasVal.Temperature, MeasVal.Humidity, MeasVal.dBApeak, MeasVal.VOCIndex);
     index = strlen(message);
 
-    sprintf(&message[index], "{\"Temperature\":%.2f},\r\n", MeasVal.Temperature);  // 22
-    index = strlen(message);
-
-    sprintf(&message[index], "{\"Humidity\":%.1f},\r\n", MeasVal.Humidity); // 19
-    index = strlen(message);
-
-    sprintf(&message[index], "{\"Sound\":%.2f},\r\n", MeasVal.dBApeak); // 18
-    index = strlen(message);
-
-    sprintf(&message[index], "{\"VOC\":%d},\r\n", MeasVal.VOCIndex); // 12
-    index = strlen(message);
-
-    sprintf(&message[index], "{\"BatteryVoltage\":%.2f},\r\n", batteryCharge); // 24
-    index = strlen(message);
     if (send) {
       status = ESP_Send((uint8_t*)message, strlen(message));
       retstat &= status;
     }
 
-    sprintf(&message[arridx], "{\"SolarVoltage\":%.2f},\r\n", solarCharge);  // 22
-    arridx = strlen(message);
+    sprintf(message, "{\"BatteryVoltage\":%.2f},{\"SolarVoltage\":%.2f},{\"PM1\":%.1f},{\"PM2p5\":%.1f},", batteryCharge, solarCharge, MeasVal.PM1p0max, MeasVal.PM2p5max);
+    index += strlen(message);
 
-    sprintf(&message[arridx], "{\"PM2p5\":%.1f},\r\n", MeasVal.PM2p5max);  // 15
-    arridx = strlen(message);
-
-    sprintf(&message[arridx], "{\"PM10\":%.1f},\r\n", MeasVal.PM10p0max);  // 14
-    arridx = strlen(message);
-
-    sprintf(&message[arridx], "{\"NOX\":%d},\r\n", MeasVal.airNOxmax);  // 8
-    arridx = strlen(message);
+    if (send) {
+      status = ESP_Send((uint8_t*)message, strlen(message));
+      retstat &= status;
+    }
 
     getUptime(uptimeBuf);
-    sprintf(&message[arridx], "{\"Uptime\" :%s}", uptimeBuf);  // 18
+    sprintf(message, "{\"PM4\":%.1f},{\"PM10\":%.1f},{\"NOX\":%d},{\"Uptime\":\"%s\"}]", MeasVal.PM4p0max , MeasVal.PM10p0max, MeasVal.airNOxmax, uptimeBuf);  // 22
+    index += strlen(message);
 
 #endif
-  sprintf(&message[strlen(message)], "]");
-  index += strlen(message);
   if (send) {
     status = ESP_Send((uint8_t*)message, strlen(message));
     retstat &= status;
@@ -1142,7 +1124,7 @@ bool WEBSERVER(){
   }
 }
 
-//These are the commands necesarry for sending data.
+//These are the commands necessary for sending data.
 bool HTTPCPOST(){
   bool txresult = false;
   uint16_t length = CreateMessage(&txresult, false);
