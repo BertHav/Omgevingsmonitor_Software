@@ -37,17 +37,10 @@
 #define ENSeCO2ConfigAddr ENSTVOCConfigAddr + IdSize
 #define URLToUploadConfigAddr ENSeCO2ConfigAddr + IdSize
 
-
-// Here is space for another 48 bytes
-//#define SSIDConfigAddr ENSeCO2ConfigAddr + IdSize
-//#define pwdConfigAddr SSIDConfigAddr + SSIDMaxLength
-
-//#define SEN55TempConfigAddr ENSeCO2ConfigAddr  + IdSize + pwdMaxLength  + SSIDMaxLength
-
 #define SEN55TempConfigAddr URLToUploadConfigAddr + URLToUploadMaxLength + 48
 #define SEN55HumidConfigAddr SEN55TempConfigAddr + IdSize
 #define hPaConfigAddr SEN55HumidConfigAddr + IdSize
-#define USBlogstatusConfigAddr hPaConfigAddr + IdSize  // uint8_tSize has size of uint8_tSize
+#define USBlogstatusConfigAddr hPaConfigAddr + IdSize
 #define UptimeConfigAddr USBlogstatusConfigAddr + IdSize
 #define ConfigSize UptimeConfigAddr + uint8_tSize - EEPromStartAddr
 

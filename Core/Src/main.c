@@ -76,7 +76,7 @@
   bool ESP_Programming = false;
   bool batteryEmpty = false;
   bool usbinitiated = USBD_FAIL;
-  bool usblog = false;
+  bool usblog = true;
   bool espfailshown = false;
 
   uint8_t sendpwremail = CLEAR;
@@ -228,7 +228,10 @@ int main(void)
   GPIO_InitPWMLEDs(&htim2, &htim3);
   Info("=-=-=-=-=-=WOTS Gadget started.=-=-=-=-=-=");
   BinaryReleaseInfo();
-  usblog = *(bool*)(USBlogstatusConfigAddr);
+  ReadUint8ArrayEEprom(USBlogstatusConfigAddr, u1_rx_buff, 1);
+  Info("usblog status: %s", u1_rx_buff[0]?"on":"off");
+  usblog = (bool)u1_rx_buff[0];
+  u1_rx_buff[0]= '\0';  //clean the misused buffer
   if(UserButton_Pressed()){
     EnableESPProg();
     ESP_Programming = true;

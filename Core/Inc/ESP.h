@@ -3,6 +3,7 @@
  *
  *  Created on: Jun 28, 2024
  *      Author: Joris Blankestijn
+ *      revised 2024, 2025 Bert Havinga
  */
 
 #ifndef INC_ESP_H_
@@ -19,9 +20,9 @@
 #include "statusCheck.h"
 #include "ssd1306_128x64_i2c.h"
 
-#define LONGMESSAGES true  // show long messages f.i. the datagram on debug UART
-#define LONGDATAGRAM  // use beurs or opensensemap, if not defined use nodeRed
-#define OPENSENSEMAP // use optimum diagram for opensensemap
+#define LONGMESSAGES  // show long messages f.i. the datagram on debug UART
+#define SHORTDATAGRAM  // use optimum diagram for opensensemap
+#define OPENSENSEMAP // use opensensemap, if not defined use nodeRed
 
 #define ESP_MAX_UART_RETRIES 2
 #define ESP_MAX_BUFFER_SIZE 256

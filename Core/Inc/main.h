@@ -113,7 +113,7 @@ extern bool usblog;
 
 /* USER CODE BEGIN Private defines */
 #define SRC_VERSION "5.15 BH"
-#define CURRENT_WEEK "2025w47-3"  // -x is day number of week i.e. Monday = 1
+#define CURRENT_WEEK "2025w47-5"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go

@@ -541,10 +541,11 @@ bool Process_USB_input(uint8_t* data) {
   }
   message = (unsigned char*)strstr((const char*)data, PREAMBLE_L);  // Search for 'L'to toggle USB logging
   if ((length == 1) && (message != NULL)){
-    usblog = !usblog; // log info to usb too
-    HAL_FLASHEx_DATAEEPROM_Unlock();
-    HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE, USBlogstatusConfigAddr, usblog);
-    HAL_FLASHEx_DATAEEPROM_Lock();
+    usblog = !usblog; // log info to usb toggle
+    boxConfig[0] = (uint8_t)usblog;  // misuse of boxConfig does not harm here
+    WriteUint8ArrayEeprom(USBlogstatusConfigAddr, boxConfig, 1);
+    ReadUint8ArrayEEprom(USBlogstatusConfigAddr, boxConfig, 1);
+    usblog = (bool)boxConfig[0];
     printf_USB("\r\nSwitching USB logging to %s\r\n", usblog?"on":"off");
     length = 0;
     data[0] = '\0';
