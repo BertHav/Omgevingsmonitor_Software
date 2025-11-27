@@ -189,7 +189,7 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
 
 ## version 5.16 <a name="version516"></a>
-Boxname instead of boxId when uploading to local services (credits AgriVision).  
+Boxname instead of boxId when uploading to local services (credits AgriVision). solves issue #5  
 USBlogging flag now functions as designed using EEPROM.  
 The definitions of SHORTDATAGRAM and OPENSENSEMAP have been changed to better reflect what they mean.
 
