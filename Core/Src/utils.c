@@ -24,12 +24,11 @@ bool TimestampIsReached(uint32_t timestamp) {
   // Ensures that the difference between now and timestamp is less than half of
   // the maximum value of the counter. This confirms that the timestamp is not
   // too far in the past.
-  bool noOverflow = (now >= timestamp && now - timestamp < HALF_TIME);
+  bool noOverflow = ((now >= timestamp) && ((now - timestamp) < HALF_TIME));
   // Ensures that the timestamp is so far ahead that it would have wrapped
   // around past the maximum value of the counter indicating an overflow
   // scenario.
-  bool overflowWithTimestampAhead =
-      (now < timestamp && timestamp - now > HALF_TIME);
+  bool overflowWithTimestampAhead = ((now < timestamp) && ((timestamp - now) > HALF_TIME));
 
   if (noOverflow || overflowWithTimestampAhead) {
     // Timestamp has been reached

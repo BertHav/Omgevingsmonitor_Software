@@ -89,6 +89,11 @@ void showESPcontrols() {
   Debug("EspState: %d ATcmd: %d Mode: %d ATExp: %d", oldEspState, ATCommand, Mode, ATExpectation);
 }
 
+void showESPtimers() {
+  Debug("Current NTP time: %lu, next NTP timestamp %lu", calculateNextNTPTime(), ESPNTPTimeStamp);
+  Debug("setTime: %s, ESPTimeStamp: %lu", setTime?"yes":"no", ESPTimeStamp);
+}
+
 void forceNTPupdate() {
   ESPNTPTimeStamp = 0;
 }
@@ -1632,7 +1637,7 @@ ESP_States ESP_Upkeep(void) {
 
     case ESP_STATE_MODE_SELECT:
 //      Debug("entry in ESP_STATE_MODE_SELECT");
-      memset(ATCommandArray, AT_END, 9);
+      memset(ATCommandArray, AT_END, sizeof(ATCommandArray));
       if(!InitIsDone || WifiReset){
         memcpy(ATCommandArray, AT_INIT, sizeof(AT_INIT));
         EspState = ESP_STATE_SEND;
@@ -1874,7 +1879,7 @@ ESP_States ESP_Upkeep(void) {
         }
 #ifdef USE_MAIL
         if((Mode == AT_MODE_MAIL) && is_OM_configured()){
-          EspState = ESP_STATE_CONFIG;
+          EspState = ESP_STATE_MODE_SELECT;
         }
 #endif
         if(Mode == AT_MODE_RECONFIG){
@@ -1887,6 +1892,10 @@ ESP_States ESP_Upkeep(void) {
         }
         if ((ReconfigSet) && (Mode != AT_MODE_RECONFIG)) {
           EspState = ESP_STATE_INIT;
+        }
+        if((Mode == AT_MODE_GETTIME) && (ATCommand == AT_END) && is_OM_configured()) {
+          EspState = ESP_STATE_INIT;
+          Mode = AT_MODE_SEND;
         }
       }
       else if (calculateNextNTPTime() > ESPNTPTimeStamp) {

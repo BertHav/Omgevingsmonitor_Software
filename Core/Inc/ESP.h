@@ -39,6 +39,7 @@
 #define ESP_UNTIL_NEXT_RETRANSMIT_SEND 743*55  //when failed try it next minute
 #define ESP_NTP_INIT_DELAY 0  // getting time is part of the ESP startup procedure, executed direct after ESP init
 #define ESP_UNTIL_NEXT_NTP 75398  //about every 24 hours
+//#define ESP_UNTIL_NEXT_NTP 5398  //about every 1,5 hours for fault isolation purpose
 #define ESP_MAX_RETRANSMITIONS 3
 #define ESP_SEND_TEMP "\"temp\""
 #define ESP_SEND_HUMID "\"humid\""
@@ -201,6 +202,7 @@ extern bool EspTurnedOn;
 extern bool ReconfigSet;
 extern uint32_t ESPNTPTimeStamp;
 void showESPcontrols();
+void showESPtimers();
 void uint8ArrayToString(char *destination, uint8_t data[]);
 bool GetReconfigMode();
 void ESP_Init(UART_HandleTypeDef* espUart);

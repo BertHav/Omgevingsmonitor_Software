@@ -261,10 +261,11 @@ void Device_Test(){
 }
 
 void showOMstatus() {
-  Debug("HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
+  Debug("Enabled: HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
     Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled);
   Debug("Lock is from sensor column : %d (0 is FREE)", getSensorLock());
   showESPcontrols();
+  showESPtimers();
 }
 
 bool AllDevicesReady() {

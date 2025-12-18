@@ -5,6 +5,7 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.17](#version517)\
 [version 5.16](#version516)\
 [version 5.15](#version515)\
 [version 5.14](#version514)\
@@ -187,6 +188,9 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
+
+## version 5.17 <a name="version517"></a>
+Added tracing for unindentified intermittent disfunction (>> days). Located to error handling in getting NTP time. Probably fix implemented. STM32CubeIDE updated to v2.0.0
 
 ## version 5.16 <a name="version516"></a>
 Boxname instead of boxId when uploading to local services (credits AgriVision). solves issue #5  
