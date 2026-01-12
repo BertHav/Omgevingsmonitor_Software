@@ -125,6 +125,7 @@ int16_t probe_sen5x(void) {
   unsigned char serial_number[32];
   uint8_t serial_number_size = 32;
   uint8_t product_name_size = 32;
+  product_name[4] = 0;  // just to be sure it is init
   sen5x_Power_On();  // switch buck converter
   error = sen5x_device_reset();
   if (error) {

@@ -130,6 +130,16 @@ void SetESPMeasurementDone(){
   SensorProbe.ESP_Present = true;
 }
 
+void ShowSensorsDetected() {
+  Info("SensorProbe.HT_Present: %s", SensorProbe.HT_Present?"yes":"no");
+  Info("SensorProbe.VOC_Present: %s", SensorProbe.VOC_Present?"yes":"no");
+  Info("SensorProbe.AHT20_Present: %s", SensorProbe.AHT20_Present?"yes":"no");
+  Info("SensorProbe.BMP280_Present: %s", SensorProbe.BMP280_Present?"yes":"no");
+  Info("SensorProbe.ENS160_Present: %s", SensorProbe.ENS160_Present?"yes":"no");
+  Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
+  Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
+}
+
 void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_HandleTypeDef* ADC_HANDLER, UART_HandleTypeDef* espUart) {
   testInit();
   I2CSensors_Init(sensorI2C);
@@ -217,13 +227,7 @@ void Device_Init(I2C_HandleTypeDef* sensorI2C, I2S_HandleTypeDef* micI2s, ADC_Ha
     SensorProbe.PM_Present = false;
     Sensor.PM_measurementEnabled = false;
   }
-  Info("SensorProbe.HT_Present: %s", SensorProbe.HT_Present?"yes":"no");
-  Info("SensorProbe.VOC_Present: %s", SensorProbe.VOC_Present?"yes":"no");
-  Info("SensorProbe.AHT20_Present: %s", SensorProbe.AHT20_Present?"yes":"no");
-  Info("SensorProbe.BMP280_Present: %s", SensorProbe.BMP280_Present?"yes":"no");
-  Info("SensorProbe.ENS160_Present: %s", SensorProbe.ENS160_Present?"yes":"no");
-  Info("SensorProbe.PM_Present: %s", SensorProbe.PM_Present?"yes":"no");
-  Info("SensorProbe.MIC_Present: %s", SensorProbe.MIC_Present?"yes":"no");
+  ShowSensorsDetected();
   Debug("Sensors initialized, probing ESP.");
   ESP_Init(espUart);
 }
@@ -261,6 +265,7 @@ void Device_Test(){
 }
 
 void showOMstatus() {
+  ShowSensorsDetected();
   Debug("Enabled: HIDS %d, AHT %d, BMP %d, ENS %d, SGP %d,PM %d, MIC %d",Sensor.HT_measurementEnabled, Sensor.AHT_measurementEnabled,
     Sensor.BMP_measurementEnabled, Sensor.ENS_measurementEnabled, Sensor.VOC_measurementEnabled, Sensor.PM_measurementEnabled, Sensor.MIC_measurementEnabled);
   Debug("Lock is from sensor column : %d (0 is FREE)", getSensorLock());

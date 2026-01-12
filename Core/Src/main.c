@@ -331,6 +331,9 @@ int main(void)
         if (((product_name[4] == '4') || (product_name[4] == '5')) && usbPluggedIn) {
           SetVOCSensorDIS_ENA(false);
         }
+        if ((product_name[4] != 0) && !Sensor.PM_measurementEnabled && usbPluggedIn) { // if any SEN5X was disabled due to empty battery, enable it when USB power is connected
+          Sensor.PM_measurementEnabled = true;
+        }
         if (!usbPluggedIn && (HAL_GetTick() > DEVICE_INIT_TIMEOUT)) {
 //          Debug("Device time out set in main due to powerstatus shift");
           deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
