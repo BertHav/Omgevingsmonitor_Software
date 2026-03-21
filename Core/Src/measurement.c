@@ -291,7 +291,7 @@ bool AllDevicesReady() {
     if ((BMPstate == BMP_STATE_WAIT) || !SensorProbe.BMP280_Present) {
       Sensor.BMP_measurementEnabled = false;
     }
-    if ((ENSstate == ENS_STATE_WAIT) || !SensorProbe.ENS160_Present) {
+    if ((ENSstate == ENS_STATE_WAIT) || !SensorProbe.ENS160_Present || (ENSstate == ENS_STATUS_CHECK)) {
       Sensor.ENS_measurementEnabled = false;
     }
     if ((SGPstate == SGP_STATE_WAIT) || !SensorProbe.SGP_Enabled) {

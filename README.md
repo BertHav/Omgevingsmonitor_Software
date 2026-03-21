@@ -5,6 +5,8 @@
 [Programming new firmware in De omgevingsmonitor with STM32CubeProgrammer](#Programming)\
 [Configuring the Omgevingsmonitor manally by USB](#USBconfig)\
 [Current consumption of the Omgevingsmonitor](#Consumption)\
+[version 5.20](#version520)\
+[version 5.19](#version519)\
 [version 5.18](#version518)\
 [version 5.17](#version517)\
 [version 5.16](#version516)\
@@ -189,6 +191,12 @@ The STM32CubeProgrammer current consumption during standby in μA with optional 
 ![The STM32CubeProgrammer current consumption during standby in μA with optional added AHT20 en BMP280](Images/versie_4.55_in_standby_detail_AHT20_en_BMP280_in_uA.png)
 
 __Reset the Omgevingsmonitor for a second time after about 90 seconds to reach optimal energy saving mode!__
+
+## version 5.20 <a name="version520"></a>
+Daylight Saving Time calculation correction
+
+## version 5.19 <a name="version519"></a>
+Blue LEDs for error on barametric sensor disabled. ENS160 code optimizations and bugfixes
 
 ## version 5.18 <a name="version518"></a>
 Bugfix for enable SEN device after drained battery

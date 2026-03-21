@@ -62,17 +62,36 @@ void showUpTime() {
 
 void set_DST() {
   bool dst = false;
+  uint8_t daynr = currentDate.WeekDay;
+  if (daynr == 7) {
+    daynr = 1;
+  }
+  else {
+    daynr++;
+  }
+
+  Debug("currentDate.WeekDay: %d", currentDate.WeekDay);
+  Debug("DayNr: %d", daynr);
+  Debug("currentDate.Date: %d", currentDate.Date);
+  Debug("currentDate.Month: %d", currentDate.Month);
   dst = !((currentDate.Month < 3) || (currentDate.Month > 10)); // between october and march
-  if (dst)
-  {
-    if ((currentDate.Month == 3) && (currentDate.WeekDay == 7) && (currentDate.Date < 25)) {
+
+  if (dst) {
+    if (currentDate.Month == 3) {
       // starts last sunday of march
-      // weekday -> sunday returns 7
+      // weekday -> saterday returns 7, sunday  is 1
+      if ( (currentDate.Date - daynr) < 24 ) {
         dst = false;
+      }
     }
-    else if ((currentDate.Month == 10) && (currentDate.WeekDay == 7) && (currentDate.Date >= 25)) {
+    else if (currentDate.Month == 10) {
+      //last sunday of october
+      // weekday -> saterday returns 7
+      if ( (currentDate.Date - daynr) >= 24 ) {
         dst = false;
+      }
     }
+
   }
 //  Debug("Daylight Saving statusbit %d.", HAL_RTC_DST_ReadStoreOperation(RealTime_Handle));
   if (dst) {

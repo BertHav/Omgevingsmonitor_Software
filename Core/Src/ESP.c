@@ -808,7 +808,7 @@ index = strlen(message);
     }
   }
 
-  if (IsENS160SensorPresent()) {
+  if (IsENS160SensorPresent() && (MeasVal.TVOCIndex != 0)) { // if TVOC is zero, the sensorvalue is not valid due to starting operational mode
     ReadUint8ArrayEEprom(ENSAQIConfigAddr, keybuffer, IdSize);
     if (isKeyValid(keybuffer, "ENS160", "air quality index")) {
       uint8ArrayToString(Buffer, keybuffer);

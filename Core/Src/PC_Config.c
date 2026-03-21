@@ -561,7 +561,18 @@ bool Process_USB_input(uint8_t* data) {
     ResetUsbRxDataSize();
     return true;
   }
-  message = (unsigned char*)strstr((const char*)data, PREAMBLE_W);  // Search for 'w'to show why the system is waiting for transmission
+/*
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_N);  // Search for 'N'to show status of ENS160 in log.
+  if ((length == 1) && (message != NULL)){
+    printf_USB("\r\nNew status if ENS160 debug: %sbled\r\n", ENS160_set_debug()?"ena":"disa");
+    showUpTime();
+    length = 0;
+    data[0] = '\0';
+    ResetUsbRxDataSize();
+    return true;
+  }
+*/
+  message = (unsigned char*)strstr((const char*)data, PREAMBLE_W);  // Search for 'W'to show why the system is waiting for transmission
   if ((length == 1) && (message != NULL)){
     bool prevUSBlog = usblog;
     if (!usblog) {

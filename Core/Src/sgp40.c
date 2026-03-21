@@ -138,7 +138,7 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
     ReadRegister(SGP_I2C_ADDRESS, SGP_ReadBuffer, SGP_MEASURE_BUFFER_RESPONSE_LENGTH);
     if (!CheckCRC(SGP_ReadBuffer, SGP_MEASURE_BUFFER_RESPONSE_LENGTH, SGP_MEASURE_BUFFER_RESPONSE_LENGTH)) {
       Error("SGP40 measurements CRC check failed.");
-      Info("SGP_Measure buffer structure:");
+      Debug("SGP_Measure buffer structure:");
       for (uint8_t i = 0; i < SGP_MEASURE_BUFFER_RESPONSE_LENGTH; i++) {
         Debug("SGP_Measurement buffer[%d]: %d", i, SGP_ReadBuffer[i]);
       }
@@ -155,7 +155,7 @@ bool SGP_GetMeasurementValues(int32_t *vocIndex) {
       sgp40samplecounter++;
       if (sgp40samplecounter == 1) {
         Debug("SGP40 rawSignal value: %d", rawSignal);
-        Debug("SGP40 vocIndex value: %d", tempVocIndex);
+        Info("SGP40 vocIndex value: %d", tempVocIndex);
       }
       else {
         if (sgp40samplecounter == 11) {

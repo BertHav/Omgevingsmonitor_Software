@@ -112,15 +112,15 @@ extern bool usblog;
 #define MCU_LED_C_B_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define SRC_VERSION "5.18 BH"
-#define CURRENT_WEEK "2026w03-1"  // -x is day number of week i.e. Monday = 1
+#define SRC_VERSION "5.20 BH"
+#define CURRENT_WEEK "2026w12-6"  // -x is day number of week i.e. Monday = 1
 
 // Mail variables. Uncomment the next line and a mail will be sent at
 // a nearly dead battery event to the mailapi of smtp2go
 #define USE_MAIL
 
 // When the standard battery is replaced by a 5000mAh+ pack.
-//#define LARGEBATTERY
+#define LARGEBATTERY
 
 //#define SMALLBUILD  // this build type fits the debug build
 //#define STLINK_V3PWR true

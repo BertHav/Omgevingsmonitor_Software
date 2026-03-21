@@ -12,14 +12,14 @@
 #include "statusCheck.h"
 #include "RealTimeClock.h"
 
-bool debugENS160 = false;
+//bool debugENS160 = true;
 uint32_t ENS160TimeStamp;
 static uint8_t enscnt = 0;
 static uint8_t offday;
 static I2CReadMEM ReadMemFunction = NULL;
 static I2CWriteMEM WriteMemFunction = NULL;
 
-ENS160raw raw;
+//ENS160raw raw;
 ENS160prediction pred;
 ENS160hwsw hwsw;
 ENS160State ENSState = ENS_STATE_INIT;
@@ -49,9 +49,12 @@ void ENS160_set_addr(uint8_t slaveaddr) {
   hwsw._slaveaddr = slaveaddr; //ENS160_I2CADDR_1;
 }
 
-void ENS160_set_debug(bool debug) {
-  debugENS160 = debug;
+/*
+bool ENS160_set_debug() {
+  debugENS160 =! debugENS160;
+  return debugENS160;
 }
+*/
 
 void ENS_Init(I2CReadMEM readFunction, I2CWriteMEM writeFunction) {
   ReadMemFunction = readFunction;
@@ -78,9 +81,9 @@ bool ENS160_checkPartID(void) {
 	ReadMemRegister(ENS160_REG_PART_ID, 1, &i2cbuf[0], 2);
 
 	part_id = i2cbuf[0] | ((uint16_t)i2cbuf[1] << 8);
-	if (debugENS160) {
+//	if (debugENS160) {
 		Debug("ENS160 checkPartID() result: %s", (part_id == ENS160_PARTID)?"ENS160 ok":(part_id == ENS161_PARTID)?"ENS161 ok":"nok");
-	}	
+//	}
 
 	if (part_id == ENS160_PARTID) {
 	  hwsw._revENS16x = 0;
@@ -98,17 +101,22 @@ bool ENS160_checkPartID(void) {
 bool ENS160_clearCommand(void) {
 	static uint8_t result;
 	static uint8_t i2cbuf = ENS160_COMMAND_NOP;
+	uint8_t i2cbuff[8];
 	result = WriteMemRegister(ENS160_REG_COMMAND, 1, &i2cbuf, 1);
 	HAL_Delay(10);
   i2cbuf = ENS160_COMMAND_CLRGPR;
   result &= WriteMemRegister(ENS160_REG_COMMAND, 1, &i2cbuf, 1);
 	HAL_Delay(ENS160_BOOTING);                   // Wait to boot after reset
-	
+
+	// Read raw resistance values for wiping flags
+  ReadMemRegister(ENS160_REG_GPR_READ_0, 1, &i2cbuff[0], 8);
+  ReadMemRegister(ENS160_REG_DATA_AQI, 1, &i2cbuff[0], 7);
   result &= ReadMemRegister(ENS160_REG_DATA_STATUS, 1, &i2cbuf, 1);
 
-	if (debugENS160) {
-		Debug("clearCommand() status of ENS16X: 0x%02X, %s", i2cbuf, (i2cbuf == 00) ? "ok" : "nok");
-	}
+//	if (debugENS160) {
+	Debug("clearCommand() status of ENS16X: 0x%02X, %s", i2cbuf, (i2cbuf == 00) ? "ok" : "nok");
+//	}
+
 	HAL_Delay(ENS160_BOOTING);                   // Wait to boot after reset
 		
 	return result;
@@ -139,9 +147,9 @@ bool ENS160_getFirmware() {
 	  hwsw._revENS16x = 0;
 	}
 
-	if (debugENS160) {
-		Debug("Firmware version:  %d.%d", hwsw._fw_ver_major, hwsw._fw_ver_minor, hwsw._fw_ver_build);
-	}
+//	if (debugENS160) {
+		Debug("ENS160 fw v%d.%d", hwsw._fw_ver_major, hwsw._fw_ver_minor, hwsw._fw_ver_build);
+//	}
 	HAL_Delay(ENS160_BOOTING);                   // Wait to boot after reset
 	
 	return (bool)i2cbuf[0];
@@ -153,6 +161,7 @@ bool ENS160_setMode(uint8_t mode) {
 	
 	//LP only valid for rev>0
 	if ((mode == ENS160_OPMODE_LP) && (hwsw._revENS16x == 0)) {
+	  Error("ENS160 LP mode for this hw version prohibited");
 	  result = 1;
 	}
 	else {
@@ -200,16 +209,16 @@ bool ENS_DeviceConnected() {
 
   if (_available) {
     _available &= ENS160_setMode(ENS160_OPMODE_IDLE);
-    _available &= ENS160_clearCommand();
+//    _available &= ENS160_clearCommand();
     _available &= ENS160_getFirmware();
-    if (debugENS160) {
-      Debug("ENS160 in idle mode");
-    }
+//    if (debugENS160) {
+      Debug("ENS160 in idle mode");   // only visible on uart, and on USB only by (re)start of device.
+//    }
   }
   return _available;
 }
 
-
+/*
 // Add a step to custom measurement profile with definition of duration, enabled data acquisition and temperature for each hotplate
 bool ENS160_addCustomStep(uint16_t time, bool measureHP0, bool measureHP1, bool measureHP2, bool measureHP3, uint16_t tempHP0, uint16_t tempHP1, uint16_t tempHP2, uint16_t tempHP3) {
 	uint8_t seq_ack;
@@ -265,16 +274,17 @@ bool ENS160_addCustomStep(uint16_t time, bool measureHP0, bool measureHP1, bool 
 		return 0;
 	}
 	return 1;
-	
 }
+*/
 
 uint8_t ENS160_readStatus(void) {
   uint8_t status;
   ReadMemRegister(ENS160_REG_DATA_STATUS, 1, &status, 1);
-
+/*
   if (debugENS160) {
     Debug("ENS160 Status: %d", status);
   }
+*/
   return status;
 }
 
@@ -286,10 +296,11 @@ bool ENS160_measure(bool waitForNew) {
 	uint8_t status;
 
 	// Set default status for early bail out
+/*
 	if (debugENS160) {
 	  Debug("ENS160 Start measurement");
 	}
-	
+*/
 	if (waitForNew) {
 		do {
 			HAL_Delay(1);
@@ -311,6 +322,7 @@ bool ENS160_measure(bool waitForNew) {
 	return newData;
 }
 
+/*
 // Perform raw measurement
 bool ENS160_measureRaw(bool waitForNew) {
 	uint8_t i2cbuf[8];
@@ -348,6 +360,7 @@ bool ENS160_measureRaw(bool waitForNew) {
 	
 	return newData;
 }
+*/
 
 bool ENS160_set_envdata210(uint16_t t, uint16_t h) {
   uint8_t trh_in[4];
@@ -376,7 +389,7 @@ ENS160State ENS_Upkeep(void) {
   switch(ENSState) {
   case ENS_STATE_OFF:
     Debug("Measurements are turned off for gas device ENS160.");
-    ENS160TimeStamp = HAL_GetTick() + 780000;  // 4 times an hour
+    ENS160TimeStamp = HAL_GetTick() + 780000;  // 4 times an hour if powered
     if (weekday != offday) {  // try to enable device again
       ENSState = ENS_STATE_WAIT;
     }
@@ -404,7 +417,7 @@ ENS160State ENS_Upkeep(void) {
     HAL_Delay(10); // wait for deferred DMA transfers
     setSensorLock(FREE);
     if ((status & 0x0C) != 0) {
-      switch (status >> 2) {
+      switch ((status & 0x0C) >> 2) {
       case 1:
         Debug("ENS160 Warm-Up phase");
         break;
@@ -415,8 +428,8 @@ ENS160State ENS_Upkeep(void) {
         Debug("ENS160 Invalid output");
         break;
       }
-      if ((status & 0x03) == 0) {
-        ENS160TimeStamp = HAL_GetTick() + 1000;
+      if ((status & 0x0C) != 0) {
+        ENS160TimeStamp = HAL_GetTick() + 10000;
 //        ENSState = ENS_LOW_POWER;
 //        ENSState = ENS_STATE_WAIT;
         break;
@@ -438,14 +451,14 @@ ENS160State ENS_Upkeep(void) {
     if ((status & 0x02) == 0) {
       ENS160TimeStamp = HAL_GetTick() + 500;
 //      Debug("ENS160 status register is: %d", status);
-      HAL_Delay(10); // wait for deferred DMA transfers
+      HAL_Delay(100); // wait for measurement
       setSensorLock(FREE);
       break;
     }
     ENS160_measure(false);
     HAL_Delay(10);
-    ENS160_measureRaw(false);
-    HAL_Delay(10);
+//    ENS160_measureRaw(false);
+//    HAL_Delay(10);
     setSensorLock(FREE);
     ENSState = ENS_STATE_PROCESS_RESULTS;
     break;
@@ -464,14 +477,20 @@ ENS160State ENS_Upkeep(void) {
     break;
 
   case ENS_LOW_POWER:
-    ENS160TimeStamp = HAL_GetTick() + 1000;
+    if (usbPluggedIn || userToggle) {
+      ENS160TimeStamp = HAL_GetTick() + 5000;
+    }
+    else {
+      ENS160TimeStamp = HAL_GetTick() + 1000;
+    }
+
     if (!usbPluggedIn && !userToggle && (enscnt >= 2)) {
       if (getSensorLock() != FREE) {
         break;
       }
       setSensorLock(ENS160);
       bool result = ENS160_setMode(ENS160_OPMODE_DEP_SLEEP);
-      Debug("ENS160 switched to deep sleep %s, sample counter is: %d", result?"done.":"failed.", enscnt);
+      Debug("ENS160 switched to deep sleep %s, sample counter is: %d.", result?"success":"failed", enscnt);
       HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);
       ENS160TimeStamp = HAL_GetTick() + 45000;
@@ -488,7 +507,7 @@ ENS160State ENS_Upkeep(void) {
       ReadMemRegister(ENS160_REG_OPMODE, 1, &data, 1);
       if (data == 0) {
         bool result = ENS160_setMode(ENS160_OPMODE_STD);
-        Debug("ENS160 switched to standard operating mode %s", result?"done.":"failed.");
+        Debug("ENS160 switched to standard operating mode %s.", result?"success":"failed");
       }
       HAL_Delay(10); // wait for deferred DMA transfers
       setSensorLock(FREE);

@@ -24,6 +24,7 @@
 #define PREAMBLE_L "L"
 #define PREAMBLE_B "B"
 #define PREAMBLE_W "W"
+//#define PREAMBLE_N "N"
 
 #define BoxConfigCmd 0
 #define TempConfigCmd 1

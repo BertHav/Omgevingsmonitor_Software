@@ -121,7 +121,7 @@ typedef enum {
   ENS_STATE_WAIT_FOR_READY,
   ENS_STATE_WAIT
 } ENS160State;
-
+/*
 typedef struct
 {
   uint32_t _hp0_rs;
@@ -134,7 +134,7 @@ typedef struct
   uint32_t _hp3_bl;
   uint8_t _misr;
 } ENS160raw;
-
+*/
 typedef struct
 {
   uint8_t _data_aqi;
@@ -172,7 +172,7 @@ typedef struct {
 void ResetENS160samplecounter();
 bool ENS_DeviceConnected(void);
 ENS160State ENS_Upkeep(void);
-void ENS160_set_debug(bool debug);
+//bool ENS160_set_debug();
 bool ENS160_set_envdata(float t, float h);
 void setENS160TimeStamp(uint32_t ticks);
 	
