@@ -120,7 +120,7 @@ extern bool usblog;
 #define USE_MAIL
 
 // When the standard battery is replaced by a 5000mAh+ pack.
-#define LARGEBATTERY
+//#define LARGEBATTERY
 
 //#define SMALLBUILD  // this build type fits the debug build
 //#define STLINK_V3PWR true
