@@ -65,8 +65,8 @@ void MX_RTC_Init(void)
   sTime.Hours = 13;
   sTime.Minutes = 0;
   sTime.Seconds = 0;
-  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE; // generated code but depricated
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET; // generated code but depricated
   if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
   {
     Error_Handler();

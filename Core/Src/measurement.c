@@ -340,7 +340,7 @@ void EnabledConnectedDevices() {
   if (SensorProbe.BMP280_Present) {
     Sensor.BMP_measurementEnabled = true;
   }
-  if (SensorProbe.ENS160_Present) {
+  if ((SensorProbe.ENS160_Present) && (ENSstate != ENS_STATE_OFF)) {
     Sensor.ENS_measurementEnabled = true;
   }
   if ((SensorProbe.VOC_Present) && (SensorProbe.SGP_Enabled)) {

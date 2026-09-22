@@ -31,7 +31,6 @@ static uint32_t posixBootTime = 0;
 static Clock myUpTime = {.Day = 0, .Hour = 0, .Minutes = 0, .Seconds = 0};
 static const char *dayNames[7] = {  "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}; // 0..6 -> 1 to 7
 static const char *monthNames[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // 0..11 -> 1 to 12
-static RTC_HandleTypeDef * RealTime_Handle;
 
 RTC_TimeTypeDef currentTime;
 RTC_DateTypeDef currentDate;
@@ -64,16 +63,17 @@ void set_DST() {
   bool dst = false;
   uint8_t daynr = currentDate.WeekDay;
   if (daynr == 7) {
-    daynr = 1;
+    daynr = 1;  // transform sunday to the forst day of the week for simpler determining dst
   }
   else {
     daynr++;
   }
-
+/*
   Debug("currentDate.WeekDay: %d", currentDate.WeekDay);
   Debug("DayNr: %d", daynr);
   Debug("currentDate.Date: %d", currentDate.Date);
   Debug("currentDate.Month: %d", currentDate.Month);
+*/
   dst = !((currentDate.Month < 3) || (currentDate.Month > 10)); // between october and march
 
   if (dst) {
@@ -93,26 +93,25 @@ void set_DST() {
     }
 
   }
-//  Debug("Daylight Saving statusbit %d.", HAL_RTC_DST_ReadStoreOperation(RealTime_Handle));
   if (dst) {
     Info("Daylight Saving Time active");
-    if (HAL_RTC_DST_ReadStoreOperation(RealTime_Handle) == 0) {
+    if (HAL_RTC_DST_ReadStoreOperation(&hrtc) == 0) {
       HAL_Delay(1000);
-      HAL_RTC_DST_Add1Hour(RealTime_Handle); // CEST or CET
-      HAL_RTC_DST_SetStoreOperation(RealTime_Handle);  // mark summertime
+      HAL_RTC_DST_Add1Hour(&hrtc); // CEST or CET
+      HAL_RTC_DST_SetStoreOperation(&hrtc);  // set summertime bit
       HAL_Delay(1000);
     }
   }
   else {
-    if (HAL_RTC_DST_ReadStoreOperation(RealTime_Handle) != 0) {
+    if (HAL_RTC_DST_ReadStoreOperation(&hrtc) != 0) {
       HAL_Delay(1000);
-      HAL_RTC_DST_ClearStoreOperation(RealTime_Handle);  // clear summertime
-      HAL_RTC_DST_Sub1Hour(RealTime_Handle);
+      HAL_RTC_DST_Sub1Hour(&hrtc);
+      HAL_RTC_DST_ClearStoreOperation(&hrtc);  // clear summertime
       HAL_Delay(1000);
     }
   }
   RTC_GetTime(&currentTime, &currentDate);
-  Debug("Current RTC time after update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
+  Debug("Current RTC time after update is: %02dh:%02dm:%02ds, DST bit: %sabled", currentTime.Hours , currentTime.Minutes, currentTime.Seconds, HAL_RTC_DST_ReadStoreOperation(&hrtc)?"en":"dis");
 }
 
 void showTime() {
@@ -199,14 +198,29 @@ void ParseTime(char* buffer) {
   currentTime.Hours = aBuff2int(buffer, 24, 25);
   currentTime.Minutes = aBuff2int(buffer, 27, 28);
   currentTime.Seconds = aBuff2int(buffer, 30, 31);
+  currentTime.TimeFormat = RTC_HOURFORMAT_24;
   currentDate.Year = aBuff2int(buffer, 35, 36);
   currentDate.Month = aBuff2int(buffer, 17, 19);
   currentDate.Date = aBuff2int(buffer, 21,22);
   currentDate.WeekDay = aBuff2int(buffer, 13, 15);
   Debug("Current RTC time before update is: %02dh:%02dm:%02ds", currentTime.Hours , currentTime.Minutes, currentTime.Seconds);
   Debug("Current RTC date before update is: %02d-%02d-%02d", currentDate.Date , currentDate.Month, currentDate.Year  );
-  RTC_SetTime(&currentTime);
-  RTC_SetDate(&currentDate);
+//  RTC_SetTime(&currentTime);
+  if (HAL_RTC_SetTime(&hrtc, &currentTime, RTC_FORMAT_BIN) != HAL_OK) {
+     Error("Error setting time to RTC");
+  }
+//  RTC_SetDate(&currentDate);
+  if (HAL_RTC_SetDate(&hrtc, &currentDate, RTC_FORMAT_BIN) != HAL_OK) {
+     Error("Error setting date to RTC");
+  }
+  if (HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 0xBEBE) {
+    // Write Back Up Register 1 Data
+    Debug("writing backup register");
+    HAL_PWR_EnableBkUpAccess();
+    // Writes a data in a RTC Backup data Register 1
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0xBEBE);
+    HAL_PWR_DisableBkUpAccess();
+  }
   set_DST();
   if (currentDate.WeekDay == 2) {
     reset_fanCleaningDone(); // reset the cleaning flag done
@@ -214,32 +228,6 @@ void ParseTime(char* buffer) {
   if (posixBootTime == 0) {
     posixBootTime = makeTime(&currentDate, &currentTime);
   }
-}
-
-// Functie om de tijd in te stellen
-void RTC_SetTime(RTC_TimeTypeDef* sTime) {
-    sTime->TimeFormat = RTC_HOURFORMAT_24;
-    sTime->DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-    sTime->StoreOperation = RTC_STOREOPERATION_RESET;
-        if (HAL_RTC_SetTime(RealTime_Handle, sTime, RTC_FORMAT_BIN) != HAL_OK) {
-      Error("Error setting time to RTC");
-    }
-}
-
-// Functie om de datum in te stellen
-void RTC_SetDate(RTC_DateTypeDef* sDate) {
-    if (HAL_RTC_SetDate(RealTime_Handle, sDate, RTC_FORMAT_BIN) != HAL_OK) {
-      Error("Error setting date to RTC");
-    }
-    //check the backup register
-    if (HAL_RTCEx_BKUPRead(RealTime_Handle, RTC_BKP_DR1) != 0xBEBE) {
-      // Write Back Up Register 1 Data
-      Debug("writing backup register");
-      HAL_PWR_EnableBkUpAccess();
-      // Writes a data in a RTC Backup data Register 1
-      HAL_RTCEx_BKUPWrite(RealTime_Handle, RTC_BKP_DR1, 0xBEBE);
-      HAL_PWR_DisableBkUpAccess();
-    }
 }
 
 void RTC_GetTime(RTC_TimeTypeDef* gTime, RTC_DateTypeDef* gDate) {
@@ -252,10 +240,10 @@ uint8_t prevValue = 0;
     t++; //
   }
   for (uint8_t i= 0; i < t; i++) {
-    if (HAL_RTC_GetTime(RealTime_Handle, gTime, RTC_FORMAT_BIN) != HAL_OK) {
+    if (HAL_RTC_GetTime(&hrtc, gTime, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting time from RTC");
     }
-    if (HAL_RTC_GetDate(RealTime_Handle, gDate, RTC_FORMAT_BIN) != HAL_OK) {
+    if (HAL_RTC_GetDate(&hrtc, gDate, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error getting date from RTC");
     }
     if (batteryCharge  < 3.77) {
@@ -287,9 +275,9 @@ void RTC_SetAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds) {
     sAlarm.AlarmTime.Hours = hours;
     sAlarm.AlarmTime.Minutes = minutes;
     sAlarm.AlarmTime.Seconds = seconds;
-    sAlarm.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
+    sAlarm.AlarmTime.TimeFormat = RTC_HOURFORMAT_24;
     sAlarm.Alarm = RTC_ALARM_A;
-    if (HAL_RTC_SetAlarm_IT(RealTime_Handle, &sAlarm, RTC_FORMAT_BIN) != HAL_OK) {
+    if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN) != HAL_OK) {
       Error("Error activating interrupt voor RTC Alarm time");
     }
 }
@@ -303,12 +291,11 @@ void RTC_SetAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds) {
 
 void RTC_SetWakeUpTimer(uint32_t secondsOfSleep)
 {
-    HAL_RTCEx_DeactivateWakeUpTimer(RealTime_Handle);
-    __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(RealTime_Handle, RTC_FLAG_WUTF);
+    HAL_RTCEx_DeactivateWakeUpTimer(&hrtc);
+    __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hrtc, RTC_FLAG_WUTF);
     __HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG();
 // for testing 60 seconds => 60 - 1 = 59
-//    HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, 0x003D, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
-    HAL_RTCEx_SetWakeUpTimer_IT(RealTime_Handle, secondsOfSleep-1, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
+    HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, secondsOfSleep-1, RTC_WAKEUPCLOCK_CK_SPRE_16BITS); //ck_spre ~1 Hz (40 kHz div127 div 315) used as clock for the RTC wake-up timer
 }
 
 /*
@@ -406,10 +393,6 @@ void Enter_Stop_Mode(uint16_t sleepTime)
   setMICTimeStamp(0);
   ESPTransmitDone = false;
   deviceTimeOut = HAL_GetTick() + DEVICE_TIMEOUT;
-}
-
-void InitClock(RTC_HandleTypeDef* h_hrtc){
-  RealTime_Handle = h_hrtc;
 }
 
 /* functions to convert to and from system time */

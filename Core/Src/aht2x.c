@@ -229,7 +229,7 @@ AHT20State AHT_Upkeep(void) {
   case AHT_STATE_OFF:
     Debug("Measurements are turned off for AHT20.");
     AHT20TimeStamp = HAL_GetTick() + 900000;  // about every 15 minute
-    if (weekday != offday) {  // try to enable device again
+    if (weekday != offday) {  // try to enable device again after a day
       AHTState = AHT_STATE_WAIT;
     }
     break;

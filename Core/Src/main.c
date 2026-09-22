@@ -256,7 +256,7 @@ int main(void)
   }
   SetVerboseLevel(VERBOSE_ALL);
   HAL_UART_Receive_IT(&huart1, u1_rx_buff, 1);
-  InitClock(&hrtc);
+//  InitClock(&hrtc);
 
   if (!soundInit(&hdma_spi2_rx, &hi2s2, &htim6, DMA1_Channel4_5_6_7_IRQn)) {
     errorHandler(__func__, __LINE__, __FILE__);
@@ -323,7 +323,7 @@ int main(void)
     }
     //====
 #endif
-    if (testDone && !ESP_Programming && !batteryEmpty) {
+    if (testDone && !ESP_Programming && (!batteryEmpty || Check_USB_PowerOn())) {
       if (priorUSBpluggedIn != usbPluggedIn) {
         if (IsSGPPresent() && !usbPluggedIn) {
           SetVOCSensorDIS_ENA(true);
